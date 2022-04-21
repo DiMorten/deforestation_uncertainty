@@ -8,15 +8,31 @@ from sklearn.preprocessing._data import _handle_zeros_in_scale
 # path_optical_im = 'E:/Jorge/dataset_deforestation/Para_2020/'
 # path_label = 'E:/Jorge/dataset_deforestation/Para/'
 
-path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2020/'
-path_label = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_regeneration/Para/'
+# dataset = 'Para_2020'
+dataset = 'MT_2020'
 
-im_filenames = ['S2_PA_2020_07_15_B1_B2_B3.tif',
-    'S2_PA_2020_07_15_B4_B5_B6.tif',
-    'S2_PA_2020_07_15_B7_B8_B8A.tif',
-    'S2_PA_2020_07_15_B9_B10_B11.tif',
-    'S2_PA_2020_07_15_B12.tif']
+if dataset == 'Para_2020':
+    path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2020/'
+    # path_label = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_regeneration/Para/'
 
+    im_filenames = ['S2_PA_2020_07_15_B1_B2_B3.tif',
+        'S2_PA_2020_07_15_B4_B5_B6.tif',
+        'S2_PA_2020_07_15_B7_B8_B8A.tif',
+        'S2_PA_2020_07_15_B9_B10_B11.tif',
+        'S2_PA_2020_07_15_B12.tif']
+elif dataset == 'MT_2020':
+    path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/MG_10m/S2/2020/'
+    # path_label = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_regeneration/Para/'
+
+    im_filenames = ['S2_R1_MT_2020_08_03_2020_08_15_B1_B2.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B3_B4.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B5_B6.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B7_B8.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B8A_B9.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B10_B11.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B12.tif']    
+
+        
 def load_tiff_image(path):
     # Read tiff Image
     print (path) 
@@ -39,7 +55,13 @@ def loadOpticalIm(im_filenames):
             optical_im = im
     del im 
     return optical_im    
-
+def exclude60mBands(optical_im):
+    sentinel2_band_names = ['B01', 'B02', 'B03', 'B04', 'B05', 'B06', 'B07', 'B08',
+            'B8A', 'B9', 'B10', 'B11', 'B12']
+    no60m_ids = [1, 2, 3, 4, 5, 6, 7, 8, 11, 12]
+    sentinel_2band_names_no60m = [sentinel2_band_names[x] for x in no60m_ids]
+    ic(sentinel_2band_names_no60m)
+    return optical_im[..., no60m_ids]
 def filter_outliers(img, bins=2**16-1, bth=0.001, uth=0.999, mask=[0]):
     img[np.isnan(img)] = np.mean(img) # Filter NaN values.
     if len(mask)==1:
@@ -60,8 +82,9 @@ createTif = True
 if createTif == True:
     optical_im = loadOpticalIm(im_filenames)
     optical_im = np.transpose(optical_im, (1, 2, 0))
+    optical_im = exclude60mBands(optical_im)
     ic(optical_im.shape)
-    # np.save('optical_im_unnormalized.npy', optical_im)
+    np.save('optical_im_unnormalized.npy', optical_im)
 else:
     optical_im = np.load('optical_im_unnormalized.npy') 
  
@@ -92,7 +115,7 @@ normalizationManager = NormalizationManager(optical_im)
 optical_im = normalizationManager.normalize(optical_im)
 ic(np.min(optical_im), np.average(optical_im), np.max(optical_im))
 
-pdb.set_trace()
+# pdb.set_trace()
 np.save(path_optical_im + 'optical_im.npy', optical_im) 
 # plt.imshow(optical_im[...,[2,1,0]])
 # plt.show()
