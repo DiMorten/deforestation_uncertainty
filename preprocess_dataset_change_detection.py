@@ -10,38 +10,19 @@ from sklearn.preprocessing._data import _handle_zeros_in_scale
 
 # dataset = 'Para_2020'
 # dataset = 'MT_2020'
-dataset = 'Para_2019'
+dataset = 'Para_2018_2019'
 
-if dataset == 'Para_2020':
-    path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2020/'
-    # path_label = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_regeneration/Para/'
-
-    im_filenames = ['S2_PA_2020_07_15_B1_B2_B3.tif',
-        'S2_PA_2020_07_15_B4_B5_B6.tif',
-        'S2_PA_2020_07_15_B7_B8_B8A.tif',
-        'S2_PA_2020_07_15_B9_B10_B11.tif',
-        'S2_PA_2020_07_15_B12.tif']
-elif dataset == 'MT_2020':
-    path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/MG_10m/S2/2020/'
-    # path_label = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_regeneration/Para/'
-
-    im_filenames = ['S2_R1_MT_2020_08_03_2020_08_15_B1_B2.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B3_B4.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B5_B6.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B7_B8.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B8A_B9.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B10_B11.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B12.tif']    
-elif dataset == 'Para_2018':
-    path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/Para_10m/Sentinel2_2018/'
-    im_filenames = ['COPERNICUS_S2_20180721_20180726_B1_B2_B3.tif',
+   
+if dataset == 'Para_2018_2019':
+    path_optical_im_t0 = 'D:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/Para_10m/Sentinel2_2018/'
+    im_filenames_t0 = ['COPERNICUS_S2_20180721_20180726_B1_B2_B3.tif',
         'COPERNICUS_S2_20180721_20180726_B4_B5_B6.tif',
         'COPERNICUS_S2_20180721_20180726_B7_B8_B8A.tif',
         'COPERNICUS_S2_20180721_20180726_B9_B10_B11.tif',
         'COPERNICUS_S2_20180721_20180726_B12.tif']
-elif dataset == 'Para_2019':
-    path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/Para_10m/Sentinel2_2019/'
-    im_filenames = ['COPERNICUS_S2_20190721_20190726_B1_B2_B3.tif',
+
+    path_optical_im_t1 = 'D:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/Para_10m/Sentinel2_2019/'
+    im_filenames_t1 = ['COPERNICUS_S2_20190721_20190726_B1_B2_B3.tif',
         'COPERNICUS_S2_20190721_20190726_B4_B5_B6.tif',
         'COPERNICUS_S2_20190721_20190726_B7_B8_B8A.tif',
         'COPERNICUS_S2_20190721_20190726_B9_B10_B11.tif',
@@ -55,7 +36,7 @@ def load_tiff_image(path):
     im = gdal_header.ReadAsArray()
     return im
 
-def loadOpticalIm(im_filenames):
+def loadOpticalIm(path_optical_im, im_filenames):
     band_count = 0
 
     for i, im_filename in enumerate(im_filenames):
@@ -95,11 +76,20 @@ def filter_outliers(img, bins=2**16-1, bth=0.001, uth=0.999, mask=[0]):
 createTif = True
 
 if createTif == True:
-    optical_im = loadOpticalIm(im_filenames)
-    optical_im = np.transpose(optical_im, (1, 2, 0))
-    optical_im = exclude60mBands(optical_im)
-    ic(optical_im.shape)
-    np.save('optical_im_unnormalized.npy', optical_im)
+    optical_im_t0 = loadOpticalIm(path_optical_im_t0, im_filenames_t0)
+    optical_im_t0 = np.transpose(optical_im_t0, (1, 2, 0))
+    optical_im_t0 = exclude60mBands(optical_im_t0)
+    ic(optical_im_t0.shape)
+    # np.save('optical_im_unnormalized.npy', optical_im_t0)
+
+    optical_im_t1 = loadOpticalIm(path_optical_im_t1, im_filenames_t1)
+    optical_im_t1 = np.transpose(optical_im_t1, (1, 2, 0))
+    optical_im_t1 = exclude60mBands(optical_im_t1)
+    ic(optical_im_t1.shape)
+    # np.save('optical_im_unnormalized.npy', optical_im_t1)
+    optical_im_t0 = np.concatenate((optical_im_t0, optical_im_t1), axis=-1)
+    del optical_im_t1
+    optical_im = optical_im_t0
 else:
     optical_im = np.load('optical_im_unnormalized.npy') 
  
@@ -131,6 +121,6 @@ optical_im = normalizationManager.normalize(optical_im)
 ic(np.min(optical_im), np.average(optical_im), np.max(optical_im))
 
 # pdb.set_trace()
-np.save(path_optical_im + 'optical_im.npy', optical_im) 
+np.save(path_optical_im_t0 + 'optical_im.npy', optical_im) 
 # plt.imshow(optical_im[...,[2,1,0]])
 # plt.show()
