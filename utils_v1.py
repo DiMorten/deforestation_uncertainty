@@ -337,7 +337,7 @@ def resnet_block_spatial_dropout(x, n_filter, ind):
     ## Conv 1
     x = Conv2D(n_filter, (3, 3), activation='relu', padding="same", name = 'res1_net'+str(ind))(x)
     # x = Dropout(0.5, name = 'drop_net'+str(ind))(x, training = True)
-    x = SpatialDropout2D(0.3, name = 'drop_net'+str(ind))(x, training = True)
+    x = SpatialDropout2D(0.5, name = 'drop_net'+str(ind))(x, training = True)
 
     ## Conv 2
     x = Conv2D(n_filter, (3, 3), activation='relu', padding="same", name = 'res2_net'+str(ind))(x)
@@ -431,10 +431,10 @@ def build_resunet_dropout(input_shape, nb_filters, n_classes):
 
 
 # Residual U-Net model
-def build_resunet_dropout3(input_shape, nb_filters, n_classes):
+def build_resunet_dropout_spatial(input_shape, nb_filters, n_classes):
     '''Base network to be shared (eq. to feature extraction)'''
 
-    dropout = 0.3
+    dropout = 0.5
     
     input_layer= Input(shape = input_shape, name="input_enc_net")
     
@@ -469,6 +469,9 @@ def build_resunet_dropout3(input_shape, nb_filters, n_classes):
                                                                                           
     upsample1 = Conv2D(nb_filters[0], (3 , 3), activation = 'relu', padding = 'same', 
                        name = 'upsampling_net1')(UpSampling2D(size = (2,2))(merged2))
+
+    upsample1 = SpatialDropout2D(dropout)(upsample1, training=True)
+
     merged1 = concatenate([res_block1, upsample1], name='concatenate1')
 
     output = Conv2D(n_classes,(1,1), activation = 'softmax', padding = 'same', name = 'output')(merged1)
