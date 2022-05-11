@@ -1,9 +1,10 @@
 import sys
 import numpy as np
+from icecream import ic
+import pdb
 
 sys.path.append("..")
 from src.paths import PathsPara
-
 class Dataset():
     def getTrainValTestMasks(self, mask_tiles):
         tiles_tr, tiles_val, tiles_ts = self.calculateTiles()
@@ -49,16 +50,34 @@ class Para(Dataset):
         tiles_val = [6,19]
         tiles_ts = list(set(np.arange(self.grid_x * self.grid_y)+1)-set(tiles_tr)-set(tiles_val))
         return tiles_tr, tiles_val, tiles_ts
+    def loadPastDeforestationLabel(self):
+        label_past_deforestation = self.loadLabel()
+        label_past_deforestation[label_past_deforestation == 1] = 0
+        label_past_deforestation[label_past_deforestation == 2] = 1
+        return label_past_deforestation
 
 
 class ParaDeforestationTime(Para):
     def loadInputImage(self):
         image_stack = super().loadInputImage()
         image_stack = self.addDeforestationTime(image_stack)
+        image_stack = self.addPastDeforestation(image_stack)
         ic(image_stack.shape)
         return image_stack  
     def addDeforestationTime(self, image_stack):
-        deforestation_time = np.load(self.paths.label + 'deforestation_time_normalized.npy')
+        deforestation_time = np.load(self.paths.label + 'deforestation_time_normalized_2018_2019.npy') # has past deforestation up to 2018
+        # 2018 = 0, 2017 = 1, 2016 = 2,....
+        ic(deforestation_time.dtype, deforestation_time.shape)
+        self.usePastDeforestationWithoutDistance = False
+        if self.usePastDeforestationWithoutDistance == True:
+            ic(np.unique(deforestation_time, return_counts=True))
+            deforestation_time[deforestation_time>0] = 1
+        ic(np.unique(deforestation_time, return_counts=True))
+
         image_stack = np.concatenate((deforestation_time, image_stack), axis = -1)  
         return image_stack
-        
+    def addPastDeforestation(self, image_stack):
+        past_deforestation = self.loadPastDeforestationLabel().astype(np.float32)
+        past_deforestation = np.expand_dims(past_deforestation, axis = -1)
+        image_stack = np.concatenate((past_deforestation, image_stack), axis = -1)  
+        return image_stack        
