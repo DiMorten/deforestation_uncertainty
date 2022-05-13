@@ -64,16 +64,11 @@ def load_SAR_image(patch):
     temp_db_img[temp_db_img>1] = 1
     return temp_db_img
 
-def load_tif_image(patch):
+def load_tiff_image(patch):
     # Read tiff Image
     print (patch)
     gdal_header = gdal.Open(patch)
     img = gdal_header.ReadAsArray()
-    #print(np.unique(img))
-    #img_tif = TIFF.open(patch)
-    #img = img_tif.read_image()
-    #img = np.transpose(img.copy(), (1, 2, 0))
-    print('Image shape :', img.shape)
     return img
 
 def filter_outliers(img, bins=1000000, bth=0.001, uth=0.999, mask=[0]):
@@ -126,7 +121,6 @@ def retrieve_idx_percentage(reference, patches_idx_set, patch_size, pertentage =
             count = count + 1
             new_idx_patches.append(patchs_idx)
     return np.asarray(new_idx_patches)
-
 
 def extract_patches_mask_indices(input_image, patch_size, stride):
     h, w = input_image.shape

@@ -2,9 +2,10 @@ import sys
 import numpy as np
 from icecream import ic
 import pdb
-
+import scipy
 sys.path.append("..")
 from src.paths import PathsPara
+import utils_v1
 class Dataset():
     def getTrainValTestMasks(self, mask_tiles):
         tiles_tr, tiles_val, tiles_ts = self.calculateTiles()
@@ -32,6 +33,15 @@ class Dataset():
         label_mask_current_deforestation[label_mask_current_deforestation != 10] = 0
         label_mask_current_deforestation[label_mask_current_deforestation == 10] = 1
         return label_mask_current_deforestation
+    def createDistMap(self, past_ref, th_sup = 800):
+        print('Generating distance map ... ')
+        # import scipy
+
+        dist_past = past_ref.copy()
+        dist_matrix = scipy.ndimage.distance_transform_edt(dist_past == 0)
+        dist_matrix[dist_matrix >= th_sup] = th_sup
+        dist_norm = (dist_matrix-np.min(dist_matrix))/(np.max(dist_matrix)-np.min(dist_matrix))
+        return dist_norm        
 class Para(Dataset):
     def __init__(self):
         self.paths = PathsPara()
@@ -56,6 +66,25 @@ class Para(Dataset):
         label_past_deforestation[label_past_deforestation == 2] = 1
         return label_past_deforestation
 
+class ParaDistanceMap(Para):
+    def loadInputImage(self):
+        image_stack = super().loadInputImage()
+        image_stack = self.addNpyBandToInput(image_stack, 
+                self.paths.distance_map_past_deforestation)
+        image_stack = self.addNpyBandToInput(image_stack, 
+                self.paths.distance_map_past_deforestation_2018)
+        image_stack = self.addNpyBandToInput(image_stack, 
+                self.paths.distance_map_past_deforestation_2017)
+        image_stack = self.addNpyBandToInput(image_stack, 
+                self.paths.distance_map_past_deforestation_2016)
+
+        ic(image_stack.shape)
+        return image_stack  
+    def addNpyBandToInput(self, image_stack, path):
+        band = np.load(path).astype(np.float32)
+        band = np.expand_dims(band, axis = -1)
+        image_stack = np.concatenate((band, image_stack), axis = -1)  
+        return image_stack    
 
 class ParaDeforestationTime(Para):
     def loadInputImage(self):
