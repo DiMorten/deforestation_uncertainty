@@ -90,7 +90,7 @@ def create_mask(size_rows, size_cols, grid_size=(6,3)):
     num_tiles_cols = size_cols//grid_size[1]
     print('Tiles size: ', num_tiles_rows, num_tiles_cols)
     patch = np.ones((num_tiles_rows, num_tiles_cols))
-    mask = np.zeros((num_tiles_rows*grid_size[0], num_tiles_cols*grid_size[1]))
+    mask = np.zeros((num_tiles_rows*grid_size[0], num_tiles_cols*grid_size[1]), dtype=np.uint8)
     count = 0
     for i in range(grid_size[0]):
         for j in range(grid_size[1]):

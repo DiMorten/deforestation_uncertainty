@@ -15,7 +15,7 @@ class Dataset():
         print('Test tiles: ', tiles_ts)
 
         # Training and validation mask
-        mask_tr_val = np.zeros((mask_tiles.shape)).astype('float32')
+        mask_tr_val = np.zeros((mask_tiles.shape)).astype('uint8')
 
         for tr_ in tiles_tr:
             mask_tr_val[mask_tiles == tr_] = 1
@@ -23,7 +23,7 @@ class Dataset():
         for val_ in tiles_val:
             mask_tr_val[mask_tiles == val_] = 2
 
-        mask_amazon_ts = np.zeros((mask_tiles.shape)).astype('float32')
+        mask_amazon_ts = np.zeros((mask_tiles.shape)).astype('uint8')
         for ts_ in tiles_ts:
             mask_amazon_ts[mask_tiles == ts_] = 1
         return mask_tr_val, mask_amazon_ts        
@@ -32,7 +32,7 @@ class Dataset():
         label_mask_current_deforestation[label_mask_current_deforestation == selected_class] = 10
         label_mask_current_deforestation[label_mask_current_deforestation != 10] = 0
         label_mask_current_deforestation[label_mask_current_deforestation == 10] = 1
-        return label_mask_current_deforestation
+        return label_mask_current_deforestation.astype(np.uint8)
     def createDistMap(self, past_ref, th_sup = 800):
         print('Generating distance map ... ')
         # import scipy
@@ -50,7 +50,7 @@ class Para(Dataset):
 
         self.label_filename = 'mask_label_17730x9203.npy'
     def loadLabel(self):
-        label = np.load(self.paths.label + self.label_filename).astype('float32')
+        label = np.load(self.paths.label + self.label_filename).astype('uint8')
         return label
     def loadInputImage(self):
         return np.load(self.paths.optical_im + 'optical_im.npy').astype('float32')
@@ -62,8 +62,10 @@ class Para(Dataset):
         return tiles_tr, tiles_val, tiles_ts
     def loadPastDeforestationLabel(self):
         label_past_deforestation = self.loadLabel()
+
         label_past_deforestation[label_past_deforestation == 1] = 0
         label_past_deforestation[label_past_deforestation == 2] = 1
+
         return label_past_deforestation
 
 class ParaDistanceMap(Para):
@@ -89,8 +91,11 @@ class ParaDistanceMap(Para):
 class ParaDeforestationTime(Para):
     def loadInputImage(self):
         image_stack = super().loadInputImage()
+        # pdb.set_trace()
         image_stack = self.addDeforestationTime(image_stack)
+        # pdb.set_trace()
         image_stack = self.addPastDeforestation(image_stack)
+        pdb.set_trace()
         ic(image_stack.shape)
         return image_stack  
     def addDeforestationTime(self, image_stack):
@@ -103,10 +108,17 @@ class ParaDeforestationTime(Para):
             deforestation_time[deforestation_time>0] = 1
         ic(np.unique(deforestation_time, return_counts=True))
 
-        image_stack = np.concatenate((deforestation_time, image_stack), axis = -1)  
+        
+        ic(deforestation_time.shape, image_stack.shape)
+        image_stack = np.concatenate((deforestation_time, image_stack), axis = -1)
+        del deforestation_time  
         return image_stack
     def addPastDeforestation(self, image_stack):
-        past_deforestation = self.loadPastDeforestationLabel().astype(np.float32)
-        past_deforestation = np.expand_dims(past_deforestation, axis = -1)
-        image_stack = np.concatenate((past_deforestation, image_stack), axis = -1)  
+        past_deforestation = self.loadPastDeforestationLabel().astype(np.uint8)
+        ic(past_deforestation.shape)
+        # pdb.set_trace()
+        past_deforestation = past_deforestation[..., np.newaxis]
+        # pdb.set_trace()
+        image_stack = np.concatenate((past_deforestation, image_stack), axis = -1)
+        del past_deforestation  
         return image_stack        
