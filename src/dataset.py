@@ -91,11 +91,8 @@ class ParaDistanceMap(Para):
 class ParaDeforestationTime(Para):
     def loadInputImage(self):
         image_stack = super().loadInputImage()
-        # pdb.set_trace()
         image_stack = self.addDeforestationTime(image_stack)
-        # pdb.set_trace()
-        image_stack = self.addPastDeforestation(image_stack)
-        pdb.set_trace()
+        # image_stack = self.addPastDeforestation(image_stack)
         ic(image_stack.shape)
         return image_stack  
     def addDeforestationTime(self, image_stack):
@@ -113,6 +110,7 @@ class ParaDeforestationTime(Para):
         image_stack = np.concatenate((deforestation_time, image_stack), axis = -1)
         del deforestation_time  
         return image_stack
+    '''
     def addPastDeforestation(self, image_stack):
         past_deforestation = self.loadPastDeforestationLabel().astype(np.uint8)
         ic(past_deforestation.shape)
@@ -121,4 +119,5 @@ class ParaDeforestationTime(Para):
         # pdb.set_trace()
         image_stack = np.concatenate((past_deforestation, image_stack), axis = -1)
         del past_deforestation  
-        return image_stack        
+        return image_stack    
+    '''    

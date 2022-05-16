@@ -13,3 +13,8 @@ class PathsPara(Paths):
         self.distance_map_past_deforestation_2016 = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2016/distance_map_past_deforestation_2016.npy'
         self.distance_map_past_deforestation_2017 = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2017/distance_map_past_deforestation_2017.npy'
         self.distance_map_past_deforestation_2018 = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2018/distance_map_past_deforestation_2018.npy'
+
+
+        self.optical_im_2017 = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2017/'
+        self.optical_im_2016 = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2016/'
+        self.optical_im_2015 = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2015/'
