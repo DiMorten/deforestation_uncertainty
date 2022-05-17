@@ -89,9 +89,14 @@ class ParaDistanceMap(Para):
         return image_stack    
 
 class ParaDeforestationTime(Para):
+    def __init__(self, addPastDeforestationInput = True):
+        self.addPastDeforestationInput = addPastDeforestationInput
+        super().__init__()
+
     def loadInputImage(self):
         image_stack = super().loadInputImage()
-        image_stack = self.addDeforestationTime(image_stack)
+        if self.addPastDeforestationInput == True:
+            image_stack = self.addDeforestationTime(image_stack)
         # image_stack = self.addPastDeforestation(image_stack)
         ic(image_stack.shape)
         return image_stack  
@@ -110,14 +115,68 @@ class ParaDeforestationTime(Para):
         image_stack = np.concatenate((deforestation_time, image_stack), axis = -1)
         del deforestation_time  
         return image_stack
-    '''
-    def addPastDeforestation(self, image_stack):
-        past_deforestation = self.loadPastDeforestationLabel().astype(np.uint8)
-        ic(past_deforestation.shape)
-        # pdb.set_trace()
-        past_deforestation = past_deforestation[..., np.newaxis]
-        # pdb.set_trace()
-        image_stack = np.concatenate((past_deforestation, image_stack), axis = -1)
-        del past_deforestation  
-        return image_stack    
-    '''    
+
+class ParaMultipleDates(ParaDeforestationTime):
+
+    def loadPastDeforestationBefore2008(self):
+        label_past_deforestation_before_2008 = utils_v1.load_tiff_image(
+            self.paths.deforestation_before_2008)
+        return label_past_deforestation_before_2008
+    def loadInputImage(self):
+        image_stack = super().loadInputImage()
+        image_stack = np.concatenate((
+            np.load(self.paths.optical_im_2017 + 'optical_im.npy').astype('float32'),
+            image_stack),
+            axis = -1)
+        if self.addPastDeforestationInput == True:
+            image_stack = self.addDeforestationTime(image_stack)        
+        
+        ic(image_stack.shape)
+        return image_stack
+
+    def addDeforestationTime(self, image_stack):
+        image_stack = super().addDeforestationTime(image_stack)
+        deforestation_time_2017 = np.load(self.paths.deforestation_time_2017)
+        image_stack = np.concatenate((deforestation_time_2017, image_stack), axis = -1)
+        return image_stack
+
+    def loadLabel(self):
+        label_past_date = self.loadLabelFromDate(2018)
+        label_current_date = super().loadLabel()
+
+        ic(np.unique(label_current_date, return_counts=True),
+            np.unique(label_past_date, return_counts=True))
+
+        label = np.concatenate((
+            np.expand_dims(label_past_date, axis = -1),
+            np.expand_dims(label_current_date, axis = -1)),
+            axis = -1)
+        del label_past_date, label_current_date
+        ic(label.shape)
+        return label
+
+    def loadLabelFromDate(self, date):
+        deforestation_past_years = utils_v1.load_tiff_image(
+            self.paths.deforestation_past_years)
+        label = np.zeros_like(deforestation_past_years, dtype = np.uint8)
+        print("Loaded deforestation past years")
+        ic(np.unique(deforestation_past_years, return_counts=True))
+        print("Label where deforestation past years is actual date (2018) = 1")
+        label[deforestation_past_years == date] = 1
+        ic(np.unique(deforestation_past_years, return_counts=True))
+        print("Past deforestation different from 0 (no deforestation)")
+        label[np.logical_and(deforestation_past_years < date, 
+            deforestation_past_years != 0)] = 2 # includes <=2007 deforestation 
+        ic(np.unique(deforestation_past_years, return_counts=True))
+        print("Past deforestation before 2008 is 2")
+        label_past_deforestation_before_2008 = self.loadPastDeforestationBefore2008()
+        ic(np.unique(label_past_deforestation_before_2008, return_counts=True))
+        label[label_past_deforestation_before_2008 == 1] = 2
+        ic(np.unique(deforestation_past_years, return_counts=True))
+
+        return label
+
+    def getLabelCurrentDeforestation(self, label_mask, selected_class = 1):
+        super().getLabelCurrentDeforestation(label_mask[-1], 
+            selected_class = selected_class)
+
