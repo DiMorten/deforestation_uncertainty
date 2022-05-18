@@ -123,19 +123,25 @@ class ParaMultipleDates(ParaDeforestationTime):
             self.paths.deforestation_before_2008)
         return label_past_deforestation_before_2008
     def loadInputImage(self):
+        self.addPastDeforestationInput = False
         image_stack = super().loadInputImage()
+        self.addPastDeforestationInput = True
         image_stack = np.concatenate((
             np.load(self.paths.optical_im_2017 + 'optical_im.npy').astype('float32'),
             image_stack),
             axis = -1)
+
+
         if self.addPastDeforestationInput == True:
             image_stack = self.addDeforestationTime(image_stack)        
-        
         ic(image_stack.shape)
         return image_stack
 
     def addDeforestationTime(self, image_stack):
         image_stack = super().addDeforestationTime(image_stack)
+        print("2")
+        ic(image_stack.shape)
+
         deforestation_time_2017 = np.load(self.paths.deforestation_time_2017)
         image_stack = np.concatenate((deforestation_time_2017, image_stack), axis = -1)
         return image_stack

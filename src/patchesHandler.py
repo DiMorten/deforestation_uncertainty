@@ -128,8 +128,8 @@ class PatchesHandler():
 class PatchesHandlerMultipleDates(PatchesHandler):
 	def __init__(self, addPastDeforestationInput):
 		if addPastDeforestationInput == True:
-			self.image_channels = [list(0) + list(range(2,22)),
-				list(1) + list(range(12,32))]
+			self.image_channels = [[0,] + list(range(2,22)),
+				[1,] + list(range(12,32))]
 			self.input_image_shape = 21
 		else:
 			self.image_channels = [list(range(0,20)),
