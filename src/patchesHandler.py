@@ -154,11 +154,11 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 		ic(coords_current_date_train.shape, coords_past_date_train.shape)
 		ic(coords_current_date_train[20])
 		coords_current_date_train = self.addDateToCoords(
-			coords_current_date_train, 0)
+			coords_current_date_train, 1)
 		coords_current_date_val = self.addDateToCoords(
-			coords_current_date_val, 0)
+			coords_current_date_val, 1)
 		coords_past_date_train = self.addDateToCoords(
-			coords_past_date_train, 1)
+			coords_past_date_train, 0)
 
 		ic(coords_current_date_train[20])
 
