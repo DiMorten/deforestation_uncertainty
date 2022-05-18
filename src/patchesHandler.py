@@ -138,7 +138,15 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 		self.input_image_shape = len(self.image_channels[0])
 		ic(self.input_image_shape)
 		ic(self.image_channels)
-
+	'''
+	def infer(self, new_model, image1_pad, h, w, 
+                    num_patches_x, num_patches_y, patch_size_rows, 
+                    patch_size_cols):
+		image1_pad = image1_pad[..., self.image_channels[-1]]
+		super().infer(new_model, image1_pad, h, w, 
+                    num_patches_x, num_patches_y, patch_size_rows, 
+                    patch_size_cols)
+	'''
 	def trainTestSplit(self, coords, mask_tr_val, patch_size):
 		coords_current_date_train, coords_current_date_val = super().trainTestSplit(
 			coords, mask_tr_val, patch_size)
@@ -198,11 +206,18 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 			batch_ref = np.zeros((batch_coords.shape[0], patch_size, patch_size, number_class), dtype = np.float32)
 			
 			for i in range(batch_coords.shape[0]):
-				batch_img[i] = image[batch_coords[i,0] : batch_coords[i,0] + patch_size,
-						batch_coords[i,1] : batch_coords[i,1] + patch_size, self.image_channels[batch_coords[i,2]]] 
-				batch_ref_int = reference[batch_coords[i,0] : batch_coords[i,0] + patch_size,
-						batch_coords[i,1] : batch_coords[i,1] + patch_size, batch_coords[i,2]]
-
+				# print("image.shape, batch_coords.shape, batch_coords",
+				# 	image.shape, batch_coords.shape, batch_coords)
+				# raise KeyboardInterrupt
+				try:
+					batch_ref_int = reference[batch_coords[i,0] : batch_coords[i,0] + patch_size,
+							batch_coords[i,1] : batch_coords[i,1] + patch_size, batch_coords[i,2]]
+					batch_img[i] = image[batch_coords[i,0] : batch_coords[i,0] + patch_size,
+							batch_coords[i,1] : batch_coords[i,1] + patch_size, self.image_channels[batch_coords[i,2]]] 
+				except:
+					# print("batch_coords.shape, batch_coords[i], batch_coords[i].shape",
+					# 	batch_coords.shape, batch_coords[i], batch_coords[i].shape)
+					pass
 				if np.random.rand()<0.3:
 					batch_img[i] = np.rot90(batch_img[i], 1)
 					batch_ref_int = np.rot90(batch_ref_int, 1)
