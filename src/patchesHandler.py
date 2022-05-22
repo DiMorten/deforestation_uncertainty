@@ -172,9 +172,10 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 
 		ic(coords_current_date_train.shape, coords_past_date_train.shape)
 		# pdb.set_trace()
-		return np.concatenate((coords_current_date_train, 
-			coords_past_date_train), axis = 0), coords_current_date_val
-			
+		# return np.concatenate((coords_current_date_train, 
+		#	coords_past_date_train), axis = 0), coords_current_date_val
+		return coords_current_date_train, coords_current_date_val
+		
 			# np.concatenate((coords_current_date_val, 
 			# coords_past_date_val), axis = 0)
 
