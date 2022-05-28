@@ -294,7 +294,7 @@ def resnet_block_spatial_dropout(x, n_filter, ind):
     ## Conv 1
     x = Conv2D(n_filter, (3, 3), activation='relu', padding="same", name = 'res1_net'+str(ind))(x)
     # x = Dropout(0.5, name = 'drop_net'+str(ind))(x, training = True)
-    x = SpatialDropout2D(0.5, name = 'drop_net'+str(ind))(x, training = True)
+    x = SpatialDropout2D(0.25, name = 'drop_net'+str(ind))(x, training = True)
 
     ## Conv 2
     x = Conv2D(n_filter, (3, 3), activation='relu', padding="same", name = 'res2_net'+str(ind))(x)
@@ -391,7 +391,7 @@ def build_resunet_dropout(input_shape, nb_filters, n_classes):
 def build_resunet_dropout_spatial(input_shape, nb_filters, n_classes):
     '''Base network to be shared (eq. to feature extraction)'''
 
-    dropout = 0.5
+    dropout = 0.25
     
     input_layer= Input(shape = input_shape, name="input_enc_net")
     
