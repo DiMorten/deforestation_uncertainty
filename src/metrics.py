@@ -269,6 +269,53 @@ def getAA_Recall(predict_probability, label_mask_current_deforestation_test,
     metrics_list = np.asarray(metrics_list)
     return metrics_list       
 
+def getUncertaintyMetricsAudited(uncertainty, label_mask_current_deforestation_test, 
+        predicted_test, threshold_list):
+    
+    metrics_list = []
+    for threshold in threshold_list:
+        print("threshold", threshold)
+        predicted_thresholded = np.zeros_like(uncertainty).astype(np.int8)
+        predicted_thresholded[uncertainty >= threshold] = 1
+
+        predicted_test_classified_correct = predicted_test[
+            predicted_thresholded == 0]
+        label_current_deforestation_test_classified_correct = label_mask_current_deforestation_test[
+            predicted_thresholded == 0]
+
+        # predicted_test_classified_incorrect = predicted_test[
+        #     predicted_thresholded == 1]
+        label_current_deforestation_test_classified_incorrect = label_mask_current_deforestation_test[
+            predicted_thresholded == 1]
+        predicted_test_classified_incorrect = label_current_deforestation_test_classified_incorrect.copy()
+
+        predicted = np.concatenate((predicted_test_classified_correct, predicted_test_classified_incorrect),
+            axis = 0)
+        label = np.concatenate((label_current_deforestation_test_classified_correct, label_current_deforestation_test_classified_incorrect),
+            axis = 0)
+
+        print(label.shape,
+            predicted.shape)
+        cm_audited = metrics.confusion_matrix(
+            label,
+            predicted)
+        print("cm_audited", cm_audited)
+
+        TN = cm_audited[0,0]
+        FN = cm_audited[1,0]
+        TP = cm_audited[1,1]
+        FP = cm_audited[0,1]
+        
+        precision = TP / (TP + FP)
+        recall = TP / (TP + FN)
+                
+        mm = np.hstack((precision, recall))
+        print(mm)
+        metrics_list.append(mm)
+
+        # pdb.set_trace()
+    metrics_list = np.asarray(metrics_list)
+    return metrics_list       
 
 def getF1byThreshold(score, label, threshold_list):
     metrics_list = []
