@@ -28,3 +28,14 @@ class PathsPara(Paths):
             2016: 'D:/Jorge/datasets/sentinel2/Para_2016/',
             2015: 'D:/Jorge/datasets/sentinel2/Para_2015/'
         }
+
+class PathsMT(Paths):
+    def __init__(self):
+        self.optical_im = 'D:/Jorge/datasets/sentinel2/MT_2019_2020/'
+        self.label = 'D:/Jorge/datasets/deforestation/MT_2019_2020/'
+        self.experiment = 'D:/Jorge/datasets/deforestation/experiments/MT/'
+
+        self.deforestation_before_2008 = 'D:/Jorge/datasets/deforestation/MT/deforestation_before_2008/deforestation_before_2008_MT.tif'
+
+        self.deforestation_past_years = 'D:/Jorge/datasets/deforestation/MT/deforestation_past_years.tif'
+

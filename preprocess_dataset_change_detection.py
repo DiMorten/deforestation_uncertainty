@@ -10,8 +10,8 @@ from sklearn.preprocessing._data import _handle_zeros_in_scale
 
 # dataset = 'Para_2020'
 # dataset = 'MT_2020'
-dataset = 'Para_2018_2019'
-
+# dataset = 'Para_2018_2019'
+dataset = 'MT_2019_2020'
    
 if dataset == 'Para_2018_2019':
     path_optical_im_t0 = 'D:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/Para_10m/Sentinel2_2018/'
@@ -27,8 +27,30 @@ if dataset == 'Para_2018_2019':
         'COPERNICUS_S2_20190721_20190726_B7_B8_B8A.tif',
         'COPERNICUS_S2_20190721_20190726_B9_B10_B11.tif',
         'COPERNICUS_S2_20190721_20190726_B12.tif']
+    name_id = '2018_2019'
 
-        
+   
+if dataset == 'MT_2019_2020':
+    path_optical_im_t0 = 'D:/Jorge/datasets/sentinel2/MT_2019/'
+    im_filenames_t0 = ['S2_R1_MT_2019_08_02_2019_08_05_B1_B2.tif',
+        'S2_R1_MT_2019_08_02_2019_08_05_B3_B4.tif',
+        'S2_R1_MT_2019_08_02_2019_08_05_B5_B6.tif',
+        'S2_R1_MT_2019_08_02_2019_08_05_B7_B8.tif',
+        'S2_R1_MT_2019_08_02_2019_08_05_B8A_B9.tif',
+        'S2_R1_MT_2019_08_02_2019_08_05_B10_B11.tif',
+        'S2_R1_MT_2019_08_02_2019_08_05_B12.tif']
+
+    path_optical_im_t1 = 'D:/Jorge/datasets/sentinel2/MT_2020/'
+    im_filenames_t1 = ['S2_R1_MT_2020_08_03_2020_08_15_B1_B2.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B3_B4.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B5_B6.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B7_B8.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B8A_B9.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B10_B11.tif',
+        'S2_R1_MT_2020_08_03_2020_08_15_B12.tif']
+    name_id = '2019_2020'
+
+                
 def load_tiff_image(path):
     # Read tiff Image
     print (path) 
@@ -121,6 +143,6 @@ optical_im = normalizationManager.normalize(optical_im)
 ic(np.min(optical_im), np.average(optical_im), np.max(optical_im))
 
 # pdb.set_trace()
-np.save(path_optical_im_t0 + 'optical_im.npy', optical_im) 
+np.save(path_optical_im_t0 + 'optical_im' + name_id + '.npy', optical_im) 
 # plt.imshow(optical_im[...,[2,1,0]])
 # plt.show()
