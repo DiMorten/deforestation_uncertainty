@@ -147,13 +147,20 @@ class ParaMultipleDates(ParaDeforestationTime):
 		return image_stack
 
 	def addDeforestationTime(self, image_stack):
+		'''
 		image_stack = super().addDeforestationTime(image_stack)
 		print("2")
 		ic(image_stack.shape)
-
-		image_stack = np.concatenate((
-			np.load(self.paths.deforestation_time[2017]), 
+		'''
+		deforestation_times = []
+		for date in self.dates[:-1]:
+			deforestation_times.append(
+				np.load(self.paths.deforestation_time[date]).astype(np.float32)
+			)
+		deforestation_times = np.concatenate(deforestation_times, axis = -1)
+		image_stack = np.concatenate((deforestation_times, 
 			image_stack), axis = -1)
+		del deforestation_times
 		
 		return image_stack
 
