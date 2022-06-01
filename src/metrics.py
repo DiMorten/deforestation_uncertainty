@@ -259,7 +259,13 @@ def getAA_Recall(predict_probability, label_mask_current_deforestation_test,
         
         recall_Ltotal = TP_L / (TP_L + FN_L + TP_H + FN_H)
         AA = (TP_H + FN_H + FP_H + TN_H) / len(label_mask_current_deforestation_test)
-        
+        '''
+        AA2 = label_current_deforestation_test_classified_incorrect.shape[0] / \
+            label_current_deforestation_test_classified_correct.shape[0]
+        print("AA2", label_current_deforestation_test_classified_incorrect.shape[0], 
+            label_current_deforestation_test_classified_correct.shape[0],
+            AA2)
+        '''
         mm = np.hstack((precision_L, recall_L, recall_Ltotal, AA,
                 precision_H, recall_H))
         print(mm)

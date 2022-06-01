@@ -126,18 +126,11 @@ class PatchesHandler():
 		return img_reconstructed
 
 class PatchesHandlerMultipleDates(PatchesHandler):
-	def __init__(self, addPastDeforestationInput):
-		if addPastDeforestationInput == True:
-			self.image_channels = [[0,] + list(range(2,22)),
-				[1,] + list(range(12,32))]
-			self.input_image_shape = 21
-		else:
-			self.image_channels = [list(range(0,20)),
-				list(range(10,30))]
-			self.input_image_shape = 20
-		self.input_image_shape = len(self.image_channels[0])
+	def __init__(self, dataset):
+		self.dataset = dataset
+		self.input_image_shape = len(self.dataset.image_channels[0])
 		ic(self.input_image_shape)
-		ic(self.image_channels)
+		ic(self.dataset.image_channels)
 	'''
 	def infer(self, new_model, image1_pad, h, w, 
                     num_patches_x, num_patches_y, patch_size_rows, 
@@ -161,20 +154,33 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 		
 		ic(coords_current_date_train.shape, coords_past_date_train.shape)
 		ic(coords_current_date_train[20])
+
+
 		coords_current_date_train = self.addDateToCoords(
-			coords_current_date_train, 1)
+			coords_current_date_train, self.dataset.date_ids[-1])
 		coords_current_date_val = self.addDateToCoords(
-			coords_current_date_val, 1)
-		coords_past_date_train = self.addDateToCoords(
-			coords_past_date_train, 0)
+			coords_current_date_val, self.dataset.date_ids[-1])
+
+		ic(self.dataset.date_ids[:-1])
+		coords_past_dates = []
+		for date_id in self.dataset.date_ids[:-1]:
+			coords_past_dates.append(self.addDateToCoords(
+				coords_past_date_train, date_id))
+		
+		coords_past_date_train = np.concatenate(coords_past_dates, axis = 0)
 
 		ic(coords_current_date_train[20])
 
 		ic(coords_current_date_train.shape, coords_past_date_train.shape)
 		# pdb.set_trace()
-		return np.concatenate((coords_current_date_train, 
-			coords_past_date_train), axis = 0), coords_current_date_val
+
+		coords_train = np.concatenate((coords_current_date_train, 
+		 	coords_past_date_train), axis = 0)
+		# coords_train = coords_current_date_train
+		# return np.concatenate((coords_current_date_train, 
+		# 	coords_past_date_train), axis = 0), coords_current_date_val
 		# return coords_current_date_train, coords_current_date_val
+		return coords_train, coords_current_date_val
 		
 			# np.concatenate((coords_current_date_val, 
 			# coords_past_date_val), axis = 0)
@@ -214,7 +220,7 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 					batch_ref_int = reference[batch_coords[i,0] : batch_coords[i,0] + patch_size,
 							batch_coords[i,1] : batch_coords[i,1] + patch_size, batch_coords[i,2]]
 					batch_img[i] = image[batch_coords[i,0] : batch_coords[i,0] + patch_size,
-							batch_coords[i,1] : batch_coords[i,1] + patch_size, self.image_channels[batch_coords[i,2]]] 
+							batch_coords[i,1] : batch_coords[i,1] + patch_size, self.dataset.image_channels[batch_coords[i,2]]] 
 				except:
 					# print("batch_coords.shape, batch_coords[i], batch_coords[i].shape",
 					# 	batch_coords.shape, batch_coords[i], batch_coords[i].shape)
