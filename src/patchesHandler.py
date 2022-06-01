@@ -94,6 +94,12 @@ class PatchesHandler():
 						batch_coords[i,1] : batch_coords[i,1] + patch_size] 
 				batch_ref_int = reference[batch_coords[i,0] : batch_coords[i,0] + patch_size,
 						batch_coords[i,1] : batch_coords[i,1] + patch_size]
+				'''
+				print("batch_img[i][:5, :5]", batch_img[i][:5, :5])
+				print("batch_ref_int[:5, :5]", batch_ref_int[:5, :5])
+				print("batch_coords[i]", batch_coords[i])
+				pdb.set_trace()
+				'''
 
 				if np.random.rand()<0.3:
 					batch_img[i] = np.rot90(batch_img[i], 1)
@@ -215,6 +221,14 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 							batch_coords[i,1] : batch_coords[i,1] + patch_size, batch_coords[i,2]]
 					batch_img[i] = image[batch_coords[i,0] : batch_coords[i,0] + patch_size,
 							batch_coords[i,1] : batch_coords[i,1] + patch_size, self.image_channels[batch_coords[i,2]]] 
+					'''
+					print("batch_img[i][:5, :5]", batch_img[i][:5, :5])
+					print("batch_ref_int[:5, :5]", batch_ref_int[:5, :5])
+					print("batch_coords[i]", batch_coords[i])
+					pdb.set_trace()
+					'''
+					
+
 				except:
 					# print("batch_coords.shape, batch_coords[i], batch_coords[i].shape",
 					# 	batch_coords.shape, batch_coords[i], batch_coords[i].shape)
