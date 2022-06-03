@@ -165,19 +165,28 @@ class ParaMultipleDates(ParaDeforestationTime):
 		return image_stack
 
 	def loadLabel(self):
+		
+		label_per_date = []
+		for date in self.dates[1:]:
+			label_per_date.append(
+				np.expand_dims(self.loadLabelFromDate(date), axis = -1)
+			)
+		label_per_date = np.concatenate(label_per_date, axis = -1)
+		'''
 		label_past_date = self.loadLabelFromDate(2018)
 		label_current_date = super().loadLabel()
 
 		ic(np.unique(label_current_date, return_counts=True),
 			np.unique(label_past_date, return_counts=True))
 
-		label = np.concatenate((
+		label_per_date = np.concatenate((
 			np.expand_dims(label_past_date, axis = -1),
 			np.expand_dims(label_current_date, axis = -1)),
 			axis = -1)
 		del label_past_date, label_current_date
-		ic(label.shape)
-		return label
+		'''
+		ic(label_per_date.shape)
+		return label_per_date
 
 	def loadLabelFromDate(self, date):
 		deforestation_past_years = utils_v1.load_tiff_image(
