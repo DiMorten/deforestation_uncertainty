@@ -6,6 +6,7 @@ import scipy
 sys.path.append("..")
 from src.paths import PathsPara
 import utils_v1
+import skimage
 class Dataset():
 	def getTrainValTestMasks(self, mask_tiles):
 		tiles_tr, tiles_val, tiles_ts = self.calculateTiles()
@@ -41,7 +42,33 @@ class Dataset():
 		dist_matrix = scipy.ndimage.distance_transform_edt(dist_past == 0)
 		dist_matrix[dist_matrix >= th_sup] = th_sup
 		dist_norm = (dist_matrix-np.min(dist_matrix))/(np.max(dist_matrix)-np.min(dist_matrix))
-		return dist_norm        
+		return dist_norm     
+	def getSeparateLabelsForClasses1And2(self, label):
+
+		label_class1 = label.copy()
+		label_class1[label_class1 == 2] = 0
+
+		label_class2 = label.copy()
+		label_class2[label_class2 == 1] = 0
+		label_class2[label_class2 == 2] = 1
+		return label_class1, label_class2
+	def removeBorderBufferFromLabel(self, label, borderBuffer):
+		# Creation of border buffer for pixels not considered
+
+		label_class1, label_class2 = self.getSeparateLabelsForClasses1And2(label)
+		image_ref_ = label_class1.copy()
+		im_dilate = skimage.morphology.dilation(image_ref_, skimage.morphology.disk(borderBuffer))
+		im_erosion = skimage.morphology.erosion(image_ref_, skimage.morphology.disk(borderBuffer))
+		inner_buffer = image_ref_ - im_erosion
+		inner_buffer[inner_buffer == 1] = 2
+		outer_buffer = im_dilate-image_ref_
+		outer_buffer[outer_buffer == 1] = 2
+		
+		# 1 deforestation, 2 unknown
+		image_ref_[outer_buffer + inner_buffer == 2 ] = 2
+
+		image_ref_[label_class2 == 1] = 2
+		return image_ref_   
 class Para(Dataset):
 	def __init__(self):
 		self.paths = PathsPara()
@@ -117,7 +144,7 @@ class ParaDeforestationTime(Para):
 		return image_stack
 
 class ParaMultipleDates(ParaDeforestationTime):
-	def __init__(self, dates = [2017, 2018, 2019], addPastDeforestationInput = True):
+	def __init__(self, dates = [2017, 2018, 2019], addPastDeforestationInput = True, borderBuffer = 0):
 		super().__init__(addPastDeforestationInput)
 		self.dates = dates
 		# self.date_ids = [0,1]
@@ -140,6 +167,8 @@ class ParaMultipleDates(ParaDeforestationTime):
 				self.image_channels.append([date_id,] + list(range(date_id * 10, 
 					date_id * 10 + 20))) 
 		ic(self.image_channels)
+
+		self.borderBuffer = borderBuffer
 		# ic(self.image_channels == image_channels_check)
 	def loadPastDeforestationBefore2008(self):
 		label_past_deforestation_before_2008 = utils_v1.load_tiff_image(
@@ -189,11 +218,15 @@ class ParaMultipleDates(ParaDeforestationTime):
 		
 		label_per_date = []
 		for date in self.dates[1:]:
+			label = self.loadLabelFromDate(date)
+			
+			if self.borderBuffer > 0:
+				label = self.removeBorderBufferFromLabel(label, self.borderBuffer)
+
 			label_per_date.append(
-				np.expand_dims(self.loadLabelFromDate(date), axis = -1)
+				np.expand_dims(label, axis = -1)
 			)
 		label_per_date = np.concatenate(label_per_date, axis = -1)
-
 
 		'''
 		label_past_date = self.loadLabelFromDate(2018)
