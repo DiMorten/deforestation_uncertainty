@@ -129,12 +129,10 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 	def __init__(self, dataset):
 		self.dataset = dataset
 		if self.dataset.addPastDeforestationInput == True:
-			# self.dataset.image_channels = [[0,] + list(range(2,22)),
-			# 	[1,] + list(range(12,32))]
+
 			self.input_image_shape = 21
 		else:
-			# self.dataset.image_channels = [list(range(0,20)),
-			# 	list(range(10,30))]
+
 			self.input_image_shape = 20
 		self.input_image_shape = len(self.dataset.image_channels[0])
 		ic(self.input_image_shape)
@@ -173,9 +171,9 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 
 		ic(coords_current_date_train.shape, coords_past_date_train.shape)
 		# pdb.set_trace()
-		# return np.concatenate((coords_current_date_train, 
-		#	coords_past_date_train), axis = 0), coords_current_date_val
-		return coords_current_date_train, coords_current_date_val
+		return np.concatenate((coords_current_date_train, 
+			coords_past_date_train), axis = 0), coords_current_date_val
+		# return coords_current_date_train, coords_current_date_val
 		
 			# np.concatenate((coords_current_date_val, 
 			# coords_past_date_val), axis = 0)

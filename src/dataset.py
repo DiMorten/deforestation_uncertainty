@@ -122,7 +122,7 @@ class ParaMultipleDates(ParaDeforestationTime):
 		self.dates = dates
 		# self.date_ids = [0,1]
 		self.date_ids = range(len(dates[:-1]))
-		ic(self.date_ids)
+		ic(list(self.date_ids))
 		self.image_channels = []
 
 		if self.addPastDeforestationInput == True:
@@ -130,17 +130,17 @@ class ParaMultipleDates(ParaDeforestationTime):
 			# 	[1,] + list(range(12,32))]
 			for date_id in self.date_ids:
 				self.image_channels.append([date_id,] + list(range(date_id * 10 + len(self.date_ids), 
-					date_id * 10 + 20 +len(self.date_ids)))) 
-			image_channels_check = [[0,] + list(range(2,22)),
-				[1,] + list(range(12,32))]
-			assert image_channels_check == self.image_channels
+					date_id * 10 + 20 + len(self.date_ids)))) 
+			# image_channels_check = [[0,] + list(range(2,22)),
+			# 	[1,] + list(range(12,32))]
+			# assert image_channels_check == self.image_channels
 			
 		else:
 			for date_id in self.date_ids:
 				self.image_channels.append([date_id,] + list(range(date_id * 10, 
 					date_id * 10 + 20))) 
 		ic(self.image_channels)
-		ic(self.image_channels == image_channels_check)
+		# ic(self.image_channels == image_channels_check)
 	def loadPastDeforestationBefore2008(self):
 		label_past_deforestation_before_2008 = utils_v1.load_tiff_image(
 			self.paths.deforestation_before_2008)
@@ -193,6 +193,8 @@ class ParaMultipleDates(ParaDeforestationTime):
 				np.expand_dims(self.loadLabelFromDate(date), axis = -1)
 			)
 		label_per_date = np.concatenate(label_per_date, axis = -1)
+
+
 		'''
 		label_past_date = self.loadLabelFromDate(2018)
 		label_current_date = super().loadLabel()
