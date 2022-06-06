@@ -151,7 +151,21 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 			coords, mask_tr_val, patch_size)
 
 		mask_past_date_tr_val = np.ones_like(mask_tr_val)
+		coords_train = []
+		coords_val = []
+		
+		for date_id in self.dataset.date_ids:
+			mask = mask_past_date_tr_val if date_id != self.dataset.date_ids[-1] else mask_tr_val
+			coords_train_date, _ = super().trainTestSplit(coords, mask, patch_size)
+			coords_train_date = self.addDateToCoords(
+				coords_train_date, date_id)
+			coords_train.append(coords_train_date)
+		coords_train = np.concatenate(coords_train, axis = 0)
+		_, coords_val = super().trainTestSplit(coords, mask_tr_val, patch_size)
+		coords_val = self.addDateToCoords(
+			coords_val, self.dataset.date_ids[-1])
 
+		return coords_train, coords_val
 		# mask_past_date_tr_val = mask_tr_val.copy()
 		# mask_past_date_tr_val[mask_past_date_tr_val == 0] = 1
 		
