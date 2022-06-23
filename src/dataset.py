@@ -219,7 +219,8 @@ class ParaMultipleDates(ParaDeforestationTime):
 		label_per_date = []
 		for date in self.dates[1:]:
 			label = self.loadLabelFromDate(date)
-			
+			label = self.addCloudMaskToLabel(label, date)
+
 			if self.borderBuffer > 0:
 				label = self.removeBorderBufferFromLabel(label, self.borderBuffer)
 
@@ -268,6 +269,11 @@ class ParaMultipleDates(ParaDeforestationTime):
 	def getLabelCurrentDeforestation(self, label_mask, selected_class = 1):
 		super().getLabelCurrentDeforestation(label_mask[-1], 
 			selected_class = selected_class)
+
+	def addCloudMaskToLabel(self, label, date):
+		cloud_mask = np.load(self.paths.cloud_mask[date])
+		label[cloud_mask == 1] = 2
+		return label
 
 class MT(Dataset): 
     def __init__(self): 

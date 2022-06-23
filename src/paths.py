@@ -35,6 +35,14 @@ class PathsPara(Paths):
             2015: self.optical_im_folder + 'Para_2015/'
         }
 
+        self.cloud_mask = {
+            2019: self.optical_im_folder + 'Para_2019/' + 'cloudmask_Para_2019.npy',
+            2018: self.optical_im_folder + 'Para_2018/' + 'cloudmask_Para_2018.npy',
+            2017: self.optical_im_folder + 'Para_2017/' + 'cloudmask_Para_2017.npy',
+            2016: self.optical_im_folder + 'Para_2016/' + 'cloudmask_Para_2016.npy',
+            2015: self.optical_im_folder + 'Para_2015/' + 'cloudmask_Para_2015.npy'
+        }
+
 
 class PathsMT(Paths): 
     def __init__(self): 
@@ -61,3 +69,5 @@ class PathsMT(Paths):
             2017: self.optical_im_folder + 'MT_2017/', 
             2016: self.optical_im_folder + 'MT_2016/' 
         }
+
+        
