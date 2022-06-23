@@ -25,13 +25,16 @@ class PathsPara(Paths):
         self.distance_map_past_deforestation_2018 = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2018/distance_map_past_deforestation_2018.npy'
 
 
+        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/'
+
         self.optical_im_past_dates = {
-            2019: 'D:/Jorge/datasets/sentinel2/Para_2019/',
-            2018: 'D:/Jorge/datasets/sentinel2/Para_2018/',
-            2017: 'D:/Jorge/datasets/sentinel2/Para_2017/',
-            2016: 'D:/Jorge/datasets/sentinel2/Para_2016/',
-            2015: 'D:/Jorge/datasets/sentinel2/Para_2015/'
+            2019: self.optical_im_folder + 'Para_2019/',
+            2018: self.optical_im_folder + 'Para_2018/',
+            2017: self.optical_im_folder + 'Para_2017/',
+            2016: self.optical_im_folder + 'Para_2016/',
+            2015: self.optical_im_folder + 'Para_2015/'
         }
+
 
 class PathsMT(Paths): 
     def __init__(self): 
@@ -49,8 +52,12 @@ class PathsMT(Paths):
             2016: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2016.npy' 
         }  
  
+        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/'
+
         self.optical_im_past_dates = { 
-            2018: 'D:/Jorge/datasets/sentinel2/MT_2018/', 
-            2017: 'D:/Jorge/datasets/sentinel2/MT_2017/', 
-            2016: 'D:/Jorge/datasets/sentinel2/MT_2016/' 
+            2020: self.optical_im_folder + 'MT_2020/', 
+            2019: self.optical_im_folder + 'MT_2019/',  
+            2018: self.optical_im_folder + 'MT_2018/', 
+            2017: self.optical_im_folder + 'MT_2017/', 
+            2016: self.optical_im_folder + 'MT_2016/' 
         }
