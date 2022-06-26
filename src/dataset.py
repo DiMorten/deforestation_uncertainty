@@ -244,7 +244,7 @@ class ParaMultipleDates(ParaDeforestationTime):
 		del label_past_date, label_current_date
 		'''
 		ic(label_per_date.shape)
-		return label_per_date
+		return label_per_date.astype(np.uint8)
 
 	def loadLabelFromDate(self, date):
 		deforestation_past_years = utils_v1.load_tiff_image(
@@ -277,7 +277,7 @@ class ParaMultipleDates(ParaDeforestationTime):
 		return label
 
 	def loadLabelFromProject(self):
-		label = np.load('D:/Jorge/datasets/deforestation/Para_2018_2019/mask_label_17730x9203.npy')
+		label = np.load('D:/Jorge/datasets/deforestation/Para_2018_2019/mask_label_17730x9203.npy').astype(np.uint8)
 		return label
 class MT(Dataset): 
     def __init__(self): 
