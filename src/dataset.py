@@ -220,9 +220,10 @@ class ParaMultipleDates(ParaDeforestationTime):
 		for date in self.dates[1:]:
 			label = self.loadLabelFromDate(date)
 			label = self.addCloudMaskToLabel(label, date)
-
 			if self.borderBuffer > 0:
 				label = self.removeBorderBufferFromLabel(label, self.borderBuffer)
+			if date == 2019:
+				label = self.loadLabelFromProject()
 
 			label_per_date.append(
 				np.expand_dims(label, axis = -1)
@@ -275,6 +276,9 @@ class ParaMultipleDates(ParaDeforestationTime):
 		label[cloud_mask == 1] = 2
 		return label
 
+	def loadLabelFromProject(self):
+		label = np.load('D:/Jorge/datasets/deforestation/Para_2018_2019/mask_label_17730x9203.npy')
+		return label
 class MT(Dataset): 
     def __init__(self): 
         self.paths = PathsMT() 
