@@ -7,6 +7,7 @@ sys.path.append("..")
 from src.paths import PathsPara, PathsMT
 import utils_v1
 import skimage
+import matplotlib.pyplot as plt
 class Dataset():
 	def getTrainValTestMasks(self, mask_tiles):
 		tiles_tr, tiles_val, tiles_ts = self.calculateTiles()
@@ -220,6 +221,8 @@ class ParaMultipleDates(ParaDeforestationTime):
 		for date in self.dates[1:]:
 			label = self.loadLabelFromDate(date)
 			label = self.addCloudMaskToLabel(label, date)
+			label = self.addCloudMaskToLabel(label, date - 1)
+			
 			if self.borderBuffer > 0:
 				label = self.removeBorderBufferFromLabel(label, self.borderBuffer)
 			if date == 2019:
@@ -274,6 +277,10 @@ class ParaMultipleDates(ParaDeforestationTime):
 	def addCloudMaskToLabel(self, label, date):
 		cloud_mask = np.load(self.paths.cloud_mask[date])
 		label[cloud_mask == 1] = 2
+		# plt.figure(figsize=(15,15))
+		# plt.imshow(cloud_mask, cmap=plt.cm.gray)
+		# plt.title(str(date))
+		# plt.axis('off')
 		return label
 
 	def loadLabelFromProject(self):

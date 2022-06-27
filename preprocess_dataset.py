@@ -4,13 +4,15 @@ from icecream import ic
 from osgeo import gdal
 import pdb
 from sklearn.preprocessing._data import _handle_zeros_in_scale
+from src.dataset import Para, ParaDeforestationTime, ParaDistanceMap, ParaMultipleDates, MTMultipleDates 
 
 # path_optical_im = 'E:/Jorge/dataset_deforestation/Para_2020/'
 # path_label = 'E:/Jorge/dataset_deforestation/Para/'
 
 # dataset = 'Para_2020'
 # dataset = 'MT_2020'
-dataset = 'Para_2019'
+# dataset = 'Para_2019'
+dataset = 'Para_2015'
 
 if dataset == 'Para_2020':
     path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2020/'
@@ -46,6 +48,15 @@ elif dataset == 'Para_2019':
         'COPERNICUS_S2_20190721_20190726_B7_B8_B8A.tif',
         'COPERNICUS_S2_20190721_20190726_B9_B10_B11.tif',
         'COPERNICUS_S2_20190721_20190726_B12.tif']
+elif dataset == 'Para_2015':
+    dataset = Para() 
+    path_optical_im = dataset.paths.optical_im_folder + 'Para_2015/'
+    
+    im_filenames = ['PA_S2_2015_B1_B2_B3_crop.tif', 
+            'PA_S2_2015_B4_B5_B6_crop.tif', 
+            'PA_S2_2015_B7_B8_B8A_crop.tif', 
+            'PA_S2_2015_B9_B10_B11_crop.tif', 
+            'PA_S2_2015_B12_crop.tif'] 
 
         
 def load_tiff_image(path):

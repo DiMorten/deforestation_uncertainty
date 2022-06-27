@@ -232,5 +232,5 @@ if __name__ == '__main__':
     
 
     print("saving in... " + path_optical_im + "cloudmask_" + filename)
-    np.save(path_optical_im + "cloudmask_" + filename, cloud_cloudshadow_mask) 
+    np.save(path_optical_im + "cloudmask_" + filename, cloud_mask) 
 
