@@ -194,16 +194,10 @@ if __name__ == '__main__':
     # === GET CLOUD CLOUD-SHADOW MASK === #
  
     cloud_cloudshadow_mask = get_cloud_cloudshadow_mask(optical_im, cloud_threshold = 0.2).astype(np.int8) 
-    # print("cloud_cloudshadow_mask.shape: ", cloud_cloudshadow_mask.shape) 
+
     ic(cloud_cloudshadow_mask.shape) 
     ic(np.unique(cloud_cloudshadow_mask, return_counts = True)) 
-    # print("saving in... " + path_optical_im + "cloudmask_" + filename)
-    # np.save(path_optical_im + "cloudmask_" + filename, cloud_cloudshadow_mask) 
 
-
-    # plt.figure() 
-    # plt.imshow(cloud_cloudshadow_mask) 
-    # plt.show() 
  
     plt.figure() 
     plt.imshow(cloud_cloudshadow_mask) 
@@ -224,6 +218,9 @@ if __name__ == '__main__':
     cloud_mask = np.zeros_like(thin_cloud_mask).astype(np.uint8)
     cloud_mask[thin_cloud_mask == 1] = 1
     cloud_mask[cloud_cloudshadow_mask == 1] = 1
+    apply_shadow_mask = False
+    if apply_shadow_mask == True:
+        cloud_mask[cloud_cloudshadow_mask == -1] = 1
 
     plt.figure() 
     plt.imshow(cloud_mask) 
