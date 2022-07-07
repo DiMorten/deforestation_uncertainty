@@ -250,6 +250,13 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 				batch_ref[i] = tf.keras.utils.to_categorical(batch_ref_int, number_class)
 			yield (batch_img, batch_ref)
 
+	def getPatch(self, image, reference, coord, patch_size=128, idx=0):
+		reference_patch = reference[coord[idx,0] : coord[idx,0] + patch_size,
+								coord[idx,1] : coord[idx,1] + patch_size, coord[idx,2]]
+		image_patch = image[coord[idx,0] : coord[idx,0] + patch_size,
+				coord[idx,1] : coord[idx,1] + patch_size, self.dataset.image_channels[coord[idx,2]]] 
+
+		return image_patch, reference_patch
 '''
 def create_idx_image(ref_mask):
 	im_idx = np.arange(ref_mask.shape[0] * ref_mask.shape[1]).reshape(ref_mask.shape[0] , ref_mask.shape[1])

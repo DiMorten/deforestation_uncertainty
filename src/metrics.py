@@ -238,7 +238,7 @@ def getAA_Recall(predict_probability, label_mask_current_deforestation_test,
         TP_L = cm_correct[1,1]
         FP_L = cm_correct[0,1]
 
-        print(label_current_deforestation_test_classified_incorrect.shape,
+        ic(label_current_deforestation_test_classified_incorrect.shape,
             predicted_test_classified_incorrect.shape)
 
         cm_incorrect = metrics.confusion_matrix(
@@ -258,8 +258,10 @@ def getAA_Recall(predict_probability, label_mask_current_deforestation_test,
         recall_H = TP_H / (TP_H + FN_H)
         
         recall_Ltotal = TP_L / (TP_L + FN_L + TP_H + FN_H)
+        ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+            
         AA = (TP_H + FN_H + FP_H + TN_H) / len(label_mask_current_deforestation_test)
-        
+        ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
         mm = np.hstack((precision_L, recall_L, recall_Ltotal, AA,
                 precision_H, recall_H))
         print(mm)

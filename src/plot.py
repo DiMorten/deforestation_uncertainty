@@ -90,6 +90,62 @@ def plotCropSample4(im1, im2, im3, im4, lims = None,
     axes[2].title.set_text(titles[2])
     axes[3].title.set_text(titles[3])  
 
+
+def plotCropSample5(im1, im2, im3, im4, im5, lims = None, 
+        titles = ['Optical', '.', '.', 'Secondary Veg.', 'Past deforestation'],
+        cmaps = [plt.cm.gray, plt.cm.gray, plt.cm.gray, plt.cm.gray, plt.cm.gray],
+        maskBackground = [False, False, False, False, False],
+        invertMask = [False, False, False, False, False]):
+    fig, axes = plt.subplots(1, 5)
+    fig.set_figheight(20)
+    fig.set_figwidth(20)
+    
+    if lims is not None:
+        im1 = im1[lims[0]:lims[1], lims[2]:lims[3]]
+        im2 = im2[lims[0]:lims[1], lims[2]:lims[3]]
+        im3 = im3[lims[0]:lims[1], lims[2]:lims[3]]
+        im4 = im4[lims[0]:lims[1], lims[2]:lims[3]]
+        im5 = im5[lims[0]:lims[1], lims[2]:lims[3]]
+
+
+    if maskBackground[1] == True:
+        im2 = applyBackgroundMask(im2, im4)
+    if maskBackground[2] == True:
+        im3 = applyBackgroundMask(im3, im3)
+    if maskBackground[3] == True:
+        im4 = applyBackgroundMask(im4, im4)
+
+    if invertMask[1] == True:
+        im2 = invertMaskFromIm(im2)
+    if invertMask[2] == True:
+        im3 = invertMaskFromIm(im3)
+    if invertMask[3] == True:
+        im4 = invertMaskFromIm(im4)
+
+
+    axes[0].imshow(im1, cmap=cmaps[0])
+    axes[1].imshow(im2, cmap=cmaps[1])
+    axes[2].imshow(im3, cmap=cmaps[2])
+    axes[3].imshow(im4, cmap=cmaps[3])
+    axes[4].imshow(im5, cmap=cmaps[4])
+
+    axes[0].axis('off')
+    axes[1].set_xticks([])
+    axes[1].set_yticks([])
+    axes[2].set_xticks([])
+    axes[2].set_yticks([])
+    axes[3].set_xticks([])
+    axes[3].set_yticks([])
+    axes[4].set_xticks([])
+    axes[4].set_yticks([])
+
+    axes[0].title.set_text(titles[0])
+    axes[1].title.set_text(titles[1])
+    axes[2].title.set_text(titles[2])
+    axes[3].title.set_text(titles[3])  
+    axes[4].title.set_text(titles[4])  
+    plt.savefig('Para' + ' normalized RGB.png', dpi=300, bbox_inches='tight')
+
 def whiteBckndImShow(im, figsize = (10,10)):
     im = np.abs(1 - im)
     '''
