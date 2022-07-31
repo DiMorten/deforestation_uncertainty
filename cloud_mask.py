@@ -7,8 +7,10 @@ import matplotlib.pyplot as plt
 import rasterio 
 from osgeo import gdal 
 import cv2 
-from src.dataset import Para, ParaDeforestationTime, ParaDistanceMap, ParaMultipleDates, MTMultipleDates 
- 
+from src.dataset import (
+    Para, ParaDeforestationTime, ParaDistanceMap, ParaMultipleDates, MTMultipleDates,
+    MT, 
+)
 # naming conventions: 
 # ['QA60', 'B1','B2',    'B3',    'B4',   'B5','B6','B7', 'B8','  B8A', 'B9',          'B10', 'B11','B12'] 
 # ['QA60','cb', 'blue', 'green', 'red', 're1','re2','re3','nir', 'nir2', 'waterVapor', 'cirrus','swir1', 'swir2']) 
@@ -128,7 +130,7 @@ def loadOpticalIm(path_optical_im, im_filenames):
  
 if __name__ == '__main__': 
  
-    dataset_id = 'Para_2015' 
+    dataset_id = 'MT_2020' 
 
     if dataset_id == 'Para_2015': 
         dataset = Para() 
@@ -184,6 +186,73 @@ if __name__ == '__main__':
             'COPERNICUS_S2_20190721_20190726_B12.tif'] 
         path_cirrus_band = im_filenames[3]
         cirrus_band_id = 1
+
+
+    elif dataset_id == 'MT_2016': 
+        dataset = MT() 
+        path_optical_im = dataset.paths.optical_im_folder + 'MT_2016/' 
+        im_filenames = ['MT_S2_2016_07_21_08_07_B1_B2_crop.tif', 
+            'MT_S2_2016_07_21_08_07_B3_B4_crop.tif', 
+            'MT_S2_2016_07_21_08_07_B5_B6_crop.tif', 
+            'MT_S2_2016_07_21_08_07_B7_B8_crop.tif', 
+            'MT_S2_2016_07_21_08_07_B8A_B9_crop.tif',
+            'MT_S2_2016_07_21_08_07_B10_B11_crop.tif',
+            'MT_S2_2016_07_21_08_07_B12_crop.tif'] 
+        path_cirrus_band = im_filenames[5]
+        cirrus_band_id = 0
+
+    elif dataset_id == 'MT_2017': 
+        dataset = MT() 
+        path_optical_im = dataset.paths.optical_im_folder + 'MT_2017/' 
+        im_filenames = ['MT_S2_07_26_28_2017_B1_B2_crop.tif', 
+            'MT_S2_07_26_28_2017_B3_B4_crop.tif', 
+            'MT_S2_07_26_28_2017_B5_B6_crop.tif', 
+            'MT_S2_07_26_28_2017_B7_B8_crop.tif', 
+            'MT_S2_07_26_28_2017_B8A_B9_crop.tif',
+            'MT_S2_07_26_28_2017_B10_B11_crop.tif',
+            'MT_S2_07_26_28_2017_B12_crop.tif'] 
+        path_cirrus_band = im_filenames[5]
+        cirrus_band_id = 0
+
+    elif dataset_id == 'MT_2018': 
+        dataset = MT() 
+        path_optical_im = dataset.paths.optical_im_folder + 'MT_2018/' 
+        im_filenames = ['MT_S2_07_26_28_31_2018_B1_B2_crop.tif', 
+            'MT_S2_07_26_28_31_2018_B3_B4_crop.tif', 
+            'MT_S2_07_26_28_31_2018_B5_B6_crop.tif', 
+            'MT_S2_07_26_28_31_2018_B7_B8_crop.tif', 
+            'MT_S2_07_26_28_31_2018_B8A_B9_crop.tif',
+            'MT_S2_07_26_28_31_2018_B10_B11_crop.tif',
+            'MT_S2_07_26_28_31_2018_B12_crop.tif'] 
+        path_cirrus_band = im_filenames[5]
+        cirrus_band_id = 0
+
+
+    elif dataset_id == 'MT_2019': 
+        dataset = MT() 
+        path_optical_im = dataset.paths.optical_im_folder + 'MT_2019/' 
+        im_filenames = ['S2_R1_MT_2019_08_02_2019_08_05_B1_B2.tif', 
+            'S2_R1_MT_2019_08_02_2019_08_05_B3_B4.tif', 
+            'S2_R1_MT_2019_08_02_2019_08_05_B5_B6.tif', 
+            'S2_R1_MT_2019_08_02_2019_08_05_B7_B8.tif', 
+            'S2_R1_MT_2019_08_02_2019_08_05_B8A_B9.tif',
+            'S2_R1_MT_2019_08_02_2019_08_05_B10_B11.tif',
+            'S2_R1_MT_2019_08_02_2019_08_05_B12.tif'] 
+        path_cirrus_band = im_filenames[5]
+        cirrus_band_id = 0
+
+    elif dataset_id == 'MT_2020': 
+        dataset = MT() 
+        path_optical_im = dataset.paths.optical_im_folder + 'MT_2020/' 
+        im_filenames = ['S2_R1_MT_2020_08_03_2020_08_15_B1_B2.tif', 
+            'S2_R1_MT_2020_08_03_2020_08_15_B3_B4.tif', 
+            'S2_R1_MT_2020_08_03_2020_08_15_B5_B6.tif', 
+            'S2_R1_MT_2020_08_03_2020_08_15_B7_B8.tif', 
+            'S2_R1_MT_2020_08_03_2020_08_15_B8A_B9.tif',
+            'S2_R1_MT_2020_08_03_2020_08_15_B10_B11.tif',
+            'S2_R1_MT_2020_08_03_2020_08_15_B12.tif'] 
+        path_cirrus_band = im_filenames[5]
+        cirrus_band_id = 0
 
     filename = dataset_id + '.npy' 
  

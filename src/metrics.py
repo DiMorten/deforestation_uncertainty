@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn import metrics
 import cv2
 import pdb
-
+import skimage
 
 def plotAUC(fpr, tpr, roc_auc, modelId = '', nameId = ''):
     
@@ -208,11 +208,37 @@ def saveRgbErrorMask(error_mask_to_show, dim = None):
             dim, interpolation = cv2.INTER_NEAREST)
     return error_mask_to_show_rgb
 
+def removeSmallPolygonsForMetrics(predicted, label_mask,
+        min_polygon_area):
+    predicted_larger_than_min_area = skimage.morphology.area_opening(predicted, 
+        area_threshold = min_polygon_area, connectivity=1)
+    ignored_polygons = predicted - predicted_larger_than_min_area
+    ic(np.unique(ignored_polygons, return_counts=True))
+
+    label_mask[ignored_polygons == 1] = 2
+    predicted[label_mask == 2] = 0
+
+    return predicted, label_mask
+
+def getTest(predicted, label_mask, mask_valid_ts):
+    predicted_masked = predicted[mask_valid_ts == 1]
+    label_masked = label_mask[mask_valid_ts == 1]
+
+    # mask class 2 again
+    predicted_masked = predicted_masked[label_masked != 2]
+    label_masked = label_masked[label_masked != 2]
+    return predicted_masked, label_masked
+
 def getAA_Recall(predict_probability, label_mask_current_deforestation_test, 
-        predicted_test, threshold_list):
+        predicted_test, threshold_list, ignoreSmallPolygons = True):
     metrics_list = []
     for threshold in threshold_list:
         print("threshold", threshold)
+
+        # if ignoreSmallPolygons == True:
+        #     predicted_test, label_mask_current_deforestation_test = removeSmallPolygonsForMetrics(
+        #         predicted_test, label_mask_current_deforestation_test, min_polygon_area=625)
+
         predicted_thresholded = np.zeros_like(predict_probability).astype(np.int8)
         predicted_thresholded[predict_probability >= threshold] = 1
 
