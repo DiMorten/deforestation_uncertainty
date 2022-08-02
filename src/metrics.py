@@ -213,6 +213,8 @@ def removeSmallPolygonsForMetrics(predicted, label_mask,
     predicted_larger_than_min_area = skimage.morphology.area_opening(predicted, 
         area_threshold = min_polygon_area, connectivity=1)
     ignored_polygons = predicted - predicted_larger_than_min_area
+    ic(np.unique(predicted, return_counts=True),
+        np.unique(predicted_larger_than_min_area, return_counts=True))
     ic(np.unique(ignored_polygons, return_counts=True))
 
     label_mask[ignored_polygons == 1] = 2
@@ -220,24 +222,25 @@ def removeSmallPolygonsForMetrics(predicted, label_mask,
 
     return predicted, label_mask
 
-def getTest(predicted, label_mask, mask_valid_ts):
-    predicted_masked = predicted[mask_valid_ts == 1]
-    label_masked = label_mask[mask_valid_ts == 1]
+def getTest(predicted, label_mask, mask_test):
+    ic(predicted.shape, label_mask.shape)
 
+    predicted_masked = predicted[mask_test == 1]
+    label_masked = label_mask[mask_test == 1]
+    ic(predicted_masked.shape, label_masked.shape)
+    ic(np.unique(label_masked, return_counts=True))
     # mask class 2 again
     predicted_masked = predicted_masked[label_masked != 2]
     label_masked = label_masked[label_masked != 2]
+    ic(predicted_masked.shape, label_masked.shape)
+
     return predicted_masked, label_masked
 
 def getAA_Recall(predict_probability, label_mask_current_deforestation_test, 
-        predicted_test, threshold_list, ignoreSmallPolygons = True):
+        predicted_test, threshold_list):
     metrics_list = []
     for threshold in threshold_list:
         print("threshold", threshold)
-
-        # if ignoreSmallPolygons == True:
-        #     predicted_test, label_mask_current_deforestation_test = removeSmallPolygonsForMetrics(
-        #         predicted_test, label_mask_current_deforestation_test, min_polygon_area=625)
 
         predicted_thresholded = np.zeros_like(predict_probability).astype(np.int8)
         predicted_thresholded[predict_probability >= threshold] = 1
@@ -296,6 +299,7 @@ def getAA_Recall(predict_probability, label_mask_current_deforestation_test,
         # pdb.set_trace()
     metrics_list = np.asarray(metrics_list)
     return metrics_list       
+
 
 def getUncertaintyMetricsAudited(uncertainty, label_mask_current_deforestation_test, 
         predicted_test, threshold_list):
