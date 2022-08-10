@@ -3,7 +3,8 @@ from icecream import ic
 import skimage
 import pdb
 import tensorflow as tf
-
+# import sys
+import utils_v1
 class PatchesHandler():
 
 	def create_idx_image(self, ref_mask):
@@ -116,9 +117,19 @@ class PatchesHandler():
 	def infer(self, new_model, image1_pad,
 		h, w, num_patches_x, num_patches_y, 
 		patch_size_x, patch_size_y):
+		# patch_size_x, patch_size_y, a):
+		
 		img_reconstructed = np.zeros((h, w), dtype=np.float32)
+
 		for i in range(0,num_patches_y):
 			for j in range(0,num_patches_x):
+				'''
+				new_model = utils_v1.build_resunet_dropout_spatial(input_shape=(a['patch_size_rows'],a['patch_size_cols'], a['c']), 
+                	nb_filters = a['nb_filters'], n_classes = a['class_n'], dropout_seed = a['dropout_seed'])
+
+				for l in range(1, len(model.layers)):
+					new_model.layers[l].set_weights(model.layers[l].get_weights())
+				'''
 				patch = image1_pad[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)]
 				predicted = new_model.predict(np.expand_dims(patch, axis=0))[:,:,:,1].astype(np.float32)
 				img_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = predicted

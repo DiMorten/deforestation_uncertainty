@@ -4,7 +4,10 @@ from icecream import ic
 from osgeo import gdal
 import pdb
 from sklearn.preprocessing._data import _handle_zeros_in_scale
-from src.dataset import Para, MT
+from src.dataset import (
+    Para, MT,
+    ParaMultipleDates, MTMultipleDates
+)
 # path_image_unnormalized = 'E:/Jorge/dataset_deforestation/Para_2020/'
 # path_label = 'E:/Jorge/dataset_deforestation/Para/'
 
@@ -12,63 +15,66 @@ from src.dataset import Para, MT
 # dataset = 'Para_2020'
 # dataset = 'MT_2019_2020'
 # dataset = 'MT_2020'
+dataset = 'Para_2015'
+# dataset = 'Para_2016'
 # dataset = 'Para_2017'
+# dataset = 'Para_2018'
 # dataset = 'Para_2019'
-dataset = 'Para_2019'
 
 # dataset = 'Para_2018_2019'
 # dataset = 'MT_2019_2020'
 
 # dataset = 'MT_2020'
 # dataset = 'MT_2016'
-
+ic(dataset)
 mask_input = 'deforestation_time'
 
 if dataset == 'Para_2020':
     if mask_input == 'deforestation_time':
-        dataset = Para()
-        path_image_unnormalized = dataset.paths.label # 'D:/Jorge/datasets/deforestation/Para/'
-        im_filename_normalized = 'deforestation_time_normalized.npy'
+        dataset = ParaMultipleDates()
+        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
+        im_filename_normalized = 'deforestation_time_normalized_2020.npy'
         im_filenames = ['deforestation_past_years.tif']
         latest_year = 2020
 
 elif dataset == 'Para_2019':
     if mask_input == 'deforestation_time':
-        dataset = Para()
-        path_image_unnormalized = dataset.paths.label # 'D:/Jorge/datasets/deforestation/Para/'
+        dataset = ParaMultipleDates()
+        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2019.npy'
-        im_filenames = ['deforestation_past_years.tif']
+        # im_filenames = ['deforestation_past_years.tif']
+        im_filenames = ['']
         latest_year = 2019
 
 
 elif dataset == 'Para_2018':
     if mask_input == 'deforestation_time':
-        dataset = Para()
-        path_image_unnormalized = dataset.paths.label # 'D:/Jorge/datasets/deforestation/Para/'
+        dataset = ParaMultipleDates()
+        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2018.npy'
-        im_filenames = ['deforestation_past_years.tif']
+        im_filenames = ['']
         latest_year = 2018
 
 elif dataset == 'Para_2017':
     if mask_input == 'deforestation_time':
-        dataset = Para()
-        path_image_unnormalized = dataset.paths.label # 'D:/Jorge/datasets/deforestation/Para/'
+        dataset = ParaMultipleDates()
+        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2017.npy'
         im_filenames = ['deforestation_past_years.tif']
         latest_year = 2017
 
 elif dataset == 'Para_2016':
     if mask_input == 'deforestation_time':
-        dataset = Para()
-        path_image_unnormalized = dataset.paths.label # 'D:/Jorge/datasets/deforestation/Para/'
+        dataset = ParaMultipleDates()
+        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2016.npy'
         im_filenames = ['deforestation_past_years.tif']
         latest_year = 2016
 
 elif dataset == 'Para_2015':
     if mask_input == 'deforestation_time':
-        dataset = Para()
-        path_image_unnormalized = dataset.paths.label # 'D:/Jorge/datasets/deforestation/Para/'
+        dataset = ParaMultipleDates()
+        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2015.npy'
         im_filenames = ['deforestation_past_years.tif']
         latest_year = 2015
@@ -127,8 +133,8 @@ def loadOpticalIm(im_filenames):
     band_count = 0
 
     for i, im_filename in enumerate(im_filenames):
-        ic(path_image_unnormalized + im_filename)        
-        im = load_tiff_image(path_image_unnormalized + im_filename).astype('float32')
+        ic(path_image_unnormalized)        
+        im = load_tiff_image(path_image_unnormalized).astype('float32')
         ic(im.shape)
         if len(im.shape) == 2: im = im[np.newaxis, ...]
         if i:
@@ -195,6 +201,8 @@ if createTif == True:
         deforestation_time_2008 = np.max(image_unnormalized)
         ic(deforestation_time_2008)
         image_unnormalized[label_past_deforestation_before_2008 == 1] = deforestation_time_2008 + 1
+        # image_unnormalized[label_past_deforestation_before_2008 == 1] = 2007
+
         ic(np.unique(image_unnormalized, return_counts=True))
 
         '''
@@ -204,7 +212,7 @@ if createTif == True:
         ic(np.unique(deforestation_before_2008, return_counts=True))
         image_unnormalized[deforestation_before_2008 == 1] = deforestation_time_2008 + 1
         '''
-        ic(np.unique(image_unnormalized, return_counts=True))
+        # ic(np.unique(image_unnormalized, return_counts=True))
     '''
     if subtractYears == True:
         ic(np.unique(image_unnormalized, return_counts=True))
