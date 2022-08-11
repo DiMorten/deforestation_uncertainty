@@ -136,6 +136,14 @@ class PatchesHandler():
 		del patch, predicted
 		return img_reconstructed
 
+
+	def getPatch(self, image, reference, coord, patch_size=128, idx=0):
+		reference_patch = reference[coord[idx,0] : coord[idx,0] + patch_size,
+								coord[idx,1] : coord[idx,1] + patch_size]
+		image_patch = image[coord[idx,0] : coord[idx,0] + patch_size,
+				coord[idx,1] : coord[idx,1] + patch_size, self.dataset.image_channels[coord[idx,2]]] 
+
+		return image_patch, reference_patch
 class PatchesHandlerMultipleDates(PatchesHandler):
 	def __init__(self, dataset):
 		self.dataset = dataset

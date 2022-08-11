@@ -10,9 +10,9 @@ from src.dataset import Para, ParaDeforestationTime, ParaDistanceMap, ParaMultip
 # path_label = 'E:/Jorge/dataset_deforestation/Para/'
 
 # dataset = 'Para_2020'
-# dataset = 'MT_2020'
+dataset = 'MT_2020'
 # dataset = 'Para_2019'
-dataset = 'Para_2015'
+# dataset = 'Para_2015'
 
 if dataset == 'Para_2020':
     path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2020/'
