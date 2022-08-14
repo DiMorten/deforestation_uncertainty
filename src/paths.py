@@ -55,6 +55,8 @@ class PathsMT(Paths):
         self.deforestation_past_years = 'D:/Jorge/datasets/deforestation/MT/deforestation_past_years.tif' 
 
         self.deforestation_time = { 
+            2020: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2020.npy', 
+            2019: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2019.npy', 
             2018: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2018.npy', 
             2017: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2017.npy', 
             2016: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2016.npy' 
