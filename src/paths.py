@@ -9,7 +9,8 @@ class PathsPara(Paths):
 
         self.deforestation_time_name = 'deforestation_time_normalized_2018_2019.npy'
         self.deforestation_before_2008 = 'D:/Jorge/datasets/deforestation/deforestation_before_2008/deforestation_before_2008_para.tif'
-
+        self.hydrography = 'D:/Jorge/datasets/deforestation/Para/hydgrography.tif'
+        
         self.deforestation_past_years = 'D:/Jorge/datasets/deforestation/Para/deforestation_past_years.tif'
 
         self.deforestation_time = {
@@ -54,7 +55,7 @@ class PathsMT(Paths):
         self.deforestation_time_name = 'deforestation_time_normalized_2019_2020.npy'
 
         self.deforestation_before_2008 = 'D:/Jorge/datasets/deforestation/MT/deforestation_before_2008/deforestation_before_2008_MT.tif' 
- 
+        self.hydrography = 'D:/Jorge/datasets/deforestation/MT/hydgrography.tif'
         self.deforestation_past_years = 'D:/Jorge/datasets/deforestation/MT/deforestation_past_years.tif' 
 
         self.deforestation_time = { 

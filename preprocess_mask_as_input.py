@@ -200,7 +200,7 @@ if createTif == True:
         label_past_deforestation_before_2008 = dataset.loadPastDeforestationBefore2008()
         deforestation_time_2008 = np.max(image_unnormalized)
         ic(deforestation_time_2008)
-        image_unnormalized[label_past_deforestation_before_2008 == 1] = deforestation_time_2008 + 1
+        image_unnormalized[label_past_deforestation_before_2008 == 2007] = deforestation_time_2008 + 1
         # image_unnormalized[label_past_deforestation_before_2008 == 1] = 2007
 
         ic(np.unique(image_unnormalized, return_counts=True))
