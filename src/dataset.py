@@ -248,8 +248,8 @@ class MultipleDates():
 			# if (self.site == 'PA' and date == 2019) or (self.site == 'MT' and date == 2020):
 			if (self.site == 'PA' and date == 2019):	
 				label = self.loadLabelFromProject()
-			if (self.site == 'MT' and date == 2020):
-				label = self.addProjectPastDeforestationToLabel(label)
+			# if (self.site == 'MT' and date == 2020):
+			# 	label = self.addProjectPastDeforestationToLabel(label)
 
 				
 
@@ -290,7 +290,7 @@ class MultipleDates():
 		print("Past deforestation before 2008 is 2")
 		label_past_deforestation_before_2008 = self.loadPastDeforestationBefore2008().astype(np.uint8)[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
 		ic(np.unique(label_past_deforestation_before_2008, return_counts=True))
-		label[label_past_deforestation_before_2008 == 2007] = 2
+		label[label_past_deforestation_before_2008 != 0] = 2
 		ic(np.unique(deforestation_past_years, return_counts=True))
 
 		return label
@@ -348,7 +348,7 @@ class MT(Dataset):
  
 		label_past_deforestation_before_2008 = utils_v1.load_tiff_image( 
 			self.paths.deforestation_before_2008).astype('uint8')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
-		label[label_past_deforestation_before_2008 == 2007] = 2 
+		label[label_past_deforestation_before_2008 != 0] = 2 
 		del label_past_deforestation_before_2008 
 		return label 
  
