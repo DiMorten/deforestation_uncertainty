@@ -245,9 +245,8 @@ class MultipleDates():
 			
 			if self.borderBuffer > 0:
 				label = self.removeBorderBufferFromLabel(label, self.borderBuffer)
-			# if (self.site == 'PA' and date == 2019) or (self.site == 'MT' and date == 2020):
-			if (self.site == 'PA' and date == 2019):	
-				label = self.loadLabelFromProject()
+			# if (self.site == 'PA' and date == 2019):	
+			# 	label = self.loadLabelFromProject()
 			# if (self.site == 'MT' and date == 2020):
 			# 	label = self.addProjectPastDeforestationToLabel(label)
 
