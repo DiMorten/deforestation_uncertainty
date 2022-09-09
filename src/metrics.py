@@ -7,6 +7,7 @@ from sklearn import metrics
 import cv2
 import pdb
 import skimage
+import utils_v1 
 
 def plotAUC(fpr, tpr, roc_auc, modelId = '', nameId = ''):
     
@@ -349,6 +350,72 @@ def getUncertaintyMetricsAudited(uncertainty, label_mask_current_deforestation_t
     metrics_list = np.asarray(metrics_list)
     return metrics_list       
 
+
+def getAA_Recall(predict_probability, label_mask_current_deforestation_test, 
+        predicted_test, threshold_list):
+    metrics_list = []
+    for threshold in threshold_list:
+        print("threshold", threshold)
+
+        predicted_thresholded = np.zeros_like(predict_probability).astype(np.int8)
+        predicted_thresholded[predict_probability >= threshold] = 1
+
+        predicted_test_classified_correct = predicted_test[
+            predicted_thresholded == 0]
+        label_current_deforestation_test_classified_correct = label_mask_current_deforestation_test[
+            predicted_thresholded == 0]
+
+        predicted_test_classified_incorrect = predicted_test[
+            predicted_thresholded == 1]
+        label_current_deforestation_test_classified_incorrect = label_mask_current_deforestation_test[
+            predicted_thresholded == 1]
+
+        print(label_current_deforestation_test_classified_correct.shape,
+            predicted_test_classified_correct.shape)
+        cm_correct = metrics.confusion_matrix(
+            label_current_deforestation_test_classified_correct,
+            predicted_test_classified_correct)
+        print("cm_correct", cm_correct)
+
+        TN_L = cm_correct[0,0]
+        FN_L = cm_correct[1,0]
+        TP_L = cm_correct[1,1]
+        FP_L = cm_correct[0,1]
+
+        ic(label_current_deforestation_test_classified_incorrect.shape,
+            predicted_test_classified_incorrect.shape)
+
+        cm_incorrect = metrics.confusion_matrix(
+            label_current_deforestation_test_classified_incorrect,
+            predicted_test_classified_incorrect)
+
+        print("cm_incorrect", cm_incorrect)
+        TN_H = cm_incorrect[0,0]
+        FN_H = cm_incorrect[1,0]
+        TP_H = cm_incorrect[1,1]
+        FP_H = cm_incorrect[0,1]
+        
+        precision_L = TP_L / (TP_L + FP_L)
+        recall_L = TP_L / (TP_L + FN_L)
+        
+        precision_H = TP_H / (TP_H + FP_H)
+        recall_H = TP_H / (TP_H + FN_H)
+        
+        recall_Ltotal = TP_L / (TP_L + FN_L + TP_H + FN_H)
+        ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+            
+        AA = (TP_H + FN_H + FP_H + TN_H) / len(label_mask_current_deforestation_test)
+        ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+        mm = np.hstack((precision_L, recall_L, recall_Ltotal, AA,
+                precision_H, recall_H))
+        print(mm)
+        metrics_list.append(mm)
+
+        # pdb.set_trace()
+    metrics_list = np.asarray(metrics_list)
+    return metrics_list       
+
+
 def getF1byThreshold(score, label, threshold_list):
     metrics_list = []
     for threshold in threshold_list:
@@ -372,6 +439,191 @@ def getF1byThreshold(score, label, threshold_list):
         
         mm = np.hstack((precision_L, recall_L, recall_Ltotal, AA,
                 precision_H, recall_H))
+        print(mm)
+        metrics_list.append(mm)
+
+        # pdb.set_trace()
+    metrics_list = np.asarray(metrics_list)
+    return metrics_list   
+
+def getUncertaintyMetricsFromImage(predict_probability, label_mask,
+        predicted_test, 
+        mask_test,
+        threshold_list,
+        px_area = 625):
+    metrics_list = []
+    for threshold in threshold_list:
+        print("threshold", threshold)
+
+        predicted_thresholded = np.zeros_like(predict_probability).astype(np.int8)
+        predicted_thresholded[predict_probability >= threshold] = 1
+
+        ignoreSmallUncertaintyPolygons = True
+        if ignoreSmallUncertaintyPolygons == True:
+            area = skimage.morphology.area_opening(predicted_thresholded, area_threshold = px_area, connectivity=1)
+            area_no_consider = predicted_thresholded-area
+            predicted_thresholded[area_no_consider==1] = 0
+        
+
+        # flatten
+        # pdb.set_trace()
+        ic(utils_v1.getTestVectorFromIm(
+                    predicted_thresholded, mask_test).shape)
+        ic(label_mask.shape)
+
+        label_mask_current_deforestation = utils_v1.getTestVectorFromIm(
+                    label_mask, mask_test)
+        label_mask_current_deforestation_test = label_mask_current_deforestation[label_mask_current_deforestation != 2]
+
+        predicted_thresholded = utils_v1.excludeBackgroundAreasFromTest(
+            utils_v1.getTestVectorFromIm(
+                    predicted_thresholded, mask_test),
+                label_mask_current_deforestation)
+        
+
+
+        predicted_test_classified_correct = predicted_test[
+            predicted_thresholded == 0]
+        label_current_deforestation_test_classified_correct = label_mask_current_deforestation_test[
+            predicted_thresholded == 0]
+
+        predicted_test_classified_incorrect = predicted_test[
+            predicted_thresholded == 1]
+        label_current_deforestation_test_classified_incorrect = label_mask_current_deforestation_test[
+            predicted_thresholded == 1]
+
+        print(label_current_deforestation_test_classified_correct.shape,
+            predicted_test_classified_correct.shape)
+        cm_correct = metrics.confusion_matrix(
+            label_current_deforestation_test_classified_correct,
+            predicted_test_classified_correct)
+        print("cm_correct", cm_correct)
+
+        TN_L = cm_correct[0,0]
+        FN_L = cm_correct[1,0]
+        TP_L = cm_correct[1,1]
+        FP_L = cm_correct[0,1]
+
+        ic(label_current_deforestation_test_classified_incorrect.shape,
+            predicted_test_classified_incorrect.shape)
+
+        cm_incorrect = metrics.confusion_matrix(
+            label_current_deforestation_test_classified_incorrect,
+            predicted_test_classified_incorrect)
+        print("cm_incorrect", cm_incorrect)
+
+        if cm_incorrect.shape[0] != 2:
+            ic(np.all(label_current_deforestation_test_classified_incorrect) == 0)
+            ic(np.all(predicted_test_classified_incorrect) == 0)
+            
+            precision_L = np.nan
+            recall_L = np.nan
+            recall_Ltotal = np.nan
+            AA = len(label_current_deforestation_test_classified_incorrect) / len(label_mask_current_deforestation_test)
+            precision_H = np.nan
+            recall_H = np.nan
+        else:
+            # pdb.set_trace()
+            TN_H = cm_incorrect[0,0]
+            FN_H = cm_incorrect[1,0]
+            TP_H = cm_incorrect[1,1]
+            FP_H = cm_incorrect[0,1]
+            
+            precision_L = TP_L / (TP_L + FP_L)
+            recall_L = TP_L / (TP_L + FN_L)
+            
+            precision_H = TP_H / (TP_H + FP_H)
+            recall_H = TP_H / (TP_H + FN_H)
+            
+            recall_Ltotal = TP_L / (TP_L + FN_L + TP_H + FN_H)
+            ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+                
+            AA = (TP_H + FN_H + FP_H + TN_H) / len(label_mask_current_deforestation_test)
+            ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+
+        mm = np.hstack((precision_L, recall_L, recall_Ltotal, AA,
+                precision_H, recall_H))
+        print(mm)
+        metrics_list.append(mm)
+
+        # pdb.set_trace()
+    metrics_list = np.asarray(metrics_list)
+    return metrics_list               
+
+# def getUncertaintyMetricsAuditedFromImage(uncertainty, label_mask_current_deforestation_test, 
+#         predicted_test, threshold_list):
+    
+def getUncertaintyMetricsAuditedFromImage(uncertainty, label_mask, 
+        predicted_test, 
+        mask_test,
+        threshold_list,
+        px_area = 625):
+
+    metrics_list = []
+    for threshold in threshold_list:
+        print("threshold", threshold)
+        predicted_thresholded = np.zeros_like(uncertainty).astype(np.int8)
+        predicted_thresholded[uncertainty >= threshold] = 1
+
+        ignoreSmallUncertaintyPolygons = True
+        if ignoreSmallUncertaintyPolygons == True:
+            area = skimage.morphology.area_opening(predicted_thresholded, area_threshold = px_area, connectivity=1)
+            area_no_consider = predicted_thresholded-area
+            predicted_thresholded[area_no_consider==1] = 0
+            
+
+
+        label_mask_current_deforestation = utils_v1.getTestVectorFromIm(
+                    label_mask, mask_test)
+        label_mask_current_deforestation_test = label_mask_current_deforestation[label_mask_current_deforestation != 2]
+
+        predicted_thresholded = utils_v1.excludeBackgroundAreasFromTest(
+            utils_v1.getTestVectorFromIm(
+                    predicted_thresholded, mask_test),
+                label_mask_current_deforestation)
+
+
+
+        predicted_test_classified_correct = predicted_test[
+            predicted_thresholded == 0]
+        label_current_deforestation_test_classified_correct = label_mask_current_deforestation_test[
+            predicted_thresholded == 0]
+
+        # predicted_test_classified_incorrect = predicted_test[
+        #     predicted_thresholded == 1]
+        label_current_deforestation_test_classified_incorrect = label_mask_current_deforestation_test[
+            predicted_thresholded == 1]
+        predicted_test_classified_incorrect = label_current_deforestation_test_classified_incorrect.copy()
+
+        predicted = np.concatenate((predicted_test_classified_correct, predicted_test_classified_incorrect),
+            axis = 0)
+        label = np.concatenate((label_current_deforestation_test_classified_correct, label_current_deforestation_test_classified_incorrect),
+            axis = 0)
+
+        print(label.shape,
+            predicted.shape)
+        cm_audited = metrics.confusion_matrix(
+            label,
+            predicted)
+        print("cm_audited", cm_audited)
+
+        if cm_audited.shape[0] != 2:
+            ic(np.all(label) == 0)
+            ic(np.all(predicted) == 0)
+            
+            precision = np.nan
+            recall = np.nan
+        else:
+
+            TN = cm_audited[0,0]
+            FN = cm_audited[1,0]
+            TP = cm_audited[1,1]
+            FP = cm_audited[0,1]
+            
+            precision = TP / (TP + FP)
+            recall = TP / (TP + FN)
+
+        mm = np.hstack((precision, recall))
         print(mm)
         metrics_list.append(mm)
 
