@@ -275,22 +275,35 @@ def getAA_Recall(predict_probability, label_mask_current_deforestation_test,
             predicted_test_classified_incorrect)
 
         print("cm_incorrect", cm_incorrect)
-        TN_H = cm_incorrect[0,0]
-        FN_H = cm_incorrect[1,0]
-        TP_H = cm_incorrect[1,1]
-        FP_H = cm_incorrect[0,1]
-        
-        precision_L = TP_L / (TP_L + FP_L)
-        recall_L = TP_L / (TP_L + FN_L)
-        
-        precision_H = TP_H / (TP_H + FP_H)
-        recall_H = TP_H / (TP_H + FN_H)
-        
-        recall_Ltotal = TP_L / (TP_L + FN_L + TP_H + FN_H)
-        ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+
+        if cm_incorrect.shape[0] != 2: 
+            ic(np.all(label_current_deforestation_test_classified_incorrect) == 0) 
+            ic(np.all(predicted_test_classified_incorrect) == 0) 
+             
+            precision_L = np.nan 
+            recall_L = np.nan 
+            recall_Ltotal = np.nan 
+            AA = len(label_current_deforestation_test_classified_incorrect) / len(label_mask_current_deforestation_test) 
+            precision_H = np.nan 
+            recall_H = np.nan 
+        else:
+                        
+            TN_H = cm_incorrect[0,0]
+            FN_H = cm_incorrect[1,0]
+            TP_H = cm_incorrect[1,1]
+            FP_H = cm_incorrect[0,1]
             
-        AA = (TP_H + FN_H + FP_H + TN_H) / len(label_mask_current_deforestation_test)
-        ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+            precision_L = TP_L / (TP_L + FP_L)
+            recall_L = TP_L / (TP_L + FN_L)
+            
+            precision_H = TP_H / (TP_H + FP_H)
+            recall_H = TP_H / (TP_H + FN_H)
+            
+            recall_Ltotal = TP_L / (TP_L + FN_L + TP_H + FN_H)
+            ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+            AA = (TP_H + FN_H + FP_H + TN_H) / len(label_mask_current_deforestation_test)
+            ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+
         mm = np.hstack((precision_L, recall_L, recall_Ltotal, AA,
                 precision_H, recall_H))
         print(mm)
