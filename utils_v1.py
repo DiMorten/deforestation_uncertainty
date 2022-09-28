@@ -170,31 +170,7 @@ def pred_recostruction(patch_size, pred_labels, image_ref):
             count+=1
     return img_reconstructed
 
-def weighted_categorical_crossentropy(weights):
-        """
-        A weighted version of keras.objectives.categorical_crossentropy
-        
-        Variables:
-            weights: numpy array of shape (C,) where C is the number of classes
-        
-        Usage:
-            weights = np.array([0.5,2,10]) # Class one at 0.5, class 2 twice the normal weights, class 3 10x.
-            loss = weighted_categorical_crossentropy(weights)
-            model.compile(loss=loss,optimizer='adam')
-        """
-        
-        weights = K.variable(weights)
-            
-        def loss(y_true, y_pred):
-            # scale predictions so that the class probas of each sample sum to 1
-            y_pred /= K.sum(y_pred, axis=-1, keepdims=True)
-            # clip to prevent NaN's and Inf's
-            y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())
-            loss = y_true * K.log(y_pred) + (1-y_true) * K.log(1-y_pred)
-            loss = loss * weights 
-            loss = - K.mean(loss, -1)
-            return loss
-        return loss
+
 
 def mask_no_considered(image_ref, past_ref, buffer):
     # Creation of buffer for pixel no considered
@@ -306,7 +282,7 @@ def resnet_block_spatial_dropout(x, n_filter, dropout_seed, ind):
     x = Add()([x, s])
     return x
 # Residual U-Net model
-def build_resunet(input_shape, nb_filters, n_classes):
+def build_resunet(input_shape, nb_filters, n_classes, last_activation='softmax'):
     '''Base network to be shared (eq. to feature extraction)'''
     input_layer= Input(shape = input_shape, name="input_enc_net")
     
@@ -339,7 +315,7 @@ def build_resunet(input_shape, nb_filters, n_classes):
                        name = 'upsampling_net1')(UpSampling2D(size = (2,2))(merged2))
     merged1 = concatenate([res_block1, upsample1], name='concatenate1')
 
-    output = Conv2D(n_classes,(1,1), activation = 'softmax', padding = 'same', name = 'output')(merged1)
+    output = Conv2D(n_classes,(1,1), activation = last_activation, padding = 'same', name = 'output')(merged1)
                                                                                                            
     return Model(input_layer, output)
 
@@ -388,7 +364,7 @@ def build_resunet_dropout(input_shape, nb_filters, n_classes):
 
 
 # Residual U-Net model
-def build_resunet_dropout_spatial(input_shape, nb_filters, n_classes, dropout_seed = None):
+def build_resunet_dropout_spatial(input_shape, nb_filters, n_classes, dropout_seed = None, last_activation='softmax'):
     '''Base network to be shared (eq. to feature extraction)'''
 
     dropout = 0.25
@@ -431,7 +407,7 @@ def build_resunet_dropout_spatial(input_shape, nb_filters, n_classes, dropout_se
 
     merged1 = concatenate([res_block1, upsample1], name='concatenate1')
 
-    output = Conv2D(n_classes,(1,1), activation = 'softmax', padding = 'same', name = 'output')(merged1)
+    output = Conv2D(n_classes,(1,1), activation = last_activation, padding = 'same', name = 'output')(merged1)
                                                                                                            
     return Model(input_layer, output)
 
