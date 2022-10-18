@@ -392,6 +392,9 @@ def getF1byThreshold(score, label, threshold_list):
     return metrics_list       
 
 
+
+
+
 '''
 
 def getAA_Recall(uncertainty, label_mask_current_deforestation_test, 

@@ -299,10 +299,13 @@ def extract_patches2(im_idx, patch_size, overlap):
 	return patches
 
 '''
+def relu(x):
+	return (abs(x) + x) / 2
 
 class PatchesHandlerEvidential(PatchesHandlerMultipleDates):
 	def predict(self, model, test_img_input):
 		evidence = np.squeeze(model.predict(np.expand_dims(test_img_input, axis=0)))
+		evidence = relu(evidence)
 		# ic(evidence.shape)
 		alpha = evidence + 1
 		# ic(self.class_n, alpha.shape)
@@ -318,7 +321,10 @@ class PatchesHandlerEvidential(PatchesHandlerMultipleDates):
 		patch_size_x, patch_size_y):
 		# patch_size_x, patch_size_y, a):
 		
+		# img_reconstructed = np.zeros((h, w, self.class_n), dtype=np.float32)
 		img_reconstructed = np.zeros((h, w), dtype=np.float32)
+
+		print("AAA", img_reconstructed.shape)
 		u_reconstructed = np.zeros((h, w), dtype=np.float32)
 
 		for i in range(0,num_patches_y):
@@ -334,6 +340,8 @@ class PatchesHandlerEvidential(PatchesHandlerMultipleDates):
 				predicted, u = self.predict(new_model, patch)
 				# ic(predicted.shape)
 				predicted = predicted[...,1].astype(np.float32)
+				# predicted = predicted.astype(np.float32)
+				
 				# predicted = new_model.predict(np.expand_dims(patch, axis=0))[:,:,:,1].astype(np.float32)
 				img_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = predicted
 				u_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = u
