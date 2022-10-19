@@ -299,10 +299,13 @@ def extract_patches2(im_idx, patch_size, overlap):
 	return patches
 
 '''
+def relu(x):
+	return (abs(x) + x) / 2
 
 class PatchesHandlerEvidential(PatchesHandlerMultipleDates):
 	def predict(self, model, test_img_input):
 		evidence = np.squeeze(model.predict(np.expand_dims(test_img_input, axis=0)))
+		evidence = relu(evidence)
 		# ic(evidence.shape)
 		alpha = evidence + 1
 		# ic(self.class_n, alpha.shape)

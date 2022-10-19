@@ -39,12 +39,21 @@ def applyBackgroundMask(im, label):
 def invertMaskFromIm(im):
     im = np.abs(1 - im)
     return im
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+def show_im(im, ax, title = "", cmap = "jet"):
+    im_plt = ax.imshow(im.astype(np.float32), cmap = cmap)
+    plt.title(title)
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    plt.colorbar(im_plt, cax=cax) 
 
 def plotCropSample4(im1, im2, im3, im4, lims = None, 
         titles = ['Optical', '.', 'Secondary Veg.', 'Past deforestation'],
         cmaps = [plt.cm.gray, plt.cm.gray, plt.cm.gray, plt.cm.gray],
         maskBackground = [False, False, False, False],
-        invertMask = [False, False, False, False]):
+        invertMask = [False, False, False, False],
+        uncertainty_vlims = [0, 1], colorbar = False):
     fig, axes = plt.subplots(1, 4)
     fig.set_figheight(14)
     fig.set_figwidth(14)
@@ -73,9 +82,20 @@ def plotCropSample4(im1, im2, im3, im4, lims = None,
 
 
     axes[0].imshow(im1, cmap=cmaps[0])
-    axes[1].imshow(im2, cmap=cmaps[1])
+    plot = axes[1].imshow(im2, cmap=cmaps[1], vmin=0, vmax=1)
+    if colorbar == True:
+        divider = make_axes_locatable(axes[1])
+        cax = divider.append_axes("bottom", size="5%", pad=0.05)
+        plt.colorbar(plot, cax=cax, orientation="horizontal")
+
+
     axes[2].imshow(im3, cmap=cmaps[2])
-    axes[3].imshow(im4, cmap=cmaps[3])
+    plot = axes[3].imshow(im4, cmap=cmaps[3], vmin=uncertainty_vlims[0], vmax=uncertainty_vlims[1])
+    if colorbar == True:
+        divider = make_axes_locatable(axes[3])
+        cax = divider.append_axes("bottom", size="5%", pad=0.05)
+        plt.colorbar(plot, cax=cax, orientation="horizontal") 
+
 
     axes[0].axis('off')
     axes[1].set_xticks([])
