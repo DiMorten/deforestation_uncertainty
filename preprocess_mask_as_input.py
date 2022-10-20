@@ -6,7 +6,7 @@ import pdb
 from sklearn.preprocessing._data import _handle_zeros_in_scale
 from src.dataset import (
     Para, MT,
-    ParaMultipleDates, MTMultipleDates
+    PAMultipleDates, MTMultipleDates
 )
 # path_image_unnormalized = 'E:/Jorge/dataset_deforestation/Para_2020/'
 # path_label = 'E:/Jorge/dataset_deforestation/Para/'
@@ -31,7 +31,7 @@ mask_input = 'deforestation_time'
 
 if dataset == 'Para_2020':
     if mask_input == 'deforestation_time':
-        dataset = ParaMultipleDates()
+        dataset = PAMultipleDates()
         path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2020.npy'
         im_filenames = ['deforestation_past_years.tif']
@@ -39,7 +39,7 @@ if dataset == 'Para_2020':
 
 elif dataset == 'Para_2019':
     if mask_input == 'deforestation_time':
-        dataset = ParaMultipleDates()
+        dataset = PAMultipleDates()
         path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2019.npy'
         # im_filenames = ['deforestation_past_years.tif']
@@ -49,7 +49,7 @@ elif dataset == 'Para_2019':
 
 elif dataset == 'Para_2018':
     if mask_input == 'deforestation_time':
-        dataset = ParaMultipleDates()
+        dataset = PAMultipleDates()
         path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2018.npy'
         im_filenames = ['']
@@ -57,7 +57,7 @@ elif dataset == 'Para_2018':
 
 elif dataset == 'Para_2017':
     if mask_input == 'deforestation_time':
-        dataset = ParaMultipleDates()
+        dataset = PAMultipleDates()
         path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2017.npy'
         im_filenames = ['deforestation_past_years.tif']
@@ -65,7 +65,7 @@ elif dataset == 'Para_2017':
 
 elif dataset == 'Para_2016':
     if mask_input == 'deforestation_time':
-        dataset = ParaMultipleDates()
+        dataset = PAMultipleDates()
         path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2016.npy'
         im_filenames = ['deforestation_past_years.tif']
@@ -73,7 +73,7 @@ elif dataset == 'Para_2016':
 
 elif dataset == 'Para_2015':
     if mask_input == 'deforestation_time':
-        dataset = ParaMultipleDates()
+        dataset = PAMultipleDates()
         path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2015.npy'
         im_filenames = ['deforestation_past_years.tif']
@@ -81,7 +81,7 @@ elif dataset == 'Para_2015':
 
 elif dataset == 'Para_2018_2019':
     if mask_input == 'deforestation_time':
-        dataset = Para()
+        dataset = PA()
         path_image_unnormalized = dataset.paths.label # 'D:/Jorge/datasets/deforestation/Para/'
         im_filename_normalized = 'deforestation_time_normalized_2018_2019.npy'
         im_filenames = ['deforestation_past_years.tif']  

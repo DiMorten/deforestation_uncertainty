@@ -70,7 +70,7 @@ class Dataset():
 
 		image_ref_[label_class2 == 1] = 2
 		return image_ref_   
-class Para(Dataset):
+class PA(Dataset):
 	def __init__(self):
 		self.paths = PathsPara()
 
@@ -96,7 +96,7 @@ class Para(Dataset):
 
 		return label_past_deforestation
 
-class ParaDistanceMap(Para):
+class PADistanceMap(PA):
 	def loadInputImage(self):
 		image_stack = super().loadInputImage()
 		image_stack = self.addNpyBandToInput(image_stack, 
@@ -116,7 +116,7 @@ class ParaDistanceMap(Para):
 		image_stack = np.concatenate((band, image_stack), axis = -1)  
 		return image_stack    
 
-class ParaDeforestationTime(Para):
+class PADeforestationTime(PA):
 	def __init__(self, addPastDeforestationInput = True):
 		self.addPastDeforestationInput = addPastDeforestationInput
 		super().__init__()
@@ -144,7 +144,7 @@ class ParaDeforestationTime(Para):
 		del deforestation_time  
 		return image_stack
 
-class ParaMultipleDates(ParaDeforestationTime):
+class PAMultipleDates(PADeforestationTime):
 	def __init__(self, dates = [2017, 2018, 2019], addPastDeforestationInput = True, borderBuffer = 0):
 		super().__init__(addPastDeforestationInput)
 		self.dates = dates

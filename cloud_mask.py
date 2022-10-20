@@ -8,8 +8,9 @@ import rasterio
 from osgeo import gdal 
 import cv2 
 from src.dataset import (
-    Para, ParaDeforestationTime, ParaDistanceMap, ParaMultipleDates, MTMultipleDates,
+    Para, PADeforestationTime, PADistanceMap, PAMultipleDates, MTMultipleDates,
     MT, 
+    MA
 )
 # naming conventions: 
 # ['QA60', 'B1','B2',    'B3',    'B4',   'B5','B6','B7', 'B8','  B8A', 'B9',          'B10', 'B11','B12'] 
@@ -111,152 +112,64 @@ def load_tiff_image(path):
     gdal_header = gdal.Open(path) 
     im = gdal_header.ReadAsArray() 
     return im 
-def loadOpticalIm(path_optical_im, im_filenames): 
+
+def scaleIm(im, scale):
+    im = np.squeeze(im)
+    if scale != 1:
+        im = cv2.resize(im, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+    return im
+
+def loadOpticalIm(path_optical_im, im_filenames, scale_list = None): 
     band_count = 0 
  
     for i, im_filename in enumerate(im_filenames): 
         ic(path_optical_im + im_filename)         
-        im = load_tiff_image(path_optical_im + im_filename).astype('float32') 
-        ic(im.shape) 
-        if len(im.shape) == 2: im = im[np.newaxis, ...] 
+        band = load_tiff_image(path_optical_im + im_filename).astype('float32') 
+        ic(band.shape) 
+        if len(band.shape) == 2: band = band[np.newaxis, ...] 
+        if scale_list != None:
+            band = np.expand_dims(scaleIm(band, scale_list[i]), axis=0)
         if i: 
-            ic(im.shape, optical_im.shape) 
-            optical_im = np.concatenate((optical_im, im), axis=0) 
+            ic(band.shape, optical_im.shape) 
+            optical_im = np.concatenate((optical_im, band), axis=0) 
         else: 
-            optical_im = im 
-    del im  
+            optical_im = band 
+    del band  
     return optical_im     
  
  
 if __name__ == '__main__': 
- 
-    dataset_id = 'MT_2020' 
+    # ======= INPUT PARAMETERS ============ # 
+    dataset = MA()
+    year = 2020
+    # ======= END INPUT PARAMETERS ============ # 
 
-    if dataset_id == 'Para_2015': 
-        dataset = Para() 
-        path_optical_im = dataset.paths.optical_im_folder + 'Para_2015/' 
-        im_filenames = ['PA_S2_2015_B1_B2_B3_crop.tif', 
-            'PA_S2_2015_B4_B5_B6_crop.tif', 
-            'PA_S2_2015_B7_B8_B8A_crop.tif', 
-            'PA_S2_2015_B9_B10_B11_crop.tif', 
-            'PA_S2_2015_B12_crop.tif'] 
-        path_cirrus_band = im_filenames[3]
+    path_optical_im = dataset.paths.optical_im_past_dates[year]
+
+    scale_list = None
+
+    if type(dataset) == PA:
+        
+        path_cirrus_band = dataset.paths.im_filenames[year][3]
         cirrus_band_id = 1
 
-    if dataset_id == 'Para_2016': 
-        dataset = Para() 
-        path_optical_im = dataset.paths.optical_im_folder + 'Para_2016/' 
-        im_filenames = ['PA_S2_2016_B1_B2_B3_crop.tif', 
-            'PA_S2_2016_B4_B5_B6_crop.tif', 
-            'PA_S2_2016_B7_B8_B8A_crop.tif', 
-            'PA_S2_2016_B9_B10_B11_crop.tif', 
-            'PA_S2_2016_B12_crop.tif'] 
-        path_cirrus_band = im_filenames[3]
-        cirrus_band_id = 1
-   
-    if dataset_id == 'Para_2017': 
-        dataset = Para() 
-        path_optical_im = dataset.paths.optical_im_folder + 'Para_2017/' 
-        im_filenames = ['PA_S2_2017_B1_B2_B3_crop.tif', 
-            'PA_S2_2017_B4_B5_B6_crop.tif', 
-            'PA_S2_2017_B7_B8_B8A_crop.tif', 
-            'PA_S2_2017_B9_B10_B11_crop.tif', 
-            'PA_S2_2017_B12_crop.tif'] 
-        path_cirrus_band = im_filenames[3]
-        cirrus_band_id = 1
+    elif type(dataset) == MT: 
 
-    if dataset_id == 'Para_2018': 
-        dataset = Para() 
-        path_optical_im = dataset.paths.optical_im_folder + 'Para_2018/' 
-        im_filenames = ['COPERNICUS_S2_20180721_20180726_B1_B2_B3.tif', 
-            'COPERNICUS_S2_20180721_20180726_B4_B5_B6.tif', 
-            'COPERNICUS_S2_20180721_20180726_B7_B8_B8A.tif', 
-            'COPERNICUS_S2_20180721_20180726_B9_B10_B11.tif', 
-            'COPERNICUS_S2_20180721_20180726_B12.tif'] 
-        path_cirrus_band = im_filenames[3]
-        cirrus_band_id = 1
-
-    elif dataset_id == 'Para_2019': 
-        dataset = Para() 
-        path_optical_im = dataset.paths.optical_im_folder + 'Para_2019/' 
-        im_filenames = ['COPERNICUS_S2_20190721_20190726_B1_B2_B3.tif', 
-            'COPERNICUS_S2_20190721_20190726_B4_B5_B6.tif', 
-            'COPERNICUS_S2_20190721_20190726_B7_B8_B8A.tif', 
-            'COPERNICUS_S2_20190721_20190726_B9_B10_B11.tif', 
-            'COPERNICUS_S2_20190721_20190726_B12.tif'] 
-        path_cirrus_band = im_filenames[3]
-        cirrus_band_id = 1
-
-
-    elif dataset_id == 'MT_2016': 
-        dataset = MT() 
-        path_optical_im = dataset.paths.optical_im_folder + 'MT_2016/' 
-        im_filenames = ['MT_S2_2016_07_21_08_07_B1_B2_crop.tif', 
-            'MT_S2_2016_07_21_08_07_B3_B4_crop.tif', 
-            'MT_S2_2016_07_21_08_07_B5_B6_crop.tif', 
-            'MT_S2_2016_07_21_08_07_B7_B8_crop.tif', 
-            'MT_S2_2016_07_21_08_07_B8A_B9_crop.tif',
-            'MT_S2_2016_07_21_08_07_B10_B11_crop.tif',
-            'MT_S2_2016_07_21_08_07_B12_crop.tif'] 
-        path_cirrus_band = im_filenames[5]
+        path_cirrus_band = dataset.paths.im_filenames[year][5]
         cirrus_band_id = 0
 
-    elif dataset_id == 'MT_2017': 
-        dataset = MT() 
-        path_optical_im = dataset.paths.optical_im_folder + 'MT_2017/' 
-        im_filenames = ['MT_S2_07_26_28_2017_B1_B2_crop.tif', 
-            'MT_S2_07_26_28_2017_B3_B4_crop.tif', 
-            'MT_S2_07_26_28_2017_B5_B6_crop.tif', 
-            'MT_S2_07_26_28_2017_B7_B8_crop.tif', 
-            'MT_S2_07_26_28_2017_B8A_B9_crop.tif',
-            'MT_S2_07_26_28_2017_B10_B11_crop.tif',
-            'MT_S2_07_26_28_2017_B12_crop.tif'] 
-        path_cirrus_band = im_filenames[5]
-        cirrus_band_id = 0
+    elif type(dataset) == MA:
 
-    elif dataset_id == 'MT_2018': 
-        dataset = MT() 
-        path_optical_im = dataset.paths.optical_im_folder + 'MT_2018/' 
-        im_filenames = ['MT_S2_07_26_28_31_2018_B1_B2_crop.tif', 
-            'MT_S2_07_26_28_31_2018_B3_B4_crop.tif', 
-            'MT_S2_07_26_28_31_2018_B5_B6_crop.tif', 
-            'MT_S2_07_26_28_31_2018_B7_B8_crop.tif', 
-            'MT_S2_07_26_28_31_2018_B8A_B9_crop.tif',
-            'MT_S2_07_26_28_31_2018_B10_B11_crop.tif',
-            'MT_S2_07_26_28_31_2018_B12_crop.tif'] 
-        path_cirrus_band = im_filenames[5]
-        cirrus_band_id = 0
+        path_cirrus_band = dataset.paths.im_filenames[year][10]
+        cirrus_band_id = None
 
-
-    elif dataset_id == 'MT_2019': 
-        dataset = MT() 
-        path_optical_im = dataset.paths.optical_im_folder + 'MT_2019/' 
-        im_filenames = ['S2_R1_MT_2019_08_02_2019_08_05_B1_B2.tif', 
-            'S2_R1_MT_2019_08_02_2019_08_05_B3_B4.tif', 
-            'S2_R1_MT_2019_08_02_2019_08_05_B5_B6.tif', 
-            'S2_R1_MT_2019_08_02_2019_08_05_B7_B8.tif', 
-            'S2_R1_MT_2019_08_02_2019_08_05_B8A_B9.tif',
-            'S2_R1_MT_2019_08_02_2019_08_05_B10_B11.tif',
-            'S2_R1_MT_2019_08_02_2019_08_05_B12.tif'] 
-        path_cirrus_band = im_filenames[5]
-        cirrus_band_id = 0
-
-    elif dataset_id == 'MT_2020': 
-        dataset = MT() 
-        path_optical_im = dataset.paths.optical_im_folder + 'MT_2020/' 
-        im_filenames = ['S2_R1_MT_2020_08_03_2020_08_15_B1_B2.tif', 
-            'S2_R1_MT_2020_08_03_2020_08_15_B3_B4.tif', 
-            'S2_R1_MT_2020_08_03_2020_08_15_B5_B6.tif', 
-            'S2_R1_MT_2020_08_03_2020_08_15_B7_B8.tif', 
-            'S2_R1_MT_2020_08_03_2020_08_15_B8A_B9.tif',
-            'S2_R1_MT_2020_08_03_2020_08_15_B10_B11.tif',
-            'S2_R1_MT_2020_08_03_2020_08_15_B12.tif'] 
-        path_cirrus_band = im_filenames[5]
-        cirrus_band_id = 0
+        resolution_list = [60, 10, 10, 10, 20, 20, 20, 10, 20, 60, 60, 20, 20]
+        scale_list = [x/10 for x in resolution_list]
+        ic(scale_list)
 
     filename = dataset_id + '.npy' 
  
-    optical_im = loadOpticalIm(path_optical_im, im_filenames) 
+    optical_im = loadOpticalIm(path_optical_im, dataset.paths.im_filenames[year], scale_list) 
     # optical_im = np.transpose(optical_im, (1, 2, 0)) 
     ic(optical_im.shape) 
  
@@ -276,6 +189,8 @@ if __name__ == '__main__':
     # === GET CIRRUS THIN CLOUD MASK === #
     ic(path_optical_im + path_cirrus_band)
     cirrus = load_tiff_image(path_optical_im + path_cirrus_band)[cirrus_band_id]
+    if scale_list != None:
+        cirrus = scaleIm(cirrus, 6.0)
     ic(np.min(cirrus), np.average(cirrus), np.max(cirrus))
     threshold = 19
 
@@ -286,6 +201,8 @@ if __name__ == '__main__':
 
     cloud_mask = np.zeros_like(thin_cloud_mask).astype(np.uint8)
     cloud_mask[thin_cloud_mask == 1] = 1
+    ic(cloud_mask.shape, cloud_cloudshadow_mask.shape, thin_cloud_mask.shape, cirrus.shape)
+    # pdb.set_trace()
     cloud_mask[cloud_cloudshadow_mask == 1] = 1
     apply_shadow_mask = False
     if apply_shadow_mask == True:

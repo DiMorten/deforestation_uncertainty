@@ -4,7 +4,7 @@ from icecream import ic
 import pdb
 import scipy
 sys.path.append("..")
-from src.paths import PathsPara, PathsMT
+from src.paths import PathsPara, PathsMT, PathsMA
 import utils_v1
 import skimage
 import matplotlib.pyplot as plt
@@ -80,7 +80,8 @@ class Dataset():
 
 		image_ref_[label_class2 == 1] = 2
 		return image_ref_   
-class Para(Dataset):
+
+class PA(Dataset):
 	def __init__(self):
 		self.paths = PathsPara()
 
@@ -111,7 +112,78 @@ class Para(Dataset):
 
 		return label_past_deforestation
 
-class ParaDistanceMap(Para):
+
+class MT(Dataset): 
+	def __init__(self): 
+		self.paths = PathsMT() 
+		# self.previewLims1 = np.array([2200, 3200, 6900, 7900])
+		# self.previewLims2 = np.array([500, 1500, 3500, 4500])
+		self.previewLims1 = np.array([11500, 12500, 9000, 10000])
+
+		self.previewLims2 = np.array([5000, 6000, 9500, 10500])
+		self.site = 'MT' 
+		 
+		self.lims = np.array([0, 20795-4000, 0+3000, 13420]) 
+ 
+		self.grid_x, self.grid_y = 5,5 
+ 
+		self.label_filename = 'ref_2019_2020_20798x13420.npy' 
+
+		self.tiles_tr = [2,4,5,6,7,12,14,15,18,21,23,24]  
+		self.tiles_val = [9,11,25] 
+
+
+	def loadLabel(self): 
+		label = np.load(self.paths.label + self.label_filename).astype('uint8')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
+ 
+		label_past_deforestation_before_2008 = utils_v1.load_tiff_image( 
+			self.paths.deforestation_before_2008).astype('uint8')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
+		label[label_past_deforestation_before_2008 != 0] = 2 
+		del label_past_deforestation_before_2008 
+		return label 
+ 
+
+	def loadPastDeforestationLabel(self): 
+		label_past_deforestation = self.loadLabel() 
+ 
+		label_past_deforestation[label_past_deforestation == 1] = 0 
+		label_past_deforestation[label_past_deforestation == 2] = 1 
+ 
+		return label_past_deforestation 
+
+class MA(Dataset):
+	def __init__(self):
+		self.paths = PathsMA()
+
+		self.site = 'MA' 
+		 
+		self.lims = np.array([None, None, None, None])
+ 
+		# self.previewLims1 = np.array([9200, 10200, 50, 1050])
+
+		self.previewLims1 = np.array([2200, 3200, 6900, 7900])
+		self.previewLims2 = np.array([500, 1500, 3500, 4500])
+		self.previewBands = [2, 1, 0]
+		self.grid_x, self.grid_y = 5,4
+
+		self.label_filename = 'mask_label_17730x9203.npy'
+
+		self.tiles_tr = [1,3,5,8,11,13,14,20] 
+		self.tiles_val = [6,19]
+	def loadLabel(self):
+		label = np.load(self.paths.label + self.label_filename).astype('uint8')
+		return label
+
+	def loadPastDeforestationLabel(self):
+		label_past_deforestation = self.loadLabel()
+
+		label_past_deforestation[label_past_deforestation == 1] = 0
+		label_past_deforestation[label_past_deforestation == 2] = 1
+
+		return label_past_deforestation
+
+
+class PADistanceMap(PA):
 	def loadInputImage(self):
 		image_stack = super().loadInputImage()
 		image_stack = self.addNpyBandToInput(image_stack, 
@@ -318,48 +390,12 @@ class MultipleDates():
 		label[label_from_project == 2] = 2
 		return label
 
-class ParaDeforestationTime(DeforestationTime, Para):
+class PADeforestationTime(DeforestationTime, PA):
 	pass
 
-class ParaMultipleDates(MultipleDates, ParaDeforestationTime):
+class PAMultipleDates(MultipleDates, PADeforestationTime):
 	pass
 
-class MT(Dataset): 
-	def __init__(self): 
-		self.paths = PathsMT() 
-		# self.previewLims1 = np.array([2200, 3200, 6900, 7900])
-		# self.previewLims2 = np.array([500, 1500, 3500, 4500])
-		self.previewLims1 = np.array([11500, 12500, 9000, 10000])
-
-		self.previewLims2 = np.array([5000, 6000, 9500, 10500])
-		self.site = 'MT' 
-		 
-		self.lims = np.array([0, 20795-4000, 0+3000, 13420]) 
- 
-		self.grid_x, self.grid_y = 5,5 
- 
-		self.label_filename = 'ref_2019_2020_20798x13420.npy' 
-
-		self.tiles_tr = [2,4,5,6,7,12,14,15,18,21,23,24]  
-		self.tiles_val = [9,11,25] 
-	def loadLabel(self): 
-		label = np.load(self.paths.label + self.label_filename).astype('uint8')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
- 
-		label_past_deforestation_before_2008 = utils_v1.load_tiff_image( 
-			self.paths.deforestation_before_2008).astype('uint8')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
-		label[label_past_deforestation_before_2008 != 0] = 2 
-		del label_past_deforestation_before_2008 
-		return label 
- 
-
-	def loadPastDeforestationLabel(self): 
-		label_past_deforestation = self.loadLabel() 
- 
-		label_past_deforestation[label_past_deforestation == 1] = 0 
-		label_past_deforestation[label_past_deforestation == 2] = 1 
- 
-		return label_past_deforestation 
- 
  
  
 class MTDeforestationTime(DeforestationTime, MT): 

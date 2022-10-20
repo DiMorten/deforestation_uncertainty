@@ -4,61 +4,27 @@ from icecream import ic
 from osgeo import gdal
 import pdb
 from sklearn.preprocessing._data import _handle_zeros_in_scale
-from src.dataset import Para, ParaDeforestationTime, ParaDistanceMap, ParaMultipleDates, MTMultipleDates 
+import cv2
 
-# path_optical_im = 'E:/Jorge/dataset_deforestation/Para_2020/'
-# path_label = 'E:/Jorge/dataset_deforestation/Para/'
+from src.dataset import PA, PADeforestationTime, PADistanceMap, PAMultipleDates, MTMultipleDates, MT, MA
 
-# dataset = 'Para_2020'
-dataset = 'MT_2020'
-# dataset = 'Para_2019'
-# dataset = 'Para_2015'
+# ======= INPUT PARAMETERS ============ # 
+dataset = MA()
+year = 2020
+maskOutClouds = True
+# ======= END INPUT PARAMETERS ============ # 
 
-if dataset == 'Para_2020':
-    path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2020/'
-    # path_label = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_regeneration/Para/'
+scale_list = None
+exclude60mBandsFlag = True
 
-    im_filenames = ['S2_PA_2020_07_15_B1_B2_B3.tif',
-        'S2_PA_2020_07_15_B4_B5_B6.tif',
-        'S2_PA_2020_07_15_B7_B8_B8A.tif',
-        'S2_PA_2020_07_15_B9_B10_B11.tif',
-        'S2_PA_2020_07_15_B12.tif']
-elif dataset == 'MT_2020':
-    path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/MG_10m/S2/2020/'
-    # path_label = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_regeneration/Para/'
+path_optical_im = dataset.paths.optical_im_past_dates[year]
 
-    im_filenames = ['S2_R1_MT_2020_08_03_2020_08_15_B1_B2.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B3_B4.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B5_B6.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B7_B8.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B8A_B9.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B10_B11.tif',
-        'S2_R1_MT_2020_08_03_2020_08_15_B12.tif']    
-elif dataset == 'Para_2018':
-    path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/Para_10m/Sentinel2_2018/'
-    im_filenames = ['COPERNICUS_S2_20180721_20180726_B1_B2_B3.tif',
-        'COPERNICUS_S2_20180721_20180726_B4_B5_B6.tif',
-        'COPERNICUS_S2_20180721_20180726_B7_B8_B8A.tif',
-        'COPERNICUS_S2_20180721_20180726_B9_B10_B11.tif',
-        'COPERNICUS_S2_20180721_20180726_B12.tif']
-elif dataset == 'Para_2019':
-    path_optical_im = 'D:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/Para_10m/Sentinel2_2019/'
-    im_filenames = ['COPERNICUS_S2_20190721_20190726_B1_B2_B3.tif',
-        'COPERNICUS_S2_20190721_20190726_B4_B5_B6.tif',
-        'COPERNICUS_S2_20190721_20190726_B7_B8_B8A.tif',
-        'COPERNICUS_S2_20190721_20190726_B9_B10_B11.tif',
-        'COPERNICUS_S2_20190721_20190726_B12.tif']
-elif dataset == 'Para_2015':
-    dataset = Para() 
-    path_optical_im = dataset.paths.optical_im_folder + 'Para_2015/'
-    
-    im_filenames = ['PA_S2_2015_B1_B2_B3_crop.tif', 
-            'PA_S2_2015_B4_B5_B6_crop.tif', 
-            'PA_S2_2015_B7_B8_B8A_crop.tif', 
-            'PA_S2_2015_B9_B10_B11_crop.tif', 
-            'PA_S2_2015_B12_crop.tif'] 
+if type(dataset) == MA:
+    resolution_list = [60, 10, 10, 10, 20, 20, 20, 10, 20, 60, 60, 20, 20]
+    scale_list = [x/10 for x in resolution_list]
+    ic(scale_list)
 
-        
+# print(im_filenames)
 def load_tiff_image(path):
     # Read tiff Image
     print (path) 
@@ -66,21 +32,30 @@ def load_tiff_image(path):
     im = gdal_header.ReadAsArray()
     return im
 
-def loadOpticalIm(im_filenames):
-    band_count = 0
+def scaleIm(im, scale):
+    im = np.squeeze(im)
+    if scale != 1:
+        im = cv2.resize(im, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+    return im
 
-    for i, im_filename in enumerate(im_filenames):
-        ic(path_optical_im + im_filename)        
-        im = load_tiff_image(path_optical_im + im_filename).astype('float32')
-        ic(im.shape)
-        if len(im.shape) == 2: im = im[np.newaxis, ...]
-        if i:
-            ic(im.shape, optical_im.shape)
-            optical_im = np.concatenate((optical_im, im), axis=0)
-        else:
-            optical_im = im
-    del im 
-    return optical_im    
+def loadOpticalIm(path_optical_im, im_filenames, scale_list = None): 
+    band_count = 0 
+ 
+    for i, im_filename in enumerate(im_filenames): 
+        ic(path_optical_im + im_filename)         
+        band = load_tiff_image(path_optical_im + im_filename).astype('float32') 
+        ic(band.shape) 
+        if len(band.shape) == 2: band = band[np.newaxis, ...] 
+        if scale_list != None:
+            band = np.expand_dims(scaleIm(band, scale_list[i]), axis=0)
+        if i: 
+            ic(band.shape, optical_im.shape) 
+            optical_im = np.concatenate((optical_im, band), axis=0) 
+        else: 
+            optical_im = band 
+    del band  
+    return optical_im     
+ 
 def exclude60mBands(optical_im):
     sentinel2_band_names = ['B01', 'B02', 'B03', 'B04', 'B05', 'B06', 'B07', 'B08',
             'B8A', 'B9', 'B10', 'B11', 'B12']
@@ -106,19 +81,49 @@ def filter_outliers(img, bins=2**16-1, bth=0.001, uth=0.999, mask=[0]):
 createTif = True
 
 if createTif == True:
-    optical_im = loadOpticalIm(im_filenames)
-    optical_im = np.transpose(optical_im, (1, 2, 0))
-    optical_im = exclude60mBands(optical_im)
+
+    optical_im = loadOpticalIm(path_optical_im, dataset.paths.im_filenames[year], scale_list)
     ic(optical_im.shape)
-    np.save('optical_im_unnormalized.npy', optical_im)
+    # pdb.set_trace()
+    optical_im = np.transpose(optical_im, (1, 2, 0))
+    ic(optical_im.shape)
+    if exclude60mBandsFlag == True:
+        optical_im = exclude60mBands(optical_im)
+    ic(optical_im.shape)
+    # ic(np.min(optical_im), np.mean(optical_im), np.max(optical_im))
+    # ic(np.count_nonzero(~np.isnan(optical_im)), np.count_nonzero(np.isnan(optical_im)))
+    if maskOutClouds == True:
+        cloud_cloudshadow_mask = np.load(dataset.paths.cloud_mask[year]).astype(np.uint8)
+        cloud_mask = np.zeros_like(cloud_cloudshadow_mask)
+        cloud_mask[cloud_cloudshadow_mask == 1] = 2
+        del cloud_cloudshadow_mask
+    else:
+        cloud_mask = np.zeros(optical_im.shape[:-1], dtype=np.uint8)
+    cloud_mask[np.isnan(optical_im[...,0])] = 2
+    cloud_mask[optical_im[...,0] == 0] = 2
+
+    '''
+    plt.figure(figsize = (12,12))
+    plt.axis('off')
+    plt.imshow(cloud_mask)
+    plt.savefig('normalization_mask.png', dpi=200, bbox_inches='tight')
+    pdb.set_trace()
+    '''
+
+    optical_im = np.nan_to_num(optical_im)
+
+    # ic(np.min(optical_im), np.mean(optical_im), np.max(optical_im))
+    # ic(np.count_nonzero(~np.isnan(optical_im)), np.count_nonzero(np.isnan(optical_im)))
+    # np.save('optical_im_unnormalized.npy', optical_im)
 else:
-    optical_im = np.load('optical_im_unnormalized.npy') 
+    pass
+    # optical_im = np.load('optical_im_unnormalized.npy') 
  
 class NormalizationManager():
-    def __init__(self, img, feature_range=[0, 1]):
+    def __init__(self, img, mask=[0], feature_range=[0, 1]):
 
         self.feature_range = feature_range
-        self.clips = filter_outliers(img.copy(), bins=2**16-1, bth=0.02, uth=0.98)
+        self.clips = filter_outliers(img.copy(), bins=2**16-1, bth=0.02, uth=0.98, mask=mask)
         self.min_val = np.nanmin(img, axis=(0,1))
         self.max_val = np.nanmax(img, axis=(0,1))
 
@@ -137,7 +142,8 @@ class NormalizationManager():
         img += min_
         return img
 
-normalizationManager = NormalizationManager(optical_im)
+# normalizationManager = NormalizationManager(optical_im, cloud_mask)
+normalizationManager = NormalizationManager(optical_im, cloud_mask)
 optical_im = normalizationManager.normalize(optical_im)
 ic(np.min(optical_im), np.average(optical_im), np.max(optical_im))
 
