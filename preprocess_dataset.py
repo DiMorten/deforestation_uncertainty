@@ -5,6 +5,7 @@ from osgeo import gdal
 import pdb
 from sklearn.preprocessing._data import _handle_zeros_in_scale
 import cv2
+import src.rasterTools as rasterTools
 
 from src.dataset import PA, PADeforestationTime, PADistanceMap, PAMultipleDates, MTMultipleDates, MT, MA
 
@@ -24,37 +25,6 @@ if type(dataset) == MA:
     scale_list = [x/10 for x in resolution_list]
     ic(scale_list)
 
-# print(im_filenames)
-def load_tiff_image(path):
-    # Read tiff Image
-    print (path) 
-    gdal_header = gdal.Open(path)
-    im = gdal_header.ReadAsArray()
-    return im
-
-def scaleIm(im, scale):
-    im = np.squeeze(im)
-    if scale != 1:
-        im = cv2.resize(im, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
-    return im
-
-def loadOpticalIm(path_optical_im, im_filenames, scale_list = None): 
-    band_count = 0 
- 
-    for i, im_filename in enumerate(im_filenames): 
-        ic(path_optical_im + im_filename)         
-        band = load_tiff_image(path_optical_im + im_filename).astype('float32') 
-        ic(band.shape) 
-        if len(band.shape) == 2: band = band[np.newaxis, ...] 
-        if scale_list != None:
-            band = np.expand_dims(scaleIm(band, scale_list[i]), axis=0)
-        if i: 
-            ic(band.shape, optical_im.shape) 
-            optical_im = np.concatenate((optical_im, band), axis=0) 
-        else: 
-            optical_im = band 
-    del band  
-    return optical_im     
  
 def exclude60mBands(optical_im):
     sentinel2_band_names = ['B01', 'B02', 'B03', 'B04', 'B05', 'B06', 'B07', 'B08',
@@ -82,13 +52,13 @@ createTif = True
 
 if createTif == True:
 
-    optical_im = loadOpticalIm(path_optical_im, dataset.paths.im_filenames[year], scale_list)
+    optical_im = rasterTools.loadOpticalIm(path_optical_im, dataset.paths.im_filenames[year], scale_list)
     ic(optical_im.shape)
     # pdb.set_trace()
     optical_im = np.transpose(optical_im, (1, 2, 0))
     ic(optical_im.shape)
     if exclude60mBandsFlag == True:
-        optical_im = exclude60mBands(optical_im)
+        optical_im = rasterTools.exclude60mBands(optical_im)
     ic(optical_im.shape)
     # ic(np.min(optical_im), np.mean(optical_im), np.max(optical_im))
     # ic(np.count_nonzero(~np.isnan(optical_im)), np.count_nonzero(np.isnan(optical_im)))

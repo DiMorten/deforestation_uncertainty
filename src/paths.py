@@ -156,6 +156,11 @@ class PathsMA(Paths):
         self.hydrography = 'D:/Jorge/datasets/deforestation/MA/hydrography.tif'
         self.deforestation_past_years = 'D:/Jorge/datasets/deforestation/MA/deforestation_past_years.tif' 
  
+        self.deforestation_time = {
+            2021: 'D:/Jorge/datasets/deforestation/MA/deforestation_time_normalized_2021.npy',
+            2020: 'D:/Jorge/datasets/deforestation/MA/deforestation_time_normalized_2020.npy'
+        } 
+
         self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/'
 
         self.optical_im_past_dates = { 

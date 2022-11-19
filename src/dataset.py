@@ -351,17 +351,18 @@ class MultipleDates():
 		label = np.zeros_like(deforestation_past_years, dtype = np.uint8)
 		print("Loaded deforestation past years")
 		ic(np.unique(deforestation_past_years, return_counts=True))
-		print("Label where deforestation past years is actual date (2018) = 1")
+		print("Label where deforestation past years is actual date ({}) = 1".format(date))
 		label[deforestation_past_years == date] = 1
 		ic(np.unique(deforestation_past_years, return_counts=True))
 		print("Past deforestation different from 0 (no deforestation)")
 		label[np.logical_and(deforestation_past_years < date, 
 			deforestation_past_years != 0)] = 2 # includes <=2007 deforestation 
 		ic(np.unique(deforestation_past_years, return_counts=True))
-		print("Past deforestation before 2008 is 2")
-		label_past_deforestation_before_2008 = self.loadPastDeforestationBefore2008().astype(np.uint8)[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
-		ic(np.unique(label_past_deforestation_before_2008, return_counts=True))
-		label[label_past_deforestation_before_2008 != 0] = 2
+		if self.site != 'MA':
+			print("Past deforestation before 2008 is 2")
+			label_past_deforestation_before_2008 = self.loadPastDeforestationBefore2008().astype(np.uint8)[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
+			ic(np.unique(label_past_deforestation_before_2008, return_counts=True))
+			label[label_past_deforestation_before_2008 != 0] = 2
 		ic(np.unique(deforestation_past_years, return_counts=True))
 
 		return label
@@ -402,4 +403,11 @@ class MTDeforestationTime(DeforestationTime, MT):
 	pass
 
 class MTMultipleDates(MultipleDates, MTDeforestationTime):
+	pass
+
+
+class MADeforestationTime(DeforestationTime, MA):
+	pass
+
+class MAMultipleDates(MultipleDates, MADeforestationTime):
 	pass

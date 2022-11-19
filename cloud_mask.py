@@ -7,8 +7,10 @@ import matplotlib.pyplot as plt
 import rasterio 
 from osgeo import gdal 
 import cv2 
+import src.rasterTools as rasterTools
+
 from src.dataset import (
-    Para, PADeforestationTime, PADistanceMap, PAMultipleDates, MTMultipleDates,
+    PA, PADeforestationTime, PADistanceMap, PAMultipleDates, MTMultipleDates,
     MT, 
     MA
 )
@@ -106,37 +108,6 @@ def get_cloud_cloudshadow_mask(data_image, cloud_threshold = 0.2):
     #pdb.set_trace() 
     return cloud_cloudshadow_mask 
  
-def load_tiff_image(path): 
-    # Read tiff Image 
-    print (path)  
-    gdal_header = gdal.Open(path) 
-    im = gdal_header.ReadAsArray() 
-    return im 
-
-def scaleIm(im, scale):
-    im = np.squeeze(im)
-    if scale != 1:
-        im = cv2.resize(im, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
-    return im
-
-def loadOpticalIm(path_optical_im, im_filenames, scale_list = None): 
-    band_count = 0 
- 
-    for i, im_filename in enumerate(im_filenames): 
-        ic(path_optical_im + im_filename)         
-        band = load_tiff_image(path_optical_im + im_filename).astype('float32') 
-        ic(band.shape) 
-        if len(band.shape) == 2: band = band[np.newaxis, ...] 
-        if scale_list != None:
-            band = np.expand_dims(scaleIm(band, scale_list[i]), axis=0)
-        if i: 
-            ic(band.shape, optical_im.shape) 
-            optical_im = np.concatenate((optical_im, band), axis=0) 
-        else: 
-            optical_im = band 
-    del band  
-    return optical_im     
- 
  
 if __name__ == '__main__': 
     # ======= INPUT PARAMETERS ============ # 
@@ -167,9 +138,10 @@ if __name__ == '__main__':
         scale_list = [x/10 for x in resolution_list]
         ic(scale_list)
 
+    dataset_id = dataset.__class__.__name__ + '_' + str(year)
     filename = dataset_id + '.npy' 
  
-    optical_im = loadOpticalIm(path_optical_im, dataset.paths.im_filenames[year], scale_list) 
+    optical_im = rasterTools.loadOpticalIm(path_optical_im, dataset.paths.im_filenames[year], scale_list) 
     # optical_im = np.transpose(optical_im, (1, 2, 0)) 
     ic(optical_im.shape) 
  
@@ -188,9 +160,9 @@ if __name__ == '__main__':
 
     # === GET CIRRUS THIN CLOUD MASK === #
     ic(path_optical_im + path_cirrus_band)
-    cirrus = load_tiff_image(path_optical_im + path_cirrus_band)[cirrus_band_id]
+    cirrus = rasterTools.load_tiff_image(path_optical_im + path_cirrus_band)[cirrus_band_id]
     if scale_list != None:
-        cirrus = scaleIm(cirrus, 6.0)
+        cirrus = rasterTools.scaleIm(cirrus, 6.0)
     ic(np.min(cirrus), np.average(cirrus), np.max(cirrus))
     threshold = 19
 
@@ -199,8 +171,10 @@ if __name__ == '__main__':
 
     # === SAVE CLOUD MASK === #
 
-    cloud_mask = np.zeros_like(thin_cloud_mask).astype(np.uint8)
-    cloud_mask[thin_cloud_mask == 1] = 1
+    cloud_mask = np.zeros_like(cirrus).astype(np.uint8)
+    addThinCloudMask = False
+    if addThinCloudMask == True:
+        cloud_mask[thin_cloud_mask == 1] = 1
     ic(cloud_mask.shape, cloud_cloudshadow_mask.shape, thin_cloud_mask.shape, cirrus.shape)
     # pdb.set_trace()
     cloud_mask[cloud_cloudshadow_mask == 1] = 1

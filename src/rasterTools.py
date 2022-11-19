@@ -1,0 +1,40 @@
+
+
+import numpy as np 
+import utils_v1
+from icecream import ic
+from osgeo import gdal
+import pdb
+from sklearn.preprocessing._data import _handle_zeros_in_scale
+import cv2
+
+def load_tiff_image(path):
+    # Read tiff Image
+    print (path) 
+    gdal_header = gdal.Open(path)
+    im = gdal_header.ReadAsArray()
+    return im
+
+def scaleIm(im, scale):
+    im = np.squeeze(im)
+    if scale != 1:
+        im = cv2.resize(im, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+    return im
+
+def loadOpticalIm(path_optical_im, im_filenames, scale_list = None): 
+    band_count = 0 
+ 
+    for i, im_filename in enumerate(im_filenames): 
+        ic(path_optical_im + im_filename)         
+        band = load_tiff_image(path_optical_im + im_filename).astype('float32') 
+        ic(band.shape) 
+        if len(band.shape) == 2: band = band[np.newaxis, ...] 
+        if scale_list != None:
+            band = np.expand_dims(scaleIm(band, scale_list[i]), axis=0)
+        if i: 
+            ic(band.shape, optical_im.shape) 
+            optical_im = np.concatenate((optical_im, band), axis=0) 
+        else: 
+            optical_im = band 
+    del band  
+    return optical_im     

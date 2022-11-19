@@ -15,7 +15,7 @@ import numpy as np
 from src import metrics as _metrics
 from src.dataset import (
     MultipleDates,
-    Para, PADeforestationTime, PADistanceMap, PAMultipleDates,
+    PA, PADeforestationTime, PADistanceMap, PAMultipleDates,
     MTDeforestationTime,
     MTMultipleDates
 )
