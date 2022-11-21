@@ -8,8 +8,8 @@ class Logger():
         figures_path = 'figures' + dataset.__class__.__name__ + '/'
         pathlib.Path(figures_path).mkdir(parents=True, exist_ok=True)
         self.title_name = 'ResUnet'
-    def plotFigure(self, figure, name='figure', cmap = plt.cm.gray, savefig=False):
-        plt.figure(figsize=(15,15))
+    def plotFigure(self, figure, name='figure', cmap = plt.cm.gray, savefig=False, figsize=(15,15)):
+        plt.figure(figsize=figsize)
         plt.imshow(figure, cmap=plt.cm.gray)
 
         # title_name = 'ResUnet'
@@ -96,3 +96,6 @@ class Logger():
         plt.title('Annealing step')
         plt.xlabel('Epoch')
         plt.ylabel('Annealing step') 
+
+    def getStats(self, value):
+        ic(np.min(value), np.mean(value), np.max(value))

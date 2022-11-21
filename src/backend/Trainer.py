@@ -1,5 +1,5 @@
 
-from src.Logger import Logger
+from src.backend.Logger import Logger
 import utils_v1
 from icecream import ic
 import numpy as np
@@ -14,7 +14,8 @@ from tensorflow.keras.callbacks import Callback
 import tensorflow.keras.backend as K
 
 class Trainer():
-    def __init__(self, dataset, patchesHandler):
+    def __init__(self, config, dataset, patchesHandler):
+        self.config = config
         self.dataset = dataset
         self.patch_size = 128
         self.overlap = 0.7
@@ -140,7 +141,8 @@ class Trainer():
 
 
         # evidential
-
+        class_n = 3
+        
         def KL(alpha, K):
             beta=tf.constant(np.ones((1,K)),dtype=tf.float32)
             S_alpha = tf.reduce_sum(alpha,axis=-1,keepdims=True)
@@ -385,3 +387,110 @@ class Trainer():
 
     def plotAnnealingCoef(self):
         self.logger.plotAnnealingCoef(self.history)
+
+    # to-do: pass to predictor. to do that, pass data to dataset class (dataset.image_stack, dataset.label, etc)
+
+    def run_predictor(self):
+        self.setPadding()
+        self.infer()
+        self.loadPredictedProbabilities()
+        self.unpadMeanProb()
+        self.squeezeLabel()
+        self.setMeanProbNotConsideredAreas()
+    def setPadding(self):
+        self.metrics_ts = []
+        self.n_pool = 3
+        self.n_rows = 5
+        self.n_cols = 4
+        rows, cols = self.image_stack.shape[:2]
+        pad_rows = rows - np.ceil(rows/(self.n_rows*2**self.n_pool))*self.n_rows*2**self.n_pool
+        pad_cols = cols - np.ceil(cols/(self.n_cols*2**self.n_pool))*self.n_cols*2**self.n_pool
+        print(pad_rows, pad_cols)
+
+        self.npad = ((0, int(abs(pad_rows))), (0, int(abs(pad_cols))), (0, 0))
+        self.image1_pad = np.pad(self.image_stack, pad_width=self.npad, mode='reflect')
+        # del image_stack
+        self.class_n = 3
+    def infer(self):
+
+        self.h, self.w, self.c = self.image1_pad.shape
+        self.c = self.channels
+        self.patch_size_rows = self.h//self.n_rows
+        self.patch_size_cols = self.w//self.n_cols
+        self.num_patches_x = int(self.h/self.patch_size_rows)
+        num_patches_y = int(self.w/self.patch_size_cols)
+
+        ic(self.path_models+ '/' + self.method +'_'+str(0)+'.h5')
+        model = utils_v1.load_model(self.path_models+ '/' + self.method +'_'+str(0)+'.h5', compile=False)
+        self.class_n = 3
+
+        if self.config["loadInference"] == False:
+            if self.config["save_probabilities"] == False:
+                # self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.class_n, inference_times), dtype = np.float32)
+                self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.class_n), dtype = np.float32)
+
+        #    new_model = utils_v1.build_resunet(input_shape=(self.patch_size_rows,self.patch_size_cols, c), 
+        #        nb_filters = nb_filters, n_classes = self.class_n, dropout_seed = None)
+            new_model = utils_v1.build_resunet(input_shape=(self.patch_size_rows,self.patch_size_cols, c), 
+                nb_filters = self.nb_filters, n_classes = self.class_n, last_activation=None)
+
+            for l in range(1, len(model.layers)):
+                new_model.layers[l].set_weights(model.layers[l].get_weights())
+            
+            self.patchesHandler.class_n = self.class_n
+
+            metrics_all =[]
+            with tf.device('/cpu:0'):
+                for tm in range(0,self.config["inference_times"]):
+                    print('time: ', tm)
+
+                    
+                    # Recinstructing predicted map
+                    start_test = time.time()
+                    '''
+                    args_network = {'patch_size_rows': patch_size_rows,
+                        'patch_size_cols': patch_size_cols,
+                        'c': c,
+                        'nb_filters': nb_filters,
+                        'class_n': class_n,
+                        'dropout_seed': self.inference_times}
+                    '''
+                    prob_reconstructed, self.u_reconstructed = self.patchesHandler.infer(
+                            new_model, self.image1_pad, h, w, 
+                            # model, self.image1_pad, h, w, 
+                            self.num_patches_x, num_patches_y, self.patch_size_rows, 
+                            self.patch_size_cols)
+                            # patch_size_cols, a = args_network)
+                            
+                    ts_time =  time.time() - start_test
+
+                    if self.config["save_probabilities"] == True:
+                        np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
+                    else:
+                        self.prob_rec = prob_reconstructed.copy()
+                    
+                    metrics_all.append(ts_time)
+                    del prob_reconstructed
+                metrics_ = np.asarray(metrics_all)
+                # Saving test time
+                np.save(self.path_exp+'/metrics_ts.npy', metrics_)
+        del self.image1_pad
+
+    def loadPredictedProbabilities(self):
+        if self.config["save_probabilities"] == True:
+            self.prob_rec = np.zeros((self.h, self.w, self.config["inference_times"]), dtype = np.float32)
+
+            for tm in range(0, self.config["inference_times"]):
+                print(tm)
+                self.prob_rec[:,:,tm] = np.load(self.path_maps+'/'+'prob_'+str(tm)+'.npy').astype(np.float32)
+
+        self.mean_prob = self.prob_rec
+
+    def unpadMeanProb(self):   
+        self.mean_prob = self.mean_prob[:self.label_mask.shape[0], :self.label_mask.shape[1]]        
+    def squeezeLabel(self):
+        self.label_mask = np.squeeze(self.label_mask)
+
+    def setMeanProbNotConsideredAreas(self):
+        self.mean_prob = self.mean_prob.copy()
+        self.mean_prob[self.label_mask == 2] = 0
