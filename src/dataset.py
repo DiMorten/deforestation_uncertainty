@@ -100,6 +100,7 @@ class PA(Dataset):
 
 		self.tiles_tr = [1,3,5,8,11,13,14,20] 
 		self.tiles_val = [6,19]
+		self.patch_deforestation_percentage = 0.2
 	def loadLabel(self):
 		label = np.load(self.paths.label + self.label_filename).astype('uint8')
 		return label
@@ -131,7 +132,7 @@ class MT(Dataset):
 
 		self.tiles_tr = [2,4,5,6,7,12,14,15,18,21,23,24]  
 		self.tiles_val = [9,11,25] 
-
+		self.patch_deforestation_percentage = 0.2
 
 	def loadLabel(self): 
 		label = np.load(self.paths.label + self.label_filename).astype('uint8')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
@@ -161,8 +162,9 @@ class MA(Dataset):
  
 		# self.previewLims1 = np.array([9200, 10200, 50, 1050])
 
-		self.previewLims1 = np.array([2200, 3200, 6900, 7900])
-		self.previewLims2 = np.array([500, 1500, 3500, 4500])
+		self.previewLims1 = np.array([200, 700, 10200, 11200])
+		self.previewLims2 = np.array([2500, 3500, 6000, 7000])
+
 		self.previewBands = [2, 1, 0]
 		self.grid_x, self.grid_y = 5,4
 
@@ -170,6 +172,8 @@ class MA(Dataset):
 
 		self.tiles_tr = [1,3,5,8,11,13,14,20] 
 		self.tiles_val = [6,19]
+
+		self.patch_deforestation_percentage = 0.02
 	def loadLabel(self):
 		label = np.load(self.paths.label + self.label_filename).astype('uint8')
 		return label

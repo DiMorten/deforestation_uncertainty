@@ -136,7 +136,7 @@ else:
 exp
 
 # %%
-figures_path = 'figures' + dataset.__class__.__name__ + '/'
+figures_path = 'output/figures' + dataset.__class__.__name__ + '/'
 pathlib.Path(figures_path).mkdir(parents=True, exist_ok=True)
 title_name = 'ResUnet'
 
@@ -193,7 +193,7 @@ plt.imshow(image_stack[...,0], cmap=plt.cm.gray)
 
 # title_name = 'ResUnet'
 plt.axis('off')
-# plt.savefig('figures/Para' + title_name + ' error mask.png', dpi=150, bbox_inches='tight')
+# plt.savefig('output/figures/Para' + title_name + ' error mask.png', dpi=150, bbox_inches='tight')
 
 # %%
 ic(image_stack.shape)
@@ -241,7 +241,7 @@ else:
 
 # title_name = 'ResUnet'
 plt.axis('off')
-# plt.savefig('figures/Para' + title_name + ' error mask.png', dpi=150, bbox_inches='tight')
+# plt.savefig('output/figures/Para' + title_name + ' error mask.png', dpi=150, bbox_inches='tight')
 
 # %%
 np.unique(label_mask)
@@ -673,7 +673,7 @@ GTTruePositives = label_mask==1
 fig1 = plt.figure(figsize=(10,10))
 plt.imshow(label_mask, cmap = plt.cm.gray)
 plt.axis('off')
-plt.savefig('figures/Para prediction probability.png', dpi=150, bbox_inches='tight')
+plt.savefig('output/figures/Para prediction probability.png', dpi=150, bbox_inches='tight')
 
 # %%
 if issubclass(type(dataset), MultipleDates):
@@ -688,7 +688,7 @@ mean_prob[label_mask == 2] = 0
 fig1 = plt.figure(figsize=(10,10))
 plt.imshow(mean_prob, cmap = 'jet')
 plt.axis('off')
-plt.savefig('figures/Para prediction probability.png', dpi=150, bbox_inches='tight')
+plt.savefig('output/figures/Para prediction probability.png', dpi=150, bbox_inches='tight')
 
 # %%
 # print(np.unique(label_mask, return_counts=True))
@@ -807,7 +807,7 @@ prob_rec.shape
 fig1 = plt.figure(figsize=(10,10))
 plt.imshow(label_mask, cmap = plt.cm.gray)
 plt.axis('off')
-plt.savefig('figures/Para prediction probability.png', dpi=150, bbox_inches='tight')
+plt.savefig('output/figures/Para prediction probability.png', dpi=150, bbox_inches='tight')
 
 # %%
 # Computing error mask
@@ -818,7 +818,7 @@ for idx in range(10):
     ax.set_xticks([])
     ax.set_yticks([])
     ax.imshow(prob_rec[idx], cmap = 'jet')
-# fig.savefig('figures/Para' + title_name + ' reference.png', dpi=300, bbox_inches='tight')
+# fig.savefig('output/figures/Para' + title_name + ' reference.png', dpi=300, bbox_inches='tight')
 '''
 
 # %%
@@ -828,7 +828,7 @@ ax.set_yticks([])
 ax.imshow(pred_entropy_to_show, cmap='jet')
 # show_im(pred_entropy_to_show, ax, title = 'Uncertainty predictive entropy')
 plt.axis('off')
-#plt.savefig('figures/Para' + title_name + ' uncertainty predictive entropy.png', 
+#plt.savefig('output/figures/Para' + title_name + ' uncertainty predictive entropy.png', 
  #   dpi=150, bbox_inches='tight')
 
 # %%
@@ -845,7 +845,7 @@ ic(pred_entropy.shape)
 fig, ax = plt.subplots(1,1,figsize=(10,10))
 show_im(pred_entropy_to_show, ax, title = 'Uncertainty predictive entropy')
 plt.axis('off')
-plt.savefig('figures/Para' + title_name + ' uncertainty predictive entropy.png', 
+plt.savefig('output/figures/Para' + title_name + ' uncertainty predictive entropy.png', 
     dpi=150, bbox_inches='tight')
 
 # %%
@@ -880,7 +880,7 @@ print(np.unique(mask_tr_val, return_counts=True))
 plt.figure(figsize=(10,10))
 plt.imshow(mask_tr_val)
 plt.axis('off')
-plt.savefig('figures/Train val mask.png', dpi=200, bbox_inches='tight')
+plt.savefig('output/figures/Train val mask.png', dpi=200, bbox_inches='tight')
 
 
 
@@ -902,7 +902,7 @@ fig, ax = plt.subplots(figsize=(15,15))
 ax.set_xticks([])
 ax.set_yticks([])
 ax.imshow(label_mask_current_deforestation_to_show, cmap = plt.cm.gray)
-fig.savefig('figures/Para' + title_name + ' reference.png', dpi=300, bbox_inches='tight')
+fig.savefig('output/figures/Para' + title_name + ' reference.png', dpi=300, bbox_inches='tight')
 
 
 
@@ -938,7 +938,7 @@ print('Best Threshold=%f, F-Score=%.3f' % (thresholds[ix], fscore[ix]))
 # %%
 importlib.reload(_metrics)
 _metrics.plotPrecisionRecall(label_mask_val, precision, recall, ix)
-plt.savefig('figures/' + 'Para_prediction_recall_curve.png', dpi=150, bbox_inches='tight')
+plt.savefig('output/figures/' + 'Para_prediction_recall_curve.png', dpi=150, bbox_inches='tight')
 
 # %%
 print(mean_prob.shape)
@@ -965,7 +965,7 @@ threshold
 plt.figure(figsize=(10,10))
 plt.imshow(predicted_unpad, cmap = plt.cm.gray)
 plt.axis('off')
-plt.savefig('figures/Para' + title_name + ' predicted.png', dpi=150, bbox_inches='tight')
+plt.savefig('output/figures/Para' + title_name + ' predicted.png', dpi=150, bbox_inches='tight')
 
 
 # %%
@@ -1142,7 +1142,7 @@ error_mask_to_show = _metrics.getRgbErrorMask(prediced_unpad_to_show,
         label_mask_current_deforestation).astype(np.uint8)
 error_mask_to_show_rgb = _metrics.saveRgbErrorMask(error_mask_to_show).astype(np.uint8)
 del error_mask_to_show
-cv2.imwrite('figures/Para_error_mask_to_show_rgb.png', error_mask_to_show_rgb)
+cv2.imwrite('output/figures/Para_error_mask_to_show_rgb.png', error_mask_to_show_rgb)
 
 # ,
 #        dim = (617, 1162)
@@ -1155,7 +1155,7 @@ ax.set_yticks([])
 
 ax.imshow(error_mask_to_show_rgb[...,::-1])
 
-fig.savefig('figures/Para' + title_name + ' error mask color.png', dpi=300, bbox_inches='tight')
+fig.savefig('output/figures/Para' + title_name + ' error mask color.png', dpi=300, bbox_inches='tight')
 
 
 # %%
@@ -1163,7 +1163,7 @@ plt.figure(figsize=(10,10))
 plt.imshow(error_mask, cmap=plt.cm.gray)
 title_name = 'ResUnet'
 plt.axis('off')
-plt.savefig('figures/Para' + title_name + ' error mask.png', dpi=150, bbox_inches='tight')
+plt.savefig('output/figures/Para' + title_name + ' error mask.png', dpi=150, bbox_inches='tight')
 
 # %%
 ic(label_mask.shape)
@@ -1263,7 +1263,7 @@ if plotCropSampleFlag == True:
                 cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
                 maskBackground = [False, True, False, True],
                 invertMask = [False, False, False, False])
-        plt.savefig('figures/' + dataset.__class__.__name__ + 'PredictSampleUncertainty1.png', dpi=150, bbox_inches='tight')
+        plt.savefig('output/figures/' + dataset.__class__.__name__ + 'PredictSampleUncertainty1.png', dpi=150, bbox_inches='tight')
 
         _plt.plotCropSample4(image_stack[...,dataset.previewBands], mean_prob, 
                 error_mask_to_show_rgb[...,::-1], pred_entropy_to_show, 
@@ -1272,7 +1272,7 @@ if plotCropSampleFlag == True:
                 cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
                 maskBackground = [False, True, False, True],
                 invertMask = [False, False, False, False])
-        plt.savefig('figures/' + dataset.__class__.__name__ + 'PredictSampleUncertainty2.png', dpi=150, bbox_inches='tight')
+        plt.savefig('output/figures/' + dataset.__class__.__name__ + 'PredictSampleUncertainty2.png', dpi=150, bbox_inches='tight')
 
 # %%
 from enum import Enum
@@ -1402,7 +1402,7 @@ if metrics_error_detection == True:
 
 
     title_name = 'ResUnet'
-    fig.savefig('figures/Para' + title_name + 'predicted error mask.png', dpi=300, bbox_inches='tight')
+    fig.savefig('output/figures/Para' + title_name + 'predicted error mask.png', dpi=300, bbox_inches='tight')
 
 
 # %%
@@ -1420,7 +1420,7 @@ if metrics_error_detection == True:
     plt.imshow(predicted_error_mask, cmap=plt.cm.gray)
     title_name = 'ResUnet'
     plt.axis('off')
-    plt.savefig('figures/Para' + title_name + 'predicted error mask forest.png', dpi=150, bbox_inches='tight')
+    plt.savefig('output/figures/Para' + title_name + 'predicted error mask forest.png', dpi=150, bbox_inches='tight')
 
 
 # %%
@@ -1465,7 +1465,7 @@ print('Best Threshold=%f, F-Score=%.3f' % (thresholds[ix], fscore[ix]))
 # %%
 importlib.reload(_metrics)
 _metrics.plotPrecisionRecall(y_val, precision, recall, ix)
-plt.savefig('figures/' + 'Para' + 'prediction_recall_curve.png', dpi=150, bbox_inches='tight')
+plt.savefig('output/figures/' + 'Para' + 'prediction_recall_curve.png', dpi=150, bbox_inches='tight')
 
 # %%
 '''
@@ -1711,7 +1711,7 @@ ax3.set_ylabel('Threshold')
 
 # if save_figures == True:
 if True:
-    plt.savefig('figures/recall_precision_AA.png', dpi=150, bbox_inches='tight')
+    plt.savefig('output/figures/recall_precision_AA.png', dpi=150, bbox_inches='tight')
 
 # %%
 xlim = [-0.3, 12.7]
@@ -1756,7 +1756,7 @@ ax3.set_xlim(xlim)
 
 # if save_figures == True:
 if True:
-    plt.savefig('figures/recall_precision_f1_AA.png', dpi=150, bbox_inches='tight')
+    plt.savefig('output/figures/recall_precision_f1_AA.png', dpi=150, bbox_inches='tight')
 
 # %%
 
@@ -1959,7 +1959,7 @@ plt.title('Precision vs. To-Audit Area')
 plt.xlabel('Precision (%)')
 plt.ylabel('Audit Area (%)')
 if True:
-    plt.savefig('figures/precision_AA_val.png', dpi=150, bbox_inches='tight')
+    plt.savefig('output/figures/precision_AA_val.png', dpi=150, bbox_inches='tight')
 '''
 
 # %%
@@ -1969,7 +1969,7 @@ plt.title('Precision vs. Threshold')
 plt.xlabel('Precision (%)')
 plt.ylabel('Threshold')
 if True:
-    plt.savefig('figures/precision_total_threshold_val.png', dpi=150, bbox_inches='tight')
+    plt.savefig('output/figures/precision_total_threshold_val.png', dpi=150, bbox_inches='tight')
 '''
 
 # %%
@@ -1979,7 +1979,7 @@ plt.title('Recall total vs. To-Audit Area')
 plt.xlabel('Recall (%)')
 plt.ylabel('Audit Area (%)')
 if True:
-    plt.savefig('figures/recall_total_AA_val.png', dpi=150, bbox_inches='tight')
+    plt.savefig('output/figures/recall_total_AA_val.png', dpi=150, bbox_inches='tight')
 '''
 
 # %%
@@ -1989,7 +1989,7 @@ plt.title('Recall total vs. Threshold')
 plt.xlabel('Recall (%)')
 plt.ylabel('Threshold')
 if True:
-    plt.savefig('figures/recall_total_threshold_val.png', dpi=150, bbox_inches='tight')
+    plt.savefig('output/figures/recall_total_threshold_val.png', dpi=150, bbox_inches='tight')
 '''
 
 # %%
@@ -2015,7 +2015,7 @@ ax3.set_ylabel('Threshold')
 
 # if save_figures == True:
 if True:
-    plt.savefig('figures/recall_precision_AA_val.png', dpi=150, bbox_inches='tight')
+    plt.savefig('output/figures/recall_precision_AA_val.png', dpi=150, bbox_inches='tight')
 '''
 
 # %%
@@ -2038,7 +2038,7 @@ ax2.set_ylabel('Threshold')
 
 # if save_figures == True:
 if True:
-    plt.savefig('figures/f1_AA_val.png', dpi=150, bbox_inches='tight')
+    plt.savefig('output/figures/f1_AA_val.png', dpi=150, bbox_inches='tight')
 '''
 
 # %%
@@ -2071,7 +2071,7 @@ ax3.set_xlim(xlim)
 
 # if save_figures == True:
 if True:
-    plt.savefig('figures/recall_precision_AA_val.png', dpi=150, bbox_inches='tight')
+    plt.savefig('output/figures/recall_precision_AA_val.png', dpi=150, bbox_inches='tight')
 '''
 
 # %% [markdown]

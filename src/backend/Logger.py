@@ -5,18 +5,27 @@ import numpy as np
 from icecream import ic
 class Logger():
     def createLogFolders(self, dataset):
-        figures_path = 'figures' + dataset.__class__.__name__ + '/'
+        figures_path = 'output/figures' + dataset.__class__.__name__ + '/'
         pathlib.Path(figures_path).mkdir(parents=True, exist_ok=True)
         self.title_name = 'ResUnet'
-    def plotFigure(self, figure, name='figure', cmap = plt.cm.gray, savefig=False, figsize=(15,15)):
+    def plotFigure(self, figure, name='output/figure', cmap = plt.cm.gray, savefig=False, figsize=(15,15), dpi=200):
         plt.figure(figsize=figsize)
-        plt.imshow(figure, cmap=plt.cm.gray)
+        plt.imshow(figure, cmap=cmap)
 
         # title_name = 'ResUnet'
         plt.axis('off')
         if savefig == True:
-            plt.savefig('figures/' + name, dpi=150, bbox_inches='tight')
-    
+            plt.savefig('output/figures/' + name, dpi=150, bbox_inches='tight')
+
+    def plotFigure2(self, figure, name='output/figure', cmap = plt.cm.gray, savefig=False, figsize=(15,15), dpi=300):
+        fig, ax = plt.subplots(figsize=(10,10))
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        ax.imshow(figure)
+
+        fig.savefig('output/figures/Para' + name, dpi=dpi, bbox_inches='tight')
+
     def snipDataset(self, idx, coords_train, patchesHandler, image_stack, label_mask):
         print(coords_train[idx])
         image_patch, reference_patch = patchesHandler.getPatch(
@@ -99,3 +108,35 @@ class Logger():
 
     def getStats(self, value):
         ic(np.min(value), np.mean(value), np.max(value))
+
+
+
+    def plotCropSample(self, trainer):
+        self.plotCropSampleFlag = True
+        if self.plotCropSampleFlag == True:
+                # import matplotlib
+                # customCmap = matplotlib.colors.ListedColormap(['black', 'red'])
+                ic(trainer.dataset.previewLims1, trainer.dataset.previewLims2)
+                lims = trainer.dataset.previewLims1
+                ic(np.unique(trainer.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]]))
+                lims = trainer.dataset.previewLims2
+                ic(np.unique(trainer.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
+
+                _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
+                        trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
+                        lims = trainer.dataset.previewLims1, 
+                        titles = ['Optical', 'Predict Probability', 'Predicted', 'Uncertainty'],
+                        cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
+                        maskBackground = [False, True, False, True],
+                        invertMask = [False, False, False, False])
+                plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertainty1.png', dpi=150, bbox_inches='tight')
+
+                _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
+                        trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
+                        lims = trainer.dataset.previewLims2, 
+                        titles = ['Optical', 'Predict Probability', 'Predicted', 'Uncertainty'],
+                        cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
+                        maskBackground = [False, True, False, True],
+                        invertMask = [False, False, False, False])
+                plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertainty2.png', dpi=150, bbox_inches='tight')
+

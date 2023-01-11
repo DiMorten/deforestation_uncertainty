@@ -223,3 +223,14 @@ def saveRgbErrorMask(error_mask_to_show, dim = None):
         error_mask_to_show_rgb = cv2.resize(error_mask_to_show_rgb, 
             dim, interpolation = cv2.INTER_NEAREST)
     return error_mask_to_show_rgb
+
+
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+epsilon = 1e-15
+def show_im(im, ax, title = "", cmap = "jet"):
+    im_plt = ax.imshow(im.astype(np.float32), cmap = cmap)
+    plt.title(title)
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    plt.colorbar(im_plt, cax=cax) 

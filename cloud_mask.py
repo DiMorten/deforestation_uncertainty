@@ -112,7 +112,10 @@ def get_cloud_cloudshadow_mask(data_image, cloud_threshold = 0.2):
 if __name__ == '__main__': 
     # ======= INPUT PARAMETERS ============ # 
     dataset = MA()
-    year = 2020
+    year = 2021
+
+    addThinCloudMask = False
+    apply_shadow_mask = False
     # ======= END INPUT PARAMETERS ============ # 
 
     path_optical_im = dataset.paths.optical_im_past_dates[year]
@@ -172,13 +175,13 @@ if __name__ == '__main__':
     # === SAVE CLOUD MASK === #
 
     cloud_mask = np.zeros_like(cirrus).astype(np.uint8)
-    addThinCloudMask = False
+    
     if addThinCloudMask == True:
         cloud_mask[thin_cloud_mask == 1] = 1
     ic(cloud_mask.shape, cloud_cloudshadow_mask.shape, thin_cloud_mask.shape, cirrus.shape)
     # pdb.set_trace()
     cloud_mask[cloud_cloudshadow_mask == 1] = 1
-    apply_shadow_mask = False
+    
     if apply_shadow_mask == True:
         cloud_mask[cloud_cloudshadow_mask == -1] = 1
 
