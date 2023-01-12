@@ -762,14 +762,14 @@ class Trainer():
             self.getValidationValues2()
             self.getTestValues2()
             self.getOptimalUncertaintyThreshold()
-            results = self.getUncertaintyMetricsFromOptimalThreshold()
-            metric = results['metrics']['f1']
+            results_tmp = self.getUncertaintyMetricsFromOptimalThreshold()
+            metric = results_tmp['metrics']['f1']
             if metric > max_metric:
                 max_metric = metric
-                results["pred_entropy_single_max"] = results
+                results["pred_entropy_single_max"] = results_tmp
             if metric < min_metric:
                 min_metric = metric
-                results["pred_entropy_single_min"] = results
+                results["pred_entropy_single_min"] = results_tmp
         
 
         print("self.exp, results", self.exp, results)
