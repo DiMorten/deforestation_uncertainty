@@ -19,14 +19,19 @@ import cv2
 from enum import Enum
 import matplotlib.pyplot as plt
 from scipy import optimize  
-from src.trainer import Trainer
+from src.trainer.base import Trainer
 
 class TrainerEvidential(Trainer):
     def __init__(self, config, dataset, patchesHandler, grid_idx=0):
         super().__init__(config, dataset, patchesHandler, grid_idx=grid_idx)
         self.annealing_step  = config['Uncertainty']['annealing_step']
+        self.times = 1
+        self.network_architecture = utils_v1.build_resunet
+        # 10*117
+        # self.annealing_step  = 10*375
+        # self.annealing_step  = 10*375/2
 
-
+        # self.annealing_step  = 10*375/4
     def train(self):
 
 
@@ -217,7 +222,7 @@ class TrainerEvidential(Trainer):
             loss = loss_evidential()
 
             input_shape = (rows, cols, self.channels)
-            self.model = utils_v1.build_resunet(input_shape, self.nb_filters, self.class_n, last_activation=None)
+            self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n, last_activation=None)
             
             self.model.compile(optimizer=adam, loss=loss, metrics=['accuracy', KL_term, loglikelihood_term, 
                 evidential_success, evidential_fail, acc, annealing_coef, global_step_get, annealing_step_get])
@@ -244,3 +249,85 @@ class TrainerEvidential(Trainer):
         # Saving training time
         # np.save(path_exp+'/metrics_tr.npy', metrics_all)
         del self.train_gen_batch, self.valid_gen_batch        
+
+    def plotLossTerms(self):
+        self.logger.plotLossTerms(self.history)
+
+    def plotAnnealingCoef(self):
+        self.logger.plotAnnealingCoef(self.history)
+    def getMeanProb(self):
+        self.mean_prob = self.prob_rec
+    def preprocessProbRec(self):
+        self.prob_rec = np.expand_dims(self.prob_rec, axis = -1)
+
+
+    def infer(self):
+        self.h, self.w, self.c = self.image1_pad.shape
+        self.c = self.channels
+        self.patch_size_rows = self.h//self.n_rows
+        self.patch_size_cols = self.w//self.n_cols
+        self.num_patches_x = int(self.h/self.patch_size_rows)
+        num_patches_y = int(self.w/self.patch_size_cols)
+
+        ic(self.path_models+ '/' + self.method +'_'+str(0)+'.h5')
+        model = utils_v1.load_model(self.path_models+ '/' + self.method +'_'+str(0)+'.h5', compile=False)
+        self.class_n = 3
+
+        if self.config["loadInference"] == False:
+            if self.config["save_probabilities"] == False:
+                # self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.class_n, inference_times), dtype = np.float32)
+                self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.class_n), dtype = np.float32)
+
+        #    new_model = utils_v1.build_resunet(input_shape=(self.patch_size_rows,self.patch_size_cols, c), 
+        #        nb_filters = nb_filters, n_classes = self.class_n, dropout_seed = None)
+            new_model = self.network_architecture(input_shape=(self.patch_size_rows,self.patch_size_cols, self.c), 
+                nb_filters = self.nb_filters, n_classes = self.class_n, last_activation=None)
+
+            for l in range(1, len(model.layers)):
+                new_model.layers[l].set_weights(model.layers[l].get_weights())
+            
+            self.patchesHandler.class_n = self.class_n
+
+            metrics_all =[]
+            with tf.device('/cpu:0'):
+                for tm in range(0,self.config["inference_times"]):
+                    print('time: ', tm)
+
+                    
+                    # Recinstructing predicted map
+                    start_test = time.time()
+                    '''
+                    args_network = {'patch_size_rows': patch_size_rows,
+                        'patch_size_cols': patch_size_cols,
+                        'c': c,
+                        'nb_filters': nb_filters,
+                        'class_n': class_n,
+                        'dropout_seed': self.inference_times}
+                    '''
+                    prob_reconstructed, self.u_reconstructed = self.patchesHandler.infer(
+                            new_model, self.image1_pad, self.h, self.w, 
+                            # model, self.image1_pad, h, w, 
+                            self.num_patches_x, num_patches_y, self.patch_size_rows, 
+                            self.patch_size_cols)
+                            # patch_size_cols, a = args_network)
+                            
+                    ts_time =  time.time() - start_test
+
+                    if self.config["save_probabilities"] == True:
+                        np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
+                    else:
+                        self.prob_rec = prob_reconstructed.copy()
+                    
+                    metrics_all.append(ts_time)
+                    del prob_reconstructed
+                metrics_ = np.asarray(metrics_all)
+                # Saving test time
+                np.save(self.path_exp+'/metrics_ts.npy', metrics_)
+        del self.image1_pad
+
+
+    # to-do: pass to predictor. to do that, pass data to dataset class (dataset.image_stack, dataset.label, etc)
+
+
+    def setUncertainty(self):
+        self.uncertainty_map = self.u_reconstructed

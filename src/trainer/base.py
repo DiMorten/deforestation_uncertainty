@@ -36,15 +36,14 @@ class Trainer():
         self.method = 'resunet'
         self.nb_filters = [16, 32, 64, 128, 256]
         self.weights = [0.1, 0.9, 0]
+        # self.weights = [0.0025, 0.9975, 0]
         self.title_name = 'ResUnet'
 
 
         self.grid_idx = grid_idx
-        # 10*117
-        # self.annealing_step  = 10*375
-        # self.annealing_step  = 10*375/2
 
-        # self.annealing_step  = 10*375/4
+        self.network = None
+        self.UncertaintyMethod = Enum('UncertaintyMethod', 'pred_var MI pred_entropy KL pred_entropy_single')
 
     def defineExperiment(self, exp):
         self.exp = exp
@@ -152,8 +151,8 @@ class Trainer():
         if type(self.patchesHandler) == PatchesHandlerMultipleDates:
             self.channels = self.patchesHandler.input_image_shape  
 
-    def train(self):
-        pass
+    # def train(self):
+    #     pass
 
     def loadDataset(self):
         self.loadLabel()
@@ -179,11 +178,6 @@ class Trainer():
     def plotHistory(self):
         self.logger.plotHistory(self.history)
 
-    def plotLossTerms(self):
-        self.logger.plotLossTerms(self.history)
-
-    def plotAnnealingCoef(self):
-        self.logger.plotAnnealingCoef(self.history)
 
     # to-do: pass to predictor. to do that, pass data to dataset class (dataset.image_stack, dataset.label, etc)
 
@@ -191,13 +185,14 @@ class Trainer():
         self.setPadding()
         self.infer()
         self.loadPredictedProbabilities()
+        self.getMeanProb()
         self.unpadMeanProb()
         self.squeezeLabel()
         self.setMeanProbNotConsideredAreas()
         self.getLabelTest()
         # self.getMAP()
-        self.expandDimsProb()
-        self.getUncertaintyToShow()
+        self.preprocessProbRec()
+        # self.getUncertaintyToShow(self.pred_entropy)
         self.getLabelCurrentDeforestation()
         self.applyProbabilityThreshold()
         self.getTestValues()
@@ -210,6 +205,7 @@ class Trainer():
             self.calculateMAPWithoutSmallPolygons()
         self.getErrorMask()
         self.getErrorMaskToShowRGB()
+        self.setUncertainty()
         self.getValidationValues2()
         self.getTestValues2()
         self.selectUncertaintyMethod()
@@ -217,7 +213,7 @@ class Trainer():
         # trainer.getUncertaintyAAAuditedValues()
         self.getOptimalUncertaintyThreshold()
         self.getUncertaintyMetricsFromOptimalThreshold()
-        
+    
     def setPadding(self):
         self.metrics_ts = []
         self.n_pool = 3
@@ -236,29 +232,27 @@ class Trainer():
 
         self.h, self.w, self.c = self.image1_pad.shape
         self.c = self.channels
-        self.patch_size_rows = self.h//self.n_rows
-        self.patch_size_cols = self.w//self.n_cols
-        self.num_patches_x = int(self.h/self.patch_size_rows)
-        num_patches_y = int(self.w/self.patch_size_cols)
+        patch_size_rows = self.h//self.n_rows
+        patch_size_cols = self.w//self.n_cols
+        num_patches_x = int(self.h/patch_size_rows)
+        num_patches_y = int(self.w/patch_size_cols)
 
         ic(self.path_models+ '/' + self.method +'_'+str(0)+'.h5')
         model = utils_v1.load_model(self.path_models+ '/' + self.method +'_'+str(0)+'.h5', compile=False)
-        self.class_n = 3
+        class_n = 3
 
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:
-                # self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.class_n, inference_times), dtype = np.float32)
-                self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.class_n), dtype = np.float32)
+                # self.prob_rec = np.zeros((image1_pad.shape[0],image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
+                self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
 
-        #    new_model = utils_v1.build_resunet(input_shape=(self.patch_size_rows,self.patch_size_cols, c), 
-        #        nb_filters = nb_filters, n_classes = self.class_n, dropout_seed = None)
-            new_model = utils_v1.build_resunet(input_shape=(self.patch_size_rows,self.patch_size_cols, self.c), 
-                nb_filters = self.nb_filters, n_classes = self.class_n, last_activation=None)
+            new_model = utils_v1.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
+                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None)
 
             for l in range(1, len(model.layers)):
                 new_model.layers[l].set_weights(model.layers[l].get_weights())
             
-            self.patchesHandler.class_n = self.class_n
+            self.patchesHandler.class_n = class_n
 
             metrics_all =[]
             with tf.device('/cpu:0'):
@@ -274,13 +268,13 @@ class Trainer():
                         'c': c,
                         'nb_filters': nb_filters,
                         'class_n': class_n,
-                        'dropout_seed': self.inference_times}
+                        'dropout_seed': inference_times}
                     '''
-                    prob_reconstructed, self.u_reconstructed = self.patchesHandler.infer(
+                    prob_reconstructed = self.patchesHandler.infer(
                             new_model, self.image1_pad, self.h, self.w, 
-                            # model, self.image1_pad, h, w, 
-                            self.num_patches_x, num_patches_y, self.patch_size_rows, 
-                            self.patch_size_cols)
+                            # model, image1_pad, h, w, 
+                            num_patches_x, num_patches_y, patch_size_rows, 
+                            patch_size_cols)
                             # patch_size_cols, a = args_network)
                             
                     ts_time =  time.time() - start_test
@@ -288,7 +282,7 @@ class Trainer():
                     if self.config["save_probabilities"] == True:
                         np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
                     else:
-                        self.prob_rec = prob_reconstructed.copy()
+                        self.prob_rec[:,:,tm] = prob_reconstructed
                     
                     metrics_all.append(ts_time)
                     del prob_reconstructed
@@ -296,7 +290,6 @@ class Trainer():
                 # Saving test time
                 np.save(self.path_exp+'/metrics_ts.npy', metrics_)
         del self.image1_pad
-
     def loadPredictedProbabilities(self):
         if self.config["save_probabilities"] == True:
             self.prob_rec = np.zeros((self.h, self.w, self.config["inference_times"]), dtype = np.float32)
@@ -305,7 +298,8 @@ class Trainer():
                 print(tm)
                 self.prob_rec[:,:,tm] = np.load(self.path_maps+'/'+'prob_'+str(tm)+'.npy').astype(np.float32)
 
-        self.mean_prob = self.prob_rec
+    def getMeanProb():
+        pass
 
     def unpadMeanProb(self):   
         self.mean_prob = self.mean_prob[:self.label_mask.shape[0], :self.label_mask.shape[1]]        
@@ -331,13 +325,11 @@ class Trainer():
                 self.mean_prob_test)*100, 2)
         print(mAP)
 
-    def expandDimsProb(self):
-
-        self.prob_rec = np.expand_dims(self.prob_rec, axis = -1)
-
+    def preprocessProbRec(self):
+        pass
     def getUncertaintyToShow(self):
         
-        self.uncertainty_to_show = self.u_reconstructed.copy()[:self.label_mask.shape[0], :self.label_mask.shape[1]]
+        self.uncertainty_to_show = self.uncertainty_map.copy()[:self.label_mask.shape[0], :self.label_mask.shape[1]]
 
         self.uncertainty_to_show[self.label_mask == 2] = 0
 
@@ -481,7 +473,8 @@ class Trainer():
         del error_mask_to_show
         cv2.imwrite('output/figures/Para_error_mask_to_show_rgb.png', self.error_mask_to_show_rgb)
 
-
+    def setUncertainty(self):
+        pass
     def getTestValues2(self):
 
         ic(self.label_mask.shape)
@@ -500,9 +493,9 @@ class Trainer():
         ic(self.error_mask_test.shape)
 
 
-        self.evidential_test = utils_v1.excludeBackgroundAreasFromTest(
+        self.uncertainty = utils_v1.excludeBackgroundAreasFromTest(
                 utils_v1.getTestVectorFromIm(
-                        utils_v1.unpadIm(self.u_reconstructed, self.npad), self.mask_amazon_ts),
+                        utils_v1.unpadIm(self.uncertainty_map, self.npad), self.mask_amazon_ts),
                 self.label_mask_test)
 
 
@@ -525,9 +518,9 @@ class Trainer():
                 self.label_mask_val) 
 
 
-        self.evidential_val = utils_v1.excludeBackgroundAreasFromTest(
+        self.uncertainty_val = utils_v1.excludeBackgroundAreasFromTest(
                 utils_v1.getTestVectorFromIm(
-                        utils_v1.unpadIm(self.u_reconstructed, self.npad), self.mask_tr_val, mask_return_value = 2),
+                        utils_v1.unpadIm(self.uncertainty_map, self.npad), self.mask_tr_val, mask_return_value = 2),
                 self.label_mask_val)
 
     def selectUncertaintyMethod(self):
@@ -575,8 +568,8 @@ class Trainer():
             self.best_threshold = 0.287
 
         elif self.predictor == self.Predictor.evidential:
-            self.uncertainty = self.evidential_test
-            self.uncertainty_val = self.evidential_val
+            self.uncertainty = self.uncertainty
+            self.uncertainty_val = self.uncertainty_val
             self.plot_lims = [[0, 0.38], [0, 2500]]
             self.title_name = 'Predictive Entropy Single'
             self.best_threshold = 0.287
@@ -771,3 +764,10 @@ class Trainer():
             "m_audited_optimal": self.m_audited_optimal,
         }
         np.save('results_{}.npy'.format(self.grid_idx), results)
+
+
+    def plotLossTerms(self):
+        pass
+    def plotAnnealingCoef(self):
+        pass
+
