@@ -27,6 +27,7 @@ class TrainerMCDropout(Trainer):
     def __init__(self, config, dataset, patchesHandler, grid_idx=0):
         super().__init__(config, dataset, patchesHandler, grid_idx=grid_idx)
         self.network_architecture = utils_v1.build_resunet_dropout_spatial
+        self.pred_entropy_single_idx = 0
     def train(self):
 
         metrics_all = []
@@ -87,5 +88,6 @@ class TrainerMCDropout(Trainer):
             self.uncertainty_map = uncertainty.expected_KL_divergence(self.prob_rec).astype(np.float32)
 
         elif self.config['uncertainty_method'] == "pred_entropy_single":
-            self.uncertainty_map = uncertainty.single_experiment_entropy(self.prob_rec[0]).astype(np.float32)
+            self.uncertainty_map = uncertainty.single_experiment_entropy(
+                self.prob_rec[self.pred_entropy_single_idx]).astype(np.float32)
         

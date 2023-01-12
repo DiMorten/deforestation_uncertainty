@@ -208,7 +208,7 @@ class Trainer():
         self.setUncertainty()
         self.getValidationValues2()
         self.getTestValues2()
-        self.selectUncertaintyMethod()
+        self.setUncertainty()
         # self.getUncertaintyAAValues()
         # trainer.getUncertaintyAAAuditedValues()
         self.getOptimalUncertaintyThreshold()
@@ -689,15 +689,15 @@ class Trainer():
 
         self.m_optimal['f1_L'] = 2*self.m_optimal['precision_L']*self.m_optimal['recall_L']/(self.m_optimal['precision_L']+self.m_optimal['recall_L'])
         self.m_optimal['f1_H'] = 2*self.m_optimal['precision_H']*self.m_optimal['recall_H']/(self.m_optimal['precision_H']+self.m_optimal['recall_H'])
-
+        self.m_optimal['f1'] = self.f1
         self.m_audited_optimal['f1'] = 2*self.m_audited_optimal['precision']*self.m_audited_optimal['recall']/(self.m_audited_optimal['precision']+self.m_audited_optimal['recall'])
 
         ic(self.m_optimal)
         ic(self.m_audited_optimal)
 
-        np.save('m_optimal_{}.npy'.format(self.grid_idx), self.m_optimal)
-        np.save('m_audited_optimal_{}.npy'.format(self.grid_idx), self.m_audited_optimal)
-
+        # np.save('m_optimal_{}.npy'.format(self.grid_idx), self.m_optimal)
+        # np.save('m_audited_optimal_{}.npy'.format(self.grid_idx), self.m_audited_optimal)
+        return {'metrics': self.m_optimal, 'metrics_audited': self.m_audited_optimal}
         
     def saveResults(self):
 
@@ -718,3 +718,59 @@ class Trainer():
     def plotAnnealingCoef(self):
         pass
 
+    def run_predictor_repetition(self):
+        self.setPadding()
+        self.infer()
+        self.loadPredictedProbabilities()
+        self.getMeanProb()
+        self.unpadMeanProb()
+        self.squeezeLabel()
+        self.setMeanProbNotConsideredAreas()
+        self.getLabelTest()
+        # self.getMAP()
+        self.preprocessProbRec()
+        # self.getUncertaintyToShow(self.pred_entropy)
+        self.getLabelCurrentDeforestation()
+        self.applyProbabilityThreshold()
+        self.getTestValues()
+        self.removeSmallPolygons()
+        self.calculateMetrics()
+        self.getValidationValuesForMetrics()
+        self.calculateMetricsValidation()
+        calculateMAPWithoutSmallPolygons = False
+        if calculateMAPWithoutSmallPolygons == True:
+            self.calculateMAPWithoutSmallPolygons()
+        self.getErrorMask()
+        self.getErrorMaskToShowRGB()
+        
+        uncertainty_methods = ['pred_entropy', 'pred_var', 'MI', 'KL']
+        results = {}
+        for uncertainty_method in uncertainty_methods:
+            self.config['uncertainty_method'] = uncertainty_method
+            self.setUncertainty()
+            self.getValidationValues2()
+            self.getTestValues2()
+            self.getOptimalUncertaintyThreshold()
+            results[uncertainty_method] = self.getUncertaintyMetricsFromOptimalThreshold()
+        
+        min_metric = np.inf
+        max_metric = 0
+        for idx in range(self.config['inference_times']):
+            self.pred_entropy_single_idx = idx
+            self.config['uncertainty_method'] = "pred_entropy_single"
+            self.setUncertainty()
+            self.getValidationValues2()
+            self.getTestValues2()
+            self.getOptimalUncertaintyThreshold()
+            results = self.getUncertaintyMetricsFromOptimalThreshold()
+            metric = results['metrics']['f1']
+            if metric > max_metric:
+                max_metric = metric
+                results["pred_entropy_single_max"] = results
+            if metric < min_metric:
+                min_metric = metric
+                results["pred_entropy_single_min"] = results
+        
+
+        print("self.exp, results", self.exp, results)
+        return results
