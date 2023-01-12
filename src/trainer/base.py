@@ -523,59 +523,6 @@ class Trainer():
                         utils_v1.unpadIm(self.uncertainty_map, self.npad), self.mask_tr_val, mask_return_value = 2),
                 self.label_mask_val)
 
-    def selectUncertaintyMethod(self):
-
-
-        self.Predictor = Enum('Predictor', 'pred_var MI pred_entropy KL pred_entropy_single evidential')
-        # self.predictor = Predictor.pred_entropy
-        # self.predictor = Predictor.pred_var
-        # self.predictor = Predictor.MI
-        # self.predictor = Predictor.KL
-        self.predictor = self.Predictor.evidential
-
-        # self.predictor = self.Predictor.pred_entropy_single
-
-        if self.predictor == self.Predictor.pred_var:
-            self.uncertainty = pred_var_test
-            self.uncertainty_val = pred_var_val
-            self.plot_lims = [[0, 0.38], [0, 2500]]
-            self.title_name = 'Predictive Variance'
-            self.best_threshold = 0.2
-        elif self.predictor == self.Predictor.MI:
-            self.uncertainty = MI_test
-            self.uncertainty_val = MI_val
-            self.plot_lims = [[0, 0.38], [0, 2500]]
-            self.title_name = 'Mutual Information'
-            self.best_threshold = 0.2
-        elif self.predictor == self.Predictor.pred_entropy:
-            self.uncertainty = pred_entropy_test
-            self.uncertainty_val = pred_entropy_val
-            self.plot_lims = [[0, 0.38], [0, 2500]]
-            self.title_name = 'Predictive Entropy'
-            self.best_threshold = 0.287
-        elif self.predictor == self.Predictor.KL:
-            self.uncertainty = KL_test
-            self.uncertainty_val = KL_val
-            self.plot_lims = [[0, 0.38], [0, 2500]]
-            self.title_name = 'Predictive Entropy'
-            self.best_threshold = 0.287
-
-        elif self.predictor == self.Predictor.pred_entropy_single:
-            self.uncertainty = pred_entropy_single_test
-            self.uncertainty_val = pred_entropy_single_val
-            self.plot_lims = [[0, 0.38], [0, 2500]]
-            self.title_name = 'Predictive Entropy Single'
-            self.best_threshold = 0.287
-
-        elif self.predictor == self.Predictor.evidential:
-            self.uncertainty = self.uncertainty
-            self.uncertainty_val = self.uncertainty_val
-            self.plot_lims = [[0, 0.38], [0, 2500]]
-            self.title_name = 'Predictive Entropy Single'
-            self.best_threshold = 0.287
-
-
-
     def getUncertaintyAAValues(self):
 
 
@@ -583,22 +530,22 @@ class Trainer():
         # self.threshold_list = [0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.27, 0.3, 0.34, 0.36]
 
         # self.threshold_list = [0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.27, 0.3, 0.34, 0.36, np.max(uncertainty)-0.003]
-        if self.predictor == self.Predictor.pred_entropy:
+        if self.config['uncertainty_method'] == "pred_entropy":
                 self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
-        elif self.predictor == self.Predictor.pred_var:
+        elif self.config['uncertainty_method'] == "pred_var":
                 self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36]
                 self.threshold_list = [x*0.13/0.36 for x in self.threshold_list] + [np.max(self.uncertainty)-0.0015, np.max(self.uncertainty)-0.0008]
-        elif self.predictor == self.Predictor.MI:
+        elif self.config['uncertainty_method'] == "MI":
                 self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36]
                 self.threshold_list = [x*0.235/0.36 for x in self.threshold_list] + [np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
-        elif self.predictor == self.Predictor.KL:
+        elif self.config['uncertainty_method'] == "KL":
                 self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36]
                 self.threshold_list = [x*1.0/0.36 for x in self.threshold_list] + [np.max(self.uncertainty)-0.006, np.max(self.uncertainty)-0.003]
-        elif self.predictor == self.Predictor.evidential:
+        elif self.config['uncertainty_method'] == "evidential":
                 # self.threshold_list = [0.015, 0.03, 0.04]
                 self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36]
@@ -704,7 +651,7 @@ class Trainer():
         # if save_figures == True:
         if True:
             plt.savefig('output/figures/recall_precision_f1_AA.png', dpi=150, bbox_inches='tight')
-    def getOptimalUncertaintyThreshold(self, AA = 0.03, bound = 0.015):
+    def getOptimalUncertaintyThreshold(self, AA = 0.03, bound = 0.0015):
 
         def getAAFromUncertaintyThreshold(threshold): 
             print(threshold)
