@@ -90,4 +90,6 @@ class TrainerMCDropout(Trainer):
         elif self.config['uncertainty_method'] == "pred_entropy_single":
             self.uncertainty_map = uncertainty.single_experiment_entropy(
                 self.prob_rec[self.pred_entropy_single_idx]).astype(np.float32)
-        
+
+class TrainerEnsemble(TrainerMCDropout):
+    

@@ -342,12 +342,14 @@ class Trainer():
         print(self.mean_prob.shape)
         self.predicted = np.zeros_like(self.mean_prob)
         self.threshold = 0.5
-        # self.threshold = 0.698
 
-        self.predicted[self.mean_prob>=self.threshold] = 1
-        self.predicted[self.mean_prob<self.threshold] = 0
-        # self.predicted[prob_rec[0][...,-1][:label_mask.shape[0], :label_mask.shape[1]]>=self.threshold] = 1
-        # self.predicted[prob_rec[0][...,-1][:label_mask.shape[0], :label_mask.shape[1]]<self.threshold] = 0
+        if self.config['uncertainty_metric'] != "pred_entropy_single":
+            self.predicted[self.mean_prob>=self.threshold] = 1
+            self.predicted[self.mean_prob<self.threshold] = 0
+        else:
+            print("Single entropy")
+            self.predicted[self.prob_rec[self.pred_entropy_single_idx][...,-1][:self.label_mask.shape[0], :self.label_mask.shape[1]]>=self.threshold] = 1
+            self.predicted[self.prob_rec[self.pred_entropy_single_idx][...,-1][:self.label_mask.shape[0], :self.label_mask.shape[1]]<self.threshold] = 0
 
         print(np.unique(self.predicted, return_counts=True))
 
@@ -731,7 +733,7 @@ class Trainer():
         self.preprocessProbRec()
         # self.getUncertaintyToShow(self.pred_entropy)
         self.getLabelCurrentDeforestation()
-        self.applyProbabilityThreshold()
+        self.applyProbabilityThreshold() # start from here for single entropy loop
         self.getTestValues()
         self.removeSmallPolygons()
         self.calculateMetrics()
@@ -752,7 +754,7 @@ class Trainer():
             self.getTestValues2()
             self.getOptimalUncertaintyThreshold()
             results[uncertainty_method] = self.getUncertaintyMetricsFromOptimalThreshold()
-        
+        '''
         min_metric = np.inf
         max_metric = 0
         for idx in range(self.config['inference_times']):
@@ -771,6 +773,57 @@ class Trainer():
                 min_metric = metric
                 results["pred_entropy_single_min"] = results_tmp
         
+        '''
+        print("self.exp, results", self.exp, results)
+        return results
 
+
+    def run_predictor_repetition(self):
+        self.setPadding()
+        self.infer()
+        self.loadPredictedProbabilities()
+        self.getMeanProb()
+        self.unpadMeanProb()
+        self.squeezeLabel()
+        self.setMeanProbNotConsideredAreas()
+        self.getLabelTest()
+        # self.getMAP()
+        self.preprocessProbRec()
+        # self.getUncertaintyToShow(self.pred_entropy)
+        self.getLabelCurrentDeforestation()
+        
+        
+        min_metric = np.inf
+        max_metric = 0
+        self.config['uncertainty_method'] = "pred_entropy_single"
+        results = {}
+        for idx in range(self.config['inference_times']):
+            self.pred_entropy_single_idx = idx
+            self.applyProbabilityThreshold() # start from here for single entropy loop
+            self.getTestValues()
+            self.removeSmallPolygons()
+            self.calculateMetrics()
+            self.getValidationValuesForMetrics()
+            self.calculateMetricsValidation()
+            calculateMAPWithoutSmallPolygons = False
+            if calculateMAPWithoutSmallPolygons == True:
+                self.calculateMAPWithoutSmallPolygons()
+            self.getErrorMask()
+            self.getErrorMaskToShowRGB()
+
+            self.setUncertainty()
+            self.getValidationValues2()
+            self.getTestValues2()
+            self.getOptimalUncertaintyThreshold()
+            results_tmp = self.getUncertaintyMetricsFromOptimalThreshold()
+            metric = self.f1
+            if metric > max_metric:
+                max_metric = metric
+                results["pred_entropy_single_max"] = results_tmp
+            if metric < min_metric:
+                min_metric = metric
+                results["pred_entropy_single_min"] = results_tmp
+        
+        
         print("self.exp, results", self.exp, results)
         return results
