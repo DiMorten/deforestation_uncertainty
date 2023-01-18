@@ -634,6 +634,11 @@ class Trainer():
         ax1.set_ylim(self.ylim)
         ax1.set_xlim(self.xlim)
         ax1.grid()
+
+        ax2.plot(range(int(self.xlim[0]), int(self.xlim[1] + 2)), 
+            np.ones(int(self.xlim[1] + 2)) * self.f1, 
+            'C1:', label="F1 No Uncertainty")
+
         ax2.plot(self.m['AA']*100, self.m['f1_L']*100, 'C3-', label="F1 Low Uncertainty")
         ax2.plot(self.m['AA']*100, self.m['f1_H']*100, 'C0-', label="F1 High Uncertainty")
         ax2.plot(self.m['AA']*100, self.m_audited['f1']*100, 'C2-', label="F1 Audited")
@@ -647,7 +652,7 @@ class Trainer():
         ax2.grid()
         ax3.plot(self.m['AA']*100, np.asarray(self.threshold_list), label="AA")
         ax3.set_xlabel('Audit Area (%)')
-        ax3.set_ylabel('Threshold')
+        ax3.set_ylabel('Uncertainty Threshold')
         ax3.grid()
         ax3.set_xlim(self.xlim)
 
