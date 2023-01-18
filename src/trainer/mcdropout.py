@@ -92,4 +92,123 @@ class TrainerMCDropout(Trainer):
                 self.prob_rec[self.pred_entropy_single_idx]).astype(np.float32)
 
 class TrainerEnsemble(TrainerMCDropout):
-    
+
+    def infer(self):
+        self.h, self.w, self.c = self.image1_pad.shape
+        self.c = self.channels
+        patch_size_rows = self.h//self.n_rows
+        patch_size_cols = self.w//self.n_cols
+        num_patches_x = int(self.h/patch_size_rows)
+        num_patches_y = int(self.w/patch_size_cols)
+
+
+        class_n = 3
+
+        if self.config["loadInference"] == False:
+            if self.config["save_probabilities"] == False:
+                # prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, inference_times), dtype = np.float32)
+                self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
+
+            new_model = utils_v1.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
+                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training = False)
+
+            self.patchesHandler.class_n = class_n
+
+            with tf.device('/cpu:0'):
+                for tm in range(0,self.config["inference_times"]):
+                    print('time: ', tm)
+                    
+                    # Recinstructing predicted map
+                    start_test = time.time()
+
+                    path_exp = self.dataset.paths.experiment + 'exp' + str(self.exp_ids[tm])
+                    path_models = path_exp + '/models'
+                    # ic(path_models+ '/' + method +'_'+str(0)+'.h5')
+                    model = utils_v1.load_model(path_models+ '/' + self.method +'_'+str(0)+'.h5', compile=False)
+                    for l in range(1, len(model.layers)):
+                        new_model.layers[l].set_weights(model.layers[l].get_weights())
+                    
+                    '''
+                    args_network = {'patch_size_rows': patch_size_rows,
+                        'patch_size_cols': patch_size_cols,
+                        'c': c,
+                        'nb_filters': nb_filters,
+                        'class_n': class_n,
+                        'dropout_seed': inference_times}
+                    '''
+                    prob_reconstructed = self.patchesHandler.infer(
+                            new_model, self.image1_pad, self.h, self.w, 
+                            # model, image1_pad, h, w, 
+                            num_patches_x, num_patches_y, patch_size_rows, 
+                            patch_size_cols)
+                            # patch_size_cols, a = args_network)
+                            
+                    ts_time =  time.time() - start_test
+
+                    if self.config["save_probabilities"] == True:
+                        np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
+                    else:
+                        self.prob_rec[:,:,tm] = prob_reconstructed
+                    
+                    del prob_reconstructed
+        del self.image1_pad
+
+    def run_predictor_repetition_single_entropy(self):
+        # self.setExperimentPath()
+        # self.createLogFolders()        
+        self.setPadding()
+        self.infer()
+        self.loadPredictedProbabilities()
+        self.getMeanProb()
+        self.unpadMeanProb()
+        self.squeezeLabel()
+        self.setMeanProbNotConsideredAreas()
+        self.getLabelTest()
+        # self.getMAP()
+        self.preprocessProbRec()
+        # self.getUncertaintyToShow(self.pred_entropy)
+        self.getLabelCurrentDeforestation()
+        
+        
+        # min_metric = np.inf
+        # max_metric = 0
+        self.config['uncertainty_method'] = "pred_entropy_single"
+        results = {}
+        for idx in range(self.config['inference_times']):
+            self.pred_entropy_single_idx = idx
+            self.applyProbabilityThreshold() # start from here for single entropy loop
+            self.getTestValues()
+            self.removeSmallPolygons()
+            self.calculateMetrics()
+            self.getValidationValuesForMetrics()
+            self.calculateMetricsValidation()
+            calculateMAPWithoutSmallPolygons = False
+            if calculateMAPWithoutSmallPolygons == True:
+                self.calculateMAPWithoutSmallPolygons()
+            self.getErrorMask()
+            self.getErrorMaskToShowRGB()
+
+            self.setUncertainty()
+            self.getValidationValues2()
+            self.getTestValues2()
+            self.getOptimalUncertaintyThreshold()
+
+            results["pred_entropy_single_{}".format(idx)] = self.getUncertaintyMetricsFromOptimalThreshold()
+            
+            '''
+            results_tmp = self.getUncertaintyMetricsFromOptimalThreshold()
+            metric = self.f1
+            if metric > max_metric:
+                max_metric = metric
+                results["pred_entropy_single_max"] = results_tmp
+            if metric < min_metric:
+                min_metric = metric
+                results["pred_entropy_single_min"] = results_tmp
+            '''
+        
+        print("results", results)
+        return results
+
+        
+    def defineExperiment(self, exp_ids):
+        self.exp_ids = exp_ids

@@ -48,14 +48,15 @@ class Trainer():
     def defineExperiment(self, exp):
         self.exp = exp
 
+    def setExperimentPath(self):
+        self.path_exp = self.dataset.paths.experiment + 'exp' + str(self.exp)
+        self.path_models = self.path_exp+'/models'
+        self.path_maps = self.path_exp+'/pred_maps'
+        
     def createLogFolders(self):
         self.logger.createLogFolders(self.dataset)
 
         # Creating folder for the experiment
-
-        self.path_exp = self.dataset.paths.experiment + 'exp' + str(self.exp)
-        self.path_models = self.path_exp+'/models'
-        self.path_maps = self.path_exp+'/pred_maps'
 
         if not os.path.exists(self.path_exp):
             os.makedirs(self.path_exp)   
@@ -343,7 +344,7 @@ class Trainer():
         self.predicted = np.zeros_like(self.mean_prob)
         self.threshold = 0.5
 
-        if self.config['uncertainty_metric'] != "pred_entropy_single":
+        if self.config['uncertainty_method'] != "pred_entropy_single":
             self.predicted[self.mean_prob>=self.threshold] = 1
             self.predicted[self.mean_prob<self.threshold] = 0
         else:
@@ -720,7 +721,9 @@ class Trainer():
     def plotAnnealingCoef(self):
         pass
 
-    def run_predictor_repetition(self):
+    def run_predictor_repetition(self, uncertainty_methods=['pred_entropy', 'pred_var', 'MI', 'KL']):
+        # self.setExperimentPath()
+        # self.createLogFolders()
         self.setPadding()
         self.infer()
         self.loadPredictedProbabilities()
@@ -745,7 +748,7 @@ class Trainer():
         self.getErrorMask()
         self.getErrorMaskToShowRGB()
         
-        uncertainty_methods = ['pred_entropy', 'pred_var', 'MI', 'KL']
+        # uncertainty_methods = 
         results = {}
         for uncertainty_method in uncertainty_methods:
             self.config['uncertainty_method'] = uncertainty_method
@@ -774,56 +777,7 @@ class Trainer():
                 results["pred_entropy_single_min"] = results_tmp
         
         '''
-        print("self.exp, results", self.exp, results)
+        print("results",  results)
         return results
 
 
-    def run_predictor_repetition(self):
-        self.setPadding()
-        self.infer()
-        self.loadPredictedProbabilities()
-        self.getMeanProb()
-        self.unpadMeanProb()
-        self.squeezeLabel()
-        self.setMeanProbNotConsideredAreas()
-        self.getLabelTest()
-        # self.getMAP()
-        self.preprocessProbRec()
-        # self.getUncertaintyToShow(self.pred_entropy)
-        self.getLabelCurrentDeforestation()
-        
-        
-        min_metric = np.inf
-        max_metric = 0
-        self.config['uncertainty_method'] = "pred_entropy_single"
-        results = {}
-        for idx in range(self.config['inference_times']):
-            self.pred_entropy_single_idx = idx
-            self.applyProbabilityThreshold() # start from here for single entropy loop
-            self.getTestValues()
-            self.removeSmallPolygons()
-            self.calculateMetrics()
-            self.getValidationValuesForMetrics()
-            self.calculateMetricsValidation()
-            calculateMAPWithoutSmallPolygons = False
-            if calculateMAPWithoutSmallPolygons == True:
-                self.calculateMAPWithoutSmallPolygons()
-            self.getErrorMask()
-            self.getErrorMaskToShowRGB()
-
-            self.setUncertainty()
-            self.getValidationValues2()
-            self.getTestValues2()
-            self.getOptimalUncertaintyThreshold()
-            results_tmp = self.getUncertaintyMetricsFromOptimalThreshold()
-            metric = self.f1
-            if metric > max_metric:
-                max_metric = metric
-                results["pred_entropy_single_max"] = results_tmp
-            if metric < min_metric:
-                min_metric = metric
-                results["pred_entropy_single_min"] = results_tmp
-        
-        
-        print("self.exp, results", self.exp, results)
-        return results
