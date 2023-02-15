@@ -223,16 +223,16 @@ def removeSmallPolygonsForMetrics(predicted, label_mask,
     return predicted, label_mask
 
 def getTest(predicted, label_mask, mask_test):
-    ic(predicted.shape, label_mask.shape)
+    # ic(predicted.shape, label_mask.shape)
 
     predicted_masked = predicted[mask_test == 1]
     label_masked = label_mask[mask_test == 1]
-    ic(predicted_masked.shape, label_masked.shape)
-    ic(np.unique(label_masked, return_counts=True))
+    # ic(predicted_masked.shape, label_masked.shape)
+    # ic(np.unique(label_masked, return_counts=True))
     # mask class 2 again
     predicted_masked = predicted_masked[label_masked != 2]
     label_masked = label_masked[label_masked != 2]
-    ic(predicted_masked.shape, label_masked.shape)
+    # ic(predicted_masked.shape, label_masked.shape)
 
     return predicted_masked, label_masked
 

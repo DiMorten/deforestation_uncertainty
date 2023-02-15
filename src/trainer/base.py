@@ -675,7 +675,7 @@ class Trainer():
         self.threshold_optimal = minimum.x
         ic(self.threshold_optimal)
     
-    def getUncertaintyMetricsFromOptimalThreshold(self):
+    def getUncertaintyMetricsFromOptimalThreshold(self, get_f1=True):
 
         self.metric_values_optimal = _metrics.getAA_Recall(self.uncertainty, 
                                 self.label_mask_current_deforestation_test, 
@@ -697,7 +697,8 @@ class Trainer():
 
         self.m_optimal['f1_L'] = 2*self.m_optimal['precision_L']*self.m_optimal['recall_L']/(self.m_optimal['precision_L']+self.m_optimal['recall_L'])
         self.m_optimal['f1_H'] = 2*self.m_optimal['precision_H']*self.m_optimal['recall_H']/(self.m_optimal['precision_H']+self.m_optimal['recall_H'])
-        self.m_optimal['f1'] = self.f1
+        if get_f1 == True:
+            self.m_optimal['f1'] = self.f1
         self.m_audited_optimal['f1'] = 2*self.m_audited_optimal['precision']*self.m_audited_optimal['recall']/(self.m_audited_optimal['precision']+self.m_audited_optimal['recall'])
 
         ic(self.m_optimal)
