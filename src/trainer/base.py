@@ -635,6 +635,11 @@ class Trainer():
         ax1.set_xlim(self.xlim)
         ax1.grid()
 
+        xs = [0, 120]
+        ax1.vlines(x = 3, ymin = 0, ymax = max(xs),
+                colors = (0.2, 0.2, 0.2),
+                label = 'vline_multiple - full height')
+
         ax2.plot(range(int(self.xlim[0]), int(self.xlim[1] + 2)), 
             np.ones(int(self.xlim[1] + 2)) * self.f1, 
             'C1:', label="F1 No Uncertainty")
@@ -650,6 +655,12 @@ class Trainer():
         ax2.set_xlim(self.xlim)
 
         ax2.grid()
+
+        xs = [0, 120]
+        ax2.vlines(x = 3, ymin = 0, ymax = max(xs),
+                colors = (0.2, 0.2, 0.2),
+                label = '3% AA')
+
         ax3.plot(self.m['AA']*100, np.asarray(self.threshold_list), label="AA")
         ax3.set_xlabel('Audit Area (%)')
         ax3.set_ylabel('Uncertainty Threshold')

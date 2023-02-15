@@ -22,12 +22,12 @@ from scipy import optimize
 from src.trainer.base import Trainer
 import src.loss
 import src.uncertainty as uncertainty
-
-class TrainerMCDropout(Trainer):
+class TrainerMultiOutput(Trainer):
     def __init__(self, config, dataset, patchesHandler, grid_idx=0):
         super().__init__(config, dataset, patchesHandler, grid_idx=grid_idx)
         self.network_architecture = utils_v1.build_resunet_dropout_spatial
         self.pred_entropy_single_idx = 0
+
     def train(self):
 
         metrics_all = []
@@ -68,10 +68,11 @@ class TrainerMCDropout(Trainer):
 
     def getMeanProb(self):
         self.mean_prob = np.mean(self.prob_rec, axis = -1)
+            
+
     def preprocessProbRec(self):
         self.prob_rec = np.transpose(self.prob_rec, (2, 0, 1))
         self.prob_rec = np.expand_dims(self.prob_rec, axis = -1)
-
 
     def setUncertainty(self):
 
@@ -90,6 +91,9 @@ class TrainerMCDropout(Trainer):
         elif self.config['uncertainty_method'] == "pred_entropy_single":
             self.uncertainty_map = uncertainty.single_experiment_entropy(
                 self.prob_rec[self.pred_entropy_single_idx]).astype(np.float32)
+
+class TrainerMCDropout(TrainerMultiOutput):
+    pass
 
 class TrainerEnsemble(TrainerMCDropout):
 
