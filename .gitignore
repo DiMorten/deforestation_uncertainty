@@ -125,3 +125,5 @@ dmypy.json
 *.npy
 *.png
 *.tif
+*.pkl
+*.json
