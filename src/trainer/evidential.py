@@ -74,8 +74,8 @@ class TrainerEvidential(Trainer):
 
         global_step = K.variable(0.0)
 
-        # def loss_evidential(weights):
-        def loss_evidential():
+        def loss_evidential(weights):
+        # def loss_evidential():
 
             # init the tensor with current epoch, to be updated during training, and define var in scope
             # self.global_step = K.variable(0.0)
@@ -98,7 +98,7 @@ class TrainerEvidential(Trainer):
                 #    loss = loss_eq5(Y, alpha, class_n, global_step, 15) # 10*34
                 #    loss = loss_eq5(Y, alpha, class_n, global_step, 5) # 10*34
                 #    loss = loss_eq5(Y, alpha, class_n, global_step, 60) # 10*34
-                # loss = loss * weights
+                loss = loss * weights
                 loss = tf.reduce_mean(loss)
                 return loss
             return loss
@@ -219,7 +219,8 @@ class TrainerEvidential(Trainer):
             adam = Adam(lr = 1e-3 , beta_1=0.9)
             
     #         loss = loss.weighted_categorical_crossentropy(weights)
-            loss = loss_evidential()
+            # loss = loss_evidential()
+            loss = loss_evidential(self.weights)
 
             input_shape = (rows, cols, self.channels)
             self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n, last_activation=None)
@@ -326,8 +327,25 @@ class TrainerEvidential(Trainer):
         del self.image1_pad
 
 
+    def applyProbabilityThreshold(self):
+        print(self.mean_prob.shape)
+        self.predicted = np.zeros_like(self.mean_prob)
+        self.threshold = 0.5
+
+        self.predicted[self.mean_prob>=self.threshold] = 1
+        self.predicted[self.mean_prob<self.threshold] = 0
+
+        print(np.unique(self.predicted, return_counts=True))
+
+        self.predicted_unpad = self.predicted.copy()
+        self.predicted_unpad[self.label_mask == 2] = 0
+        ic(self.predicted_unpad.shape, self.predicted.shape)
+        del self.predicted
+
     # to-do: pass to predictor. to do that, pass data to dataset class (dataset.image_stack, dataset.label, etc)
 
 
     def setUncertainty(self):
         self.uncertainty_map = self.u_reconstructed
+
+

@@ -209,12 +209,11 @@ class Trainer():
         self.setUncertainty()
         self.getValidationValues2()
         self.getTestValues2()
-        self.setUncertainty()
         # self.getUncertaintyAAValues()
         # trainer.getUncertaintyAAAuditedValues()
         self.getOptimalUncertaintyThreshold()
-        self.getUncertaintyMetricsFromOptimalThreshold()
-    
+        result = self.getUncertaintyMetricsFromOptimalThreshold()
+        return result
     def setPadding(self):
         self.metrics_ts = []
         self.n_pool = 3
@@ -468,14 +467,17 @@ class Trainer():
     
     def getErrorMaskToShowRGB(self):
         predicted_unpad_to_show = self.predicted_unpad.copy()
-        predicted_unpad_to_show[self.label_mask == 2] = 0
 
+        predicted_unpad_to_show[self.label_mask == 2] = 0
+        print(np.unique(predicted_unpad_to_show))
         error_mask_to_show = _metrics.getRgbErrorMask(predicted_unpad_to_show, 
                 self.label_mask_current_deforestation).astype(np.uint8)
         self.error_mask_to_show_rgb = _metrics.saveRgbErrorMask(error_mask_to_show).astype(np.uint8)
         del error_mask_to_show
         cv2.imwrite('output/figures/Para_error_mask_to_show_rgb.png', self.error_mask_to_show_rgb)
 
+    def addPastDeforestationToErrorMask(self):
+        print(np.unique(self.error_mask_to_show_rgb))
     def setUncertainty(self):
         pass
     def getTestValues2(self):
@@ -555,6 +557,9 @@ class Trainer():
                 self.threshold_list = [ 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36]
                 self.threshold_list = [ 0.15, 0.2, 0.225, 
+                        0.25, 0.27, 0.3, 0.34, 0.36, 0.45, 0.55, 0.65, 0.8]
+
+                self.threshold_list = [0.0075, 0.01, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36, 0.45, 0.55, 0.65, 0.8]
 
                 # self.threshold_list = [ 0.15, 0.2,  
@@ -661,11 +666,18 @@ class Trainer():
                 colors = (0.2, 0.2, 0.2),
                 label = '3% AA')
 
-        ax3.plot(self.m['AA']*100, np.asarray(self.threshold_list), label="AA")
-        ax3.set_xlabel('Audit Area (%)')
-        ax3.set_ylabel('Uncertainty Threshold')
+        ax3.plot(np.asarray(self.threshold_list), self.m['AA']*100, label="AA")
+        ax3.set_ylabel('Audit Area (%)')
+        ax3.set_xlabel('Uncertainty Threshold')
         ax3.grid()
-        ax3.set_xlim(self.xlim)
+        ax3.set_ylim(self.xlim)
+
+        lims = ax3.get_xlim()
+        ax3.hlines(y = 3, xmin = lims[0], xmax = lims[1],
+                colors = (0.2, 0.2, 0.2),
+                label = '3% AA')
+
+        ax3.set_xlim(lims)
 
         # if save_figures == True:
         if True:
@@ -717,7 +729,7 @@ class Trainer():
 
         # np.save('m_optimal_{}.npy'.format(self.grid_idx), self.m_optimal)
         # np.save('m_audited_optimal_{}.npy'.format(self.grid_idx), self.m_audited_optimal)
-        return {'metrics': self.m_optimal, 'metrics_audited': self.m_audited_optimal}
+        return {'metrics': self.m_optimal, 'metrics_audited': self.m_audited_optimal, 'exp': self.exp}
         
     def saveResults(self):
 
