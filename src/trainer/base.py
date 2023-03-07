@@ -472,12 +472,11 @@ class Trainer():
         print(np.unique(predicted_unpad_to_show))
         error_mask_to_show = _metrics.getRgbErrorMask(predicted_unpad_to_show, 
                 self.label_mask_current_deforestation).astype(np.uint8)
+        error_mask_to_show[self.label_mask == 2] = 4 # add color for past deforestation
         self.error_mask_to_show_rgb = _metrics.saveRgbErrorMask(error_mask_to_show).astype(np.uint8)
         del error_mask_to_show
         cv2.imwrite('output/figures/Para_error_mask_to_show_rgb.png', self.error_mask_to_show_rgb)
 
-    def addPastDeforestationToErrorMask(self):
-        print(np.unique(self.error_mask_to_show_rgb))
     def setUncertainty(self):
         pass
     def getTestValues2(self):

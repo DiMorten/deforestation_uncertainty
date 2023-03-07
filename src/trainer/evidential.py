@@ -21,12 +21,25 @@ import matplotlib.pyplot as plt
 from scipy import optimize  
 from src.trainer.base import Trainer
 
+def relu_evidence(logits):
+    return tf.nn.relu(logits)
+
+def exp_evidence(logits): 
+    return tf.exp(logits/1000)
+
+def relu6_evidence(logits):
+    return tf.nn.relu6(logits)
+
+def softsign_evidence(logits):
+    return tf.nn.softsign(logits)
+
 class TrainerEvidential(Trainer):
     def __init__(self, config, dataset, patchesHandler, grid_idx=0):
         super().__init__(config, dataset, patchesHandler, grid_idx=grid_idx)
         self.annealing_step  = config['Uncertainty']['annealing_step']
         self.times = 1
         self.network_architecture = utils_v1.build_resunet
+        self.weights = config['weights']
         # 10*117
         # self.annealing_step  = 10*375
         # self.annealing_step  = 10*375/2
@@ -38,6 +51,12 @@ class TrainerEvidential(Trainer):
         # evidential
         class_n = 3
 
+        #### Logit to evidence converters - activation functions (they have to produce non-negative outputs for the uncertaintyuncertainity process)
+
+        logits2evidence = self.config['evidence_function']
+        logits2evidence = relu_evidence
+        # logits2evidence = softsign_evidence
+        
         def KL(alpha, K):
             beta=tf.constant(np.ones((1,K)),dtype=tf.float32)
             S_alpha = tf.reduce_sum(alpha,axis=-1,keepdims=True)
@@ -81,7 +100,7 @@ class TrainerEvidential(Trainer):
             # self.global_step = K.variable(0.0)
             # global_step = self.global_step  
             def loss(y_true, y_pred):  
-                evidence = tf.nn.relu(y_pred)
+                evidence = logits2evidence(y_pred)
 
                 alpha = evidence + 1
                 u = class_n / tf.reduce_sum(alpha, axis= -1, keepdims=True)
@@ -146,7 +165,7 @@ class TrainerEvidential(Trainer):
             return loglikelihood + KL_reg, loglikelihood, KL_reg
 
         def evidence_get(y_pred):
-            evidence = tf.nn.relu(y_pred)
+            evidence = logits2evidence(y_pred)
 
             alpha = evidence + 1
             u = class_n / tf.reduce_sum(alpha, axis= -1, keepdims=True)
@@ -179,7 +198,7 @@ class TrainerEvidential(Trainer):
         def acc(y_true, y_pred):
             logits = y_pred
             Y = y_true
-            evidence = tf.nn.relu(y_pred)
+            evidence = logits2evidence(y_pred)
             match = tf.reshape(tf.cast(tf.equal(tf.argmax(logits, -1), tf.argmax(Y, -1)), tf.float32),(-1,1))
             acc = tf.reduce_mean(match)
             return acc
@@ -187,14 +206,14 @@ class TrainerEvidential(Trainer):
         def evidential_success(y_true, y_pred):
             logits = y_pred
             Y = y_true
-            evidence = tf.nn.relu(y_pred)
+            evidence = logits2evidence(y_pred)
             match = tf.reshape(tf.cast(tf.equal(tf.argmax(logits, -1), tf.argmax(Y, -1)), tf.float32),(-1,1))
             mean_ev_succ = tf.reduce_sum(tf.reshape(tf.reduce_sum(evidence,-1, keepdims=True), (-1,1)) * match) / tf.reduce_sum(match+1e-20)
             return mean_ev_succ
         def evidential_fail(y_true, y_pred):
             logits = y_pred
             Y = y_true
-            evidence = tf.nn.relu(y_pred)
+            evidence = logits2evidence(y_pred)
             match = tf.reshape(tf.cast(tf.equal(tf.argmax(logits, -1), tf.argmax(Y, -1)), tf.float32),(-1,1))
             mean_ev_fail = tf.reduce_sum(tf.reshape(tf.reduce_sum(evidence,-1, keepdims=True), (-1,1)) * (1-match)) / (tf.reduce_sum(tf.abs(1-match))+1e-20) 
             return mean_ev_fail
@@ -216,7 +235,7 @@ class TrainerEvidential(Trainer):
 
             rows = self.patch_size
             cols = self.patch_size
-            adam = Adam(lr = 1e-3 , beta_1=0.9)
+            adam = Adam(lr = self.config['learning_rate'] , beta_1=0.9)
             
     #         loss = loss.weighted_categorical_crossentropy(weights)
             # loss = loss_evidential()

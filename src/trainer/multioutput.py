@@ -37,7 +37,7 @@ class TrainerMultiOutput(Trainer):
 
             rows = self.patch_size
             cols = self.patch_size
-            adam = Adam(lr = 1e-3 , beta_1=0.9)
+            adam = Adam(lr = self.config['learning_rate'] , beta_1=0.9) # 1e-3
             
             loss = src.loss.weighted_categorical_crossentropy(self.weights)
             

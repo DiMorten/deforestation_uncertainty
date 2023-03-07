@@ -184,15 +184,11 @@ def getRgbErrorMask(predicted, label):
 def saveRgbErrorMask(error_mask_to_show, dim = None):
 
 
-    colormap = np.array([[0, 0, 0],
-            [255, 255, 255],
-            [0, 0, 255],
-            [255, 0, 0]])
-
     colormap = np.array([[255, 255, 255],
             [0, 0, 0],
             [45, 150, 255],
-            [255, 146, 36]])
+            [255, 146, 36],
+            [44, 160, 44]]) # past deforestation
 
 
     
