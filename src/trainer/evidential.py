@@ -54,7 +54,7 @@ class TrainerEvidential(Trainer):
         #### Logit to evidence converters - activation functions (they have to produce non-negative outputs for the uncertaintyuncertainity process)
 
         logits2evidence = self.config['evidence_function']
-        logits2evidence = relu_evidence
+        # logits2evidence = relu_evidence
         # logits2evidence = softsign_evidence
         
         def KL(alpha, K):
