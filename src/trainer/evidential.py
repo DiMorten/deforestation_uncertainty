@@ -368,3 +368,87 @@ class TrainerEvidential(Trainer):
         self.uncertainty_map = self.u_reconstructed
 
 
+
+    def getUncertaintyMetrics(self):
+        predicted_thresholded = np.zeros_like(self.uncertainty).astype(np.int8)
+        predicted_thresholded[self.uncertainty >= np.max(self.predicted_test,axis=-1)] = 1
+        print(np.unique(predicted_thresholded, return_counts=True))
+
+        predicted_test_classified_correct = self.predicted_test[
+                predicted_thresholded == 0]
+        label_current_deforestation_test_classified_correct = self.label_mask_current_deforestation_test[
+                predicted_thresholded == 0]
+
+
+        predicted_test_classified_incorrect = self.predicted_test[
+                predicted_thresholded == 1]
+        label_current_deforestation_test_classified_incorrect = self.label_mask_current_deforestation_test[
+                predicted_thresholded == 1]
+
+        uncertainty_classified_correct = self.uncertainty[
+                predicted_thresholded == 0]
+        uncertainty_classified_incorrect = self.uncertainty[
+                predicted_thresholded == 1]
+        print(np.min(uncertainty_classified_correct), np.mean(uncertainty_classified_correct), np.max(uncertainty_classified_correct))
+        print(np.min(uncertainty_classified_incorrect), np.mean(uncertainty_classified_incorrect), np.max(uncertainty_classified_incorrect))
+
+        print(label_current_deforestation_test_classified_correct.shape,
+                predicted_test_classified_correct.shape)
+        cm_correct = metrics.confusion_matrix(
+                label_current_deforestation_test_classified_correct,
+                predicted_test_classified_correct)
+        print("cm_correct", cm_correct)
+
+        TN_L = cm_correct[0,0]
+        FN_L = cm_correct[1,0]
+        TP_L = cm_correct[1,1]
+        FP_L = cm_correct[0,1]
+
+        ic(label_current_deforestation_test_classified_incorrect.shape,
+                predicted_test_classified_incorrect.shape)
+
+        cm_incorrect = metrics.confusion_matrix(
+                label_current_deforestation_test_classified_incorrect,
+                predicted_test_classified_incorrect)
+
+        print("cm_incorrect", cm_incorrect)
+
+        if cm_incorrect.shape[0] != 2: 
+                ic(np.all(label_current_deforestation_test_classified_incorrect) == 0) 
+                ic(np.all(predicted_test_classified_incorrect) == 0) 
+                
+                precision_L = np.nan 
+                recall_L = np.nan 
+                recall_Ltotal = np.nan 
+                AA = len(label_current_deforestation_test_classified_incorrect) / len(self.label_mask_current_deforestation_test) 
+                precision_H = np.nan 
+                recall_H = np.nan 
+        else:
+                        
+                TN_H = cm_incorrect[0,0]
+                FN_H = cm_incorrect[1,0]
+                TP_H = cm_incorrect[1,1]
+                FP_H = cm_incorrect[0,1]
+                
+                precision_L = TP_L / (TP_L + FP_L)
+                recall_L = TP_L / (TP_L + FN_L)
+                
+                precision_H = TP_H / (TP_H + FP_H)
+                recall_H = TP_H / (TP_H + FN_H)
+                
+                recall_Ltotal = TP_L / (TP_L + FN_L + TP_H + FN_H)
+                ic((TP_H + FN_H + FP_H + TN_H), len(self.label_mask_current_deforestation_test))
+                AA = (TP_H + FN_H + FP_H + TN_H) / len(self.label_mask_current_deforestation_test)
+                ic((TP_H + FN_H + FP_H + TN_H), len(self.label_mask_current_deforestation_test))
+
+
+        self.m = {'precision_L': precision_L,
+                'recall_L': recall_L,
+                'recall_Ltotal': recall_Ltotal,
+                'AA': AA,
+                'precision_H': precision_H,
+                'recall_H': recall_H}
+
+        self.m['f1_L'] = 2*self.m['precision_L']*self.m['recall_L']/(self.m['precision_L']+self.m['recall_L'])
+        self.m['f1_H'] = 2*self.m['precision_H']*self.m['recall_H']/(self.m['precision_H']+self.m['recall_H'])
+
