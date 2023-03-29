@@ -576,7 +576,7 @@ class Trainer():
                 # y_test
                 ic(self.uncertainty.shape, self.label_mask_current_deforestation_test.shape)
 
-                metrics_values = _metrics.getAA_Recall(self.uncertainty, 
+                metrics_values = _metrics.getUncertaintyMetrics(self.uncertainty, 
                         self.label_mask_current_deforestation_test, 
                         self.predicted_test, self.threshold_list)
 
@@ -588,7 +588,8 @@ class Trainer():
                 'recall_Ltotal': metrics_values[:,2],
                 'AA': metrics_values[:,3],
                 'precision_H': metrics_values[:,4],
-                'recall_H': metrics_values[:,5]}
+                'recall_H': metrics_values[:,5],
+                'UEO': metrics_values[:,6]}
 
         self.m['f1_L'] = 2*self.m['precision_L']*self.m['recall_L']/(self.m['precision_L']+self.m['recall_L'])
         self.m['f1_H'] = 2*self.m['precision_H']*self.m['recall_H']/(self.m['precision_H']+self.m['recall_H'])
@@ -681,11 +682,20 @@ class Trainer():
         # if save_figures == True:
         if True:
             plt.savefig('output/figures/recall_precision_f1_AA.png', dpi=150, bbox_inches='tight')
+
+    def plotUEO(self):
+
+
+        plt.plot(self.m['AA']*100, self.m['UEO']*100, label="UEO")
+        plt.grid()
+        plt.xlabel('Audit Area (%)')
+        plt.ylabel('UEO (%)')
+        
     def getOptimalUncertaintyThreshold(self, AA = 0.03, bound = 0.0015):
 
         def getAAFromUncertaintyThreshold(threshold): 
             print(threshold)
-            metrics_values2 = _metrics.getAA_Recall(self.uncertainty, 
+            metrics_values2 = _metrics.getUncertaintyMetrics(self.uncertainty, 
                             self.label_mask_current_deforestation_test, 
                             self.predicted_test, [threshold])
             return np.abs(AA - metrics_values2[:,3].squeeze())
@@ -699,7 +709,7 @@ class Trainer():
     
     def getUncertaintyMetricsFromOptimalThreshold(self, get_f1=True):
 
-        self.metric_values_optimal = _metrics.getAA_Recall(self.uncertainty, 
+        self.metric_values_optimal = _metrics.getUncertaintyMetrics(self.uncertainty, 
                                 self.label_mask_current_deforestation_test, 
                                 self.predicted_test, [self.threshold_optimal])
 
@@ -712,7 +722,8 @@ class Trainer():
                 'recall_Ltotal': self.metric_values_optimal[:,2],
                 'AA': self.metric_values_optimal[:,3],
                 'precision_H': self.metric_values_optimal[:,4],
-                'recall_H': self.metric_values_optimal[:,5]}
+                'recall_H': self.metric_values_optimal[:,5],
+                'UEO': self.metric_values_optimal[:,6]}
 
         self.m_audited_optimal = {'precision': self.metric_values_audited_optimal[:,0],
                 'recall': self.metric_values_audited_optimal[:,1]}

@@ -412,34 +412,34 @@ class TrainerEvidential(Trainer):
 
 
 
-    def getUncertaintyMetrics(self):
-        predicted_thresholded = np.zeros_like(self.uncertainty).astype(np.int8)
-        predicted_thresholded[self.uncertainty >= np.max(self.predicted_test,axis=-1)] = 1
-        print(np.unique(predicted_thresholded, return_counts=True))
+    def getUncertaintyMetricsSingleThreshold(self):
+        uncertainty_thresholded = np.zeros_like(self.uncertainty).astype(np.int8)
+        uncertainty_thresholded[self.uncertainty >= np.max(self.predicted_test,axis=-1)] = 1
+        print(np.unique(uncertainty_thresholded, return_counts=True))
 
-        predicted_test_classified_correct = self.predicted_test[
-                predicted_thresholded == 0]
-        label_current_deforestation_test_classified_correct = self.label_mask_current_deforestation_test[
-                predicted_thresholded == 0]
+        predicted_low_uncertainty = self.predicted_test[
+                uncertainty_thresholded == 0]
+        label_current_deforestation_low_uncertainty = self.label_mask_current_deforestation_test[
+                uncertainty_thresholded == 0]
 
 
-        predicted_test_classified_incorrect = self.predicted_test[
-                predicted_thresholded == 1]
-        label_current_deforestation_test_classified_incorrect = self.label_mask_current_deforestation_test[
-                predicted_thresholded == 1]
+        predicted_high_uncertainty = self.predicted_test[
+                uncertainty_thresholded == 1]
+        label_current_deforestation_high_uncertainty = self.label_mask_current_deforestation_test[
+                uncertainty_thresholded == 1]
 
         uncertainty_classified_correct = self.uncertainty[
-                predicted_thresholded == 0]
+                uncertainty_thresholded == 0]
         uncertainty_classified_incorrect = self.uncertainty[
-                predicted_thresholded == 1]
+                uncertainty_thresholded == 1]
         print(np.min(uncertainty_classified_correct), np.mean(uncertainty_classified_correct), np.max(uncertainty_classified_correct))
         print(np.min(uncertainty_classified_incorrect), np.mean(uncertainty_classified_incorrect), np.max(uncertainty_classified_incorrect))
 
-        print(label_current_deforestation_test_classified_correct.shape,
-                predicted_test_classified_correct.shape)
+        print(label_current_deforestation_low_uncertainty.shape,
+                predicted_low_uncertainty.shape)
         cm_correct = metrics.confusion_matrix(
-                label_current_deforestation_test_classified_correct,
-                predicted_test_classified_correct)
+                label_current_deforestation_low_uncertainty,
+                predicted_low_uncertainty)
         print("cm_correct", cm_correct)
 
         TN_L = cm_correct[0,0]
@@ -447,23 +447,23 @@ class TrainerEvidential(Trainer):
         TP_L = cm_correct[1,1]
         FP_L = cm_correct[0,1]
 
-        ic(label_current_deforestation_test_classified_incorrect.shape,
-                predicted_test_classified_incorrect.shape)
+        ic(label_current_deforestation_high_uncertainty.shape,
+                predicted_high_uncertainty.shape)
 
         cm_incorrect = metrics.confusion_matrix(
-                label_current_deforestation_test_classified_incorrect,
-                predicted_test_classified_incorrect)
+                label_current_deforestation_high_uncertainty,
+                predicted_high_uncertainty)
 
         print("cm_incorrect", cm_incorrect)
 
         if cm_incorrect.shape[0] != 2: 
-                ic(np.all(label_current_deforestation_test_classified_incorrect) == 0) 
-                ic(np.all(predicted_test_classified_incorrect) == 0) 
+                ic(np.all(label_current_deforestation_high_uncertainty) == 0) 
+                ic(np.all(predicted_high_uncertainty) == 0) 
                 
                 precision_L = np.nan 
                 recall_L = np.nan 
                 recall_Ltotal = np.nan 
-                AA = len(label_current_deforestation_test_classified_incorrect) / len(self.label_mask_current_deforestation_test) 
+                AA = len(label_current_deforestation_high_uncertainty) / len(self.label_mask_current_deforestation_test) 
                 precision_H = np.nan 
                 recall_H = np.nan 
         else:
