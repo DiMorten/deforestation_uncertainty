@@ -216,3 +216,4 @@ class TrainerEnsemble(TrainerMCDropout):
         
     def defineExperiment(self, exp_ids):
         self.exp_ids = exp_ids
+        self.exp = self.exp_ids[0]

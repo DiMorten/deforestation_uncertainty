@@ -299,15 +299,26 @@ def getAA_Recall(uncertainty, label_mask_current_deforestation_test,
             ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
             AA = (TP_H + FN_H + FP_H + TN_H) / len(label_mask_current_deforestation_test)
             ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+            UEO = getUEO(predicted_test, label_mask_current_deforestation_test, predicted_thresholded)
 
         mm = np.hstack((precision_L, recall_L, recall_Ltotal, AA,
-                precision_H, recall_H))
+                precision_H, recall_H, UEO))
         print(mm)
         metrics_list.append(mm)
 
         # pdb.set_trace()
     metrics_list = np.asarray(metrics_list)
     return metrics_list       
+
+def getUEO(predicted, label, uncertainty_thresholded): 
+    # print(np.unique(predicted), np.unique(label)) 
+    error = np.abs(predicted-label).astype(np.uint8) 
+    # print("np.unique(error)", np.unique(error)) 
+    UEO = metrics.jaccard_score(error, uncertainty_thresholded) 
+    # print("UEO:", UEO) 
+    # pdb.set_trace() 
+ 
+    return UEO 
 
 def getUncertaintyMetricsAudited(uncertainty, label_mask_current_deforestation_test, 
         predicted_test, threshold_list):

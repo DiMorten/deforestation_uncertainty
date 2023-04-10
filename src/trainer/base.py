@@ -588,7 +588,8 @@ class Trainer():
                 'recall_Ltotal': metrics_values[:,2],
                 'AA': metrics_values[:,3],
                 'precision_H': metrics_values[:,4],
-                'recall_H': metrics_values[:,5]}
+                'recall_H': metrics_values[:,5],
+                'UEO': metrics_values[:,6]}
 
         self.m['f1_L'] = 2*self.m['precision_L']*self.m['recall_L']/(self.m['precision_L']+self.m['recall_L'])
         self.m['f1_H'] = 2*self.m['precision_H']*self.m['recall_H']/(self.m['precision_H']+self.m['recall_H'])
@@ -671,16 +672,27 @@ class Trainer():
         ax3.grid()
         ax3.set_ylim(self.xlim)
 
-        lims = ax3.get_xlim()
-        ax3.hlines(y = 3, xmin = lims[0], xmax = lims[1],
+        self.xlim_adjusted = ax3.get_xlim()
+        ax3.hlines(y = 3, xmin = self.xlim_adjusted[0], xmax = self.xlim_adjusted[1],
                 colors = (0.2, 0.2, 0.2),
                 label = '3% AA')
 
-        ax3.set_xlim(lims)
+        ax3.set_xlim(self.xlim_adjusted)
 
         # if save_figures == True:
         if True:
             plt.savefig('output/figures/recall_precision_f1_AA.png', dpi=150, bbox_inches='tight')
+
+    def plotUEO(self): 
+
+        plt.plot(self.m['AA']*100, self.m['UEO'], label="UEO") 
+        plt.grid() 
+        plt.xlabel('Audit Area (%)') 
+        plt.ylabel('UEO (%)') 
+        plt.xlim(self.xlim)
+        plt.ylim([0, 0.4])
+        plt.savefig('output/figures/ueo.png', dpi=150, bbox_inches='tight')
+
     def getOptimalUncertaintyThreshold(self, AA = 0.03, bound = 0.0015):
 
         def getAAFromUncertaintyThreshold(threshold): 
@@ -712,7 +724,8 @@ class Trainer():
                 'recall_Ltotal': self.metric_values_optimal[:,2],
                 'AA': self.metric_values_optimal[:,3],
                 'precision_H': self.metric_values_optimal[:,4],
-                'recall_H': self.metric_values_optimal[:,5]}
+                'recall_H': self.metric_values_optimal[:,5],
+                'UEO': self.metric_values_optimal[:,6]}
 
         self.m_audited_optimal = {'precision': self.metric_values_audited_optimal[:,0],
                 'recall': self.metric_values_audited_optimal[:,1]}

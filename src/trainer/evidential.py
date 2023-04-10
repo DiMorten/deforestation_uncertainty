@@ -23,6 +23,7 @@ from src.trainer.base import Trainer
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
+import pdb
 
 corners = np.array([[0, 0], [1, 0], [0.5, 0.75**0.5]])
 AREA = 0.5 * 1 * 0.75**0.5
@@ -164,6 +165,61 @@ class TrainerEvidential(Trainer):
                 loss = tf.reduce_mean(loss)
                 return loss
             return loss
+        
+
+
+
+
+
+        def dice_coef(y_true, y_pred, smooth=100):        
+            y_true_f = K.flatten(y_true)
+            y_pred_f = K.flatten(y_pred)
+            intersection = K.sum(y_true_f * y_pred_f)
+            dice = (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+            return dice
+        def dice_coef_loss(y_true, y_pred):
+            return 1 - dice_coef(y_true, y_pred, smooth=100) # smooth = 10e-6
+        def abs(x):
+            return tf.nn.relu(x) + tf.nn.relu(-x)
+        def getError(Y, prob):
+            print("K.int_shape(Y)", Y)
+            print("K.int_shape(prob)", prob)
+            Y_argmax =  tf.cast(tf.argmax(Y, axis=-1), tf.float32)
+            prob_argmax = tf.cast(tf.argmax(prob, axis=-1), tf.float32)
+            
+            dif = Y_argmax - prob_argmax
+            dif = abs(dif)
+            return dif
+
+        def loss_evidential_dice(weights):
+        # def loss_evidential():
+
+            # init the tensor with current epoch, to be updated during training, and define var in scope
+            # self.global_step = K.variable(0.0)
+            # global_step = self.global_step  
+
+            def loss(y_true, y_pred):  
+                evidence = logits2evidence(y_pred)
+
+                alpha = evidence + 1
+                u = class_n / tf.reduce_sum(alpha, axis= -1, keepdims=True)
+
+                print("alpha", alpha)
+                print("u", u)
+                prob = alpha / tf.reduce_sum(alpha, axis = -1, keepdims=True) 
+
+                Y = y_true
+                loss = loss_eq5(Y, alpha, class_n, global_step, self.annealing_step) # 10*3753/32
+
+                e = getError(Y, prob)
+
+                ueo_dice = dice_coef_loss(e, tf.squeeze(u))
+                # loss = (loss + ueo_dice) * weights
+                # loss = loss * weights
+                loss = loss * weights + ueo_dice
+                loss = tf.reduce_mean(loss)
+                return loss
+            return loss
         class GetCurrentEpoch(Callback):
             """get the current epoch to pass it within the loss function.
             # Arguments
@@ -220,6 +276,15 @@ class TrainerEvidential(Trainer):
             return alpha, u
 
         loss_metric = loss_eq5_metric
+        def UEO_term(y_true, y_pred):
+            alpha, u = evidence_get(y_pred)
+            Y = y_true
+            prob = alpha / tf.reduce_sum(alpha, axis = -1, keepdims=True) 
+
+            e = getError(Y, prob)
+
+            ueo_dice = dice_coef_loss(e, tf.squeeze(u))      
+            return ueo_dice
         def KL_term(y_true, y_pred):
             alpha, u = evidence_get(y_pred)
             Y = y_true
@@ -282,13 +347,15 @@ class TrainerEvidential(Trainer):
             
     #         loss = loss.weighted_categorical_crossentropy(weights)
             # loss = loss_evidential()
-            loss = loss_evidential(self.weights)
+            # loss = loss_evidential(self.weights)
+            loss = loss_evidential_dice(self.weights)
 
             input_shape = (rows, cols, self.channels)
             self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n, last_activation=None)
             
             self.model.compile(optimizer=adam, loss=loss, metrics=['accuracy', KL_term, loglikelihood_term, 
-                evidential_success, evidential_fail, acc, annealing_coef, global_step_get, annealing_step_get])
+                evidential_success, evidential_fail, acc, annealing_coef, global_step_get, annealing_step_get,
+                UEO_term])
             self.model.summary()
 
             earlystop = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=1, mode='min')
@@ -498,3 +565,14 @@ class TrainerEvidential(Trainer):
 
     def getMassFcn(self, alpha = [5, 5, 5]):
         draw_pdf_contours(Dirichlet(alpha))
+
+class TrainerEvidentialUEO(TrainerEvidential):
+    def plotLossTerms(self):
+        super().plotLossTerms()
+        plt.figure(8)
+        plt.plot(self.history.history['UEO_term'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.savefig('loss_history.png')
+        
