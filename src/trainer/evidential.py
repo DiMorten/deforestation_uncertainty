@@ -202,16 +202,18 @@ class TrainerEvidential(Trainer):
                 evidence = logits2evidence(y_pred)
 
                 alpha = evidence + 1
-                u = class_n / tf.reduce_sum(alpha, axis= -1, keepdims=True)
+                S = tf.reduce_sum(alpha, axis= -1, keepdims=True)
+                u = class_n / S
 
+                belief = evidence / S
                 print("alpha", alpha)
                 print("u", u)
-                prob = alpha / tf.reduce_sum(alpha, axis = -1, keepdims=True) 
+                prob = alpha / S 
 
                 Y = y_true
                 loss = loss_eq5(Y, alpha, class_n, global_step, self.annealing_step) # 10*3753/32
 
-                e = getError(Y, prob)
+                e = getError(Y, belief)
 
                 ueo_dice = dice_coef_loss(e, tf.squeeze(u))
                 # loss = (loss + ueo_dice) * weights
@@ -434,7 +436,7 @@ class TrainerEvidential(Trainer):
                         'class_n': class_n,
                         'dropout_seed': self.inference_times}
                     '''
-                    prob_reconstructed, self.u_reconstructed = self.patchesHandler.infer(
+                    prob_reconstructed, self.u_reconstructed, self.alpha_reconstructed = self.patchesHandler.infer(
                             new_model, self.image1_pad, self.h, self.w, 
                             # model, self.image1_pad, h, w, 
                             self.num_patches_x, num_patches_y, self.patch_size_rows, 
@@ -571,8 +573,11 @@ class TrainerEvidentialUEO(TrainerEvidential):
         super().plotLossTerms()
         plt.figure(8)
         plt.plot(self.history.history['UEO_term'])
+        plt.plot(self.history.history['val_UEO_term'])
+
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
+        plt.legend('UEO_term', 'val_UEO_term', loc='upper left')
         plt.savefig('loss_history.png')
         

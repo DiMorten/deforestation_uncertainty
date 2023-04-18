@@ -328,7 +328,7 @@ class PatchesHandlerEvidential(PatchesHandlerMultipleDates):
 		# print("alpha", alpha.shape)
 		# print("u", u.shape)
 		predictions = alpha / np.sum(alpha, axis = -1, keepdims=True)  # prob
-		return predictions, u # , alpha
+		return predictions, u, np.squeeze(alpha)
 
 	def infer(self, new_model, image1_pad,
 		h, w, num_patches_x, num_patches_y, 
@@ -337,7 +337,7 @@ class PatchesHandlerEvidential(PatchesHandlerMultipleDates):
 		
 		img_reconstructed = np.zeros((h, w), dtype=np.float32)
 		u_reconstructed = np.zeros((h, w), dtype=np.float32)
-		# alpha_reconstructed = np.zeros((h, w, ), dtype=np.float32)
+		alpha_reconstructed = np.zeros((h, w, 3), dtype=np.float32)
 
 		for i in range(0,num_patches_y):
 			for j in range(0,num_patches_x):
@@ -349,14 +349,14 @@ class PatchesHandlerEvidential(PatchesHandlerMultipleDates):
 					new_model.layers[l].set_weights(model.layers[l].get_weights())
 				'''
 				patch = image1_pad[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)]
-				predicted, u = self.predict(new_model, patch)
+				predicted, u, alpha = self.predict(new_model, patch)
 				# ic(predicted.shape)
 				predicted = predicted[...,1].numpy().astype(np.float32)
 				# predicted = new_model.predict(np.expand_dims(patch, axis=0))[:,:,:,1].astype(np.float32)
 				img_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = predicted
 				u_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = u
-				# alpha_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = alpha
+				alpha_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = alpha
 				
 		del patch, predicted
-		return img_reconstructed, u_reconstructed
+		return img_reconstructed, u_reconstructed, alpha_reconstructed
 
