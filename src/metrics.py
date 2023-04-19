@@ -319,6 +319,12 @@ def getUEO(predicted, label, uncertainty_thresholded):
     # pdb.set_trace() 
  
     return UEO 
+def getSUEO(predicted, label, uncertainty):
+    error = np.abs(predicted-label).astype(np.float32) 
+    print(error.shape, uncertainty.shape)
+    # pdb.set_trace()
+    sUEO = 2*np.sum(error*uncertainty)/np.sum(np.square(error)+np.square(uncertainty))
+    return sUEO
 
 def getUncertaintyMetricsAudited(uncertainty, label_mask_current_deforestation_test, 
         predicted_test, threshold_list):

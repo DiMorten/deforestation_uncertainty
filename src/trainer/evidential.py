@@ -114,11 +114,29 @@ class TrainerEvidential(Trainer):
 
         def loss_eq5(p, alpha, K, global_step, annealing_step):
             S = tf.reduce_sum(alpha, axis=-1, keepdims=True)
+            print()
             loglikelihood = tf.reduce_sum((p-(alpha/S))**2, axis=-1, keepdims=True) + tf.reduce_sum(alpha*(S-alpha)/(S*S*(S+1)), axis=-1, keepdims=True)
+
             #global_step = tf.compat.v1.train.get_global_step
             KL_reg =  tf.minimum(1.0, tf.cast(global_step/annealing_step, tf.float32)) * KL((alpha - 1)*(1-p) + 1 , K)
             # tf.keras.backend.set_value(KL_reg_monitor, tf.keras.backend.get_value(KL_reg))
             return loglikelihood + KL_reg
+
+        def loss_eq_dice(p, alpha, K, global_step, annealing_step):
+            S = tf.reduce_sum(alpha, axis=-1, keepdims=True)
+            print("A", tf.reduce_sum(p*alpha/S, axis=[1, 2]))
+            print("B", tf.reduce_sum(p*alpha/S, axis=[1, 2], keepdims=True))
+            print("C", tf.repeat(tf.repeat(
+                tf.reduce_sum(p*alpha/S, axis=[1, 2], keepdims=True), repeats=128, axis=1), repeats=128, axis=2))
+
+            # loglikelihood = tf.reduce_sum((p-(alpha/S))**2, axis=-1, keepdims=True) + tf.reduce_sum(alpha*(S-alpha)/(S*S*(S+1)), axis=-1, keepdims=True)
+            dice = 1 - (2/K) * tf.reduce_sum( tf.reduce_sum(p*alpha/S, axis=[1, 2]) / (tf.reduce_sum(p**2, axis=[1, 2]) + (alpha/S)**2 + alpha*(S-alpha)/(S**2*(S+1))), 
+                                             axis=-1, keepdims=True)
+            #global_step = tf.compat.v1.train.get_global_step
+            KL_reg =  tf.minimum(1.0, tf.cast(global_step/annealing_step, tf.float32)) * KL((alpha - 1)*(1-p) + 1 , K)
+            # tf.keras.backend.set_value(KL_reg_monitor, tf.keras.backend.get_value(KL_reg))
+            return dice + KL_reg
+
         '''
         class EpochTracker(Callback):
             def __init__(self):
@@ -137,7 +155,7 @@ class TrainerEvidential(Trainer):
 
         global_step = K.variable(0.0)
 
-        def loss_evidential(weights):
+        def loss_evidential_mse(weights):
         # def loss_evidential():
 
             # init the tensor with current epoch, to be updated during training, and define var in scope
@@ -167,6 +185,33 @@ class TrainerEvidential(Trainer):
             return loss
         
 
+        def loss_evidential_dice(weights):
+
+            # init the tensor with current epoch, to be updated during training, and define var in scope
+            # self.global_step = K.variable(0.0)
+            # global_step = self.global_step  
+            def loss(y_true, y_pred):  
+                evidence = logits2evidence(y_pred)
+
+                alpha = evidence + 1
+                u = class_n / tf.reduce_sum(alpha, axis= -1, keepdims=True)
+
+                print("alpha", alpha)
+                print("u", u)
+                prob = alpha / tf.reduce_sum(alpha, axis = -1, keepdims=True) 
+
+                Y = y_true
+                # loss = loss_eq5(Y, alpha, class_n, global_step, 30) # 10*34
+                # loss = loss_eq5(Y, alpha, class_n, global_step, 40) # 10*34
+                loss = loss_eq_dice(Y, alpha, class_n, global_step, self.annealing_step) # 10*3753/32
+
+                #    loss = loss_eq5(Y, alpha, class_n, global_step, 15) # 10*34
+                #    loss = loss_eq5(Y, alpha, class_n, global_step, 5) # 10*34
+                #    loss = loss_eq5(Y, alpha, class_n, global_step, 60) # 10*34
+                loss = loss * weights
+                loss = tf.reduce_mean(loss)
+                return loss
+            return loss
 
 
 
@@ -191,7 +236,7 @@ class TrainerEvidential(Trainer):
             dif = abs(dif)
             return dif
 
-        def loss_evidential_dice(weights):
+        def loss_evidential_UEO(weights):
         # def loss_evidential():
 
             # init the tensor with current epoch, to be updated during training, and define var in scope
@@ -349,9 +394,9 @@ class TrainerEvidential(Trainer):
             
     #         loss = loss.weighted_categorical_crossentropy(weights)
             # loss = loss_evidential()
-            # loss = loss_evidential(self.weights)
+            # loss = loss_evidential_mse(self.weights)
+            # loss = loss_evidential_UEO(self.weights)
             loss = loss_evidential_dice(self.weights)
-
             input_shape = (rows, cols, self.channels)
             self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n, last_activation=None)
             
