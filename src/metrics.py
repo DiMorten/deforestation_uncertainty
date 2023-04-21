@@ -321,6 +321,7 @@ def getUEO(predicted, label, uncertainty_thresholded):
     return UEO 
 def getSUEO(predicted, label, uncertainty):
     error = np.abs(predicted-label).astype(np.float32) 
+    error = 1 - error
     print(error.shape, uncertainty.shape)
     # pdb.set_trace()
     sUEO = 2*np.sum(error*uncertainty)/np.sum(np.square(error)+np.square(uncertainty))

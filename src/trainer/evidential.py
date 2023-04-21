@@ -127,15 +127,19 @@ class TrainerEvidential(Trainer):
             # tf.keras.backend.set_value(KL_reg_monitor, tf.keras.backend.get_value(KL_reg))
             return loglikelihood + KL_reg
 
-        def loss_eq_dice(p, alpha, K, global_step, annealing_step):
+        def loss_eq_dice(p, alpha, K, global_step, annealing_step, weights):
             S = tf.reduce_sum(alpha, axis=-1, keepdims=True)
             print("A", tf.reduce_sum(p*alpha/S, axis=[1, 2]))
             print("B", tf.reduce_sum(p*alpha/S, axis=[1, 2], keepdims=True))
 
             # loglikelihood = tf.reduce_sum((p-(alpha/S))**2, axis=-1, keepdims=True) + tf.reduce_sum(alpha*(S-alpha)/(S*S*(S+1)), axis=-1, keepdims=True)
-            dice = 1 - (2/K) * tf.reduce_sum( tf.reduce_sum(p*alpha/S, axis=[1, 2], keepdims=True) / tf.reduce_sum(p**2 + (alpha/S)**2 + alpha*(S-alpha)/(S**2*(S+1)), axis=[1, 2], keepdims=True), 
+            term = tf.reduce_sum(p*alpha/S, axis=[1, 2], keepdims=True) / tf.reduce_sum(p**2 + (alpha/S)**2 + alpha*(S-alpha)/(S**2*(S+1)), axis=[1, 2], keepdims=True)
+            print("term1", term)
+            term = term * weights
+            print("term2", term)
+            dice = 1 - (2/K) * tf.reduce_sum( term, 
                                              axis=-1, keepdims=True)
-            dice = tf.repeat(tf.repeat(dice, repeats=128, axis=1), repeats=128, axis=1)
+            dice = tf.repeat(tf.repeat(dice, repeats=128, axis=1), repeats=128, axis=2)
             print(dice)
             #global_step = tf.compat.v1.train.get_global_step
             KL_reg =  tf.minimum(1.0, tf.cast(global_step/annealing_step, tf.float32)) * KL((alpha - 1)*(1-p) + 1 , K)
@@ -195,6 +199,7 @@ class TrainerEvidential(Trainer):
             # init the tensor with current epoch, to be updated during training, and define var in scope
             # self.global_step = K.variable(0.0)
             # global_step = self.global_step  
+            weights = K.variable(weights)
             def loss(y_true, y_pred):  
                 evidence = logits2evidence(y_pred)
 
@@ -208,7 +213,7 @@ class TrainerEvidential(Trainer):
                 Y = y_true
                 # loss = loss_eq5(Y, alpha, class_n, global_step, 30) # 10*34
                 # loss = loss_eq5(Y, alpha, class_n, global_step, 40) # 10*34
-                loss = loss_eq_dice(Y, alpha, class_n, global_step, self.annealing_step) # 10*3753/32
+                loss = loss_eq_dice(Y, alpha, class_n, global_step, self.annealing_step, weights) # 10*3753/32
 
                 #    loss = loss_eq5(Y, alpha, class_n, global_step, 15) # 10*34
                 #    loss = loss_eq5(Y, alpha, class_n, global_step, 5) # 10*34
@@ -265,7 +270,7 @@ class TrainerEvidential(Trainer):
 
                 e = getError(Y, belief)
 
-                ueo_dice = dice_coef_loss(e, tf.squeeze(u))
+                ueo_dice = 1 - dice_coef_loss(e, tf.squeeze(u))
                 # loss = (loss + ueo_dice) * weights
                 # loss = loss * weights
                 loss = loss * weights + ueo_dice
@@ -335,7 +340,7 @@ class TrainerEvidential(Trainer):
 
             e = getError(Y, prob)
 
-            ueo_dice = dice_coef_loss(e, tf.squeeze(u))      
+            ueo_dice = 1 - dice_coef_loss(e, tf.squeeze(u))      
             return ueo_dice
         def KL_term(y_true, y_pred):
             alpha, u = evidence_get(y_pred)
