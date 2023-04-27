@@ -116,10 +116,12 @@ class PatchesHandler():
 
 	def infer(self, new_model, image1_pad,
 		h, w, num_patches_x, num_patches_y, 
-		patch_size_x, patch_size_y):
+		patch_size_x, patch_size_y, classes_mode=False):
 		# patch_size_x, patch_size_y, a):
-		
-		img_reconstructed = np.zeros((h, w), dtype=np.float32)
+		if classes_mode == False:
+			img_reconstructed = np.zeros((h, w), dtype=np.float32)
+		else:
+			img_reconstructed = np.zeros((h, w, 3), dtype=np.float32)
 
 		for i in range(0,num_patches_y):
 			for j in range(0,num_patches_x):
@@ -131,7 +133,10 @@ class PatchesHandler():
 					new_model.layers[l].set_weights(model.layers[l].get_weights())
 				'''
 				patch = image1_pad[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)]
-				predicted = new_model.predict(np.expand_dims(patch, axis=0))[:,:,:,1].astype(np.float32)
+				if classes_mode == False:
+					predicted = new_model.predict(np.expand_dims(patch, axis=0))[:,:,:,1].astype(np.float32)
+				else:
+					predicted = new_model.predict(np.expand_dims(patch, axis=0)).astype(np.float32)
 				img_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = predicted
 		del patch, predicted
 		return img_reconstructed

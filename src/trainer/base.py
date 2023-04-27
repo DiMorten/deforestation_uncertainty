@@ -548,6 +548,7 @@ class Trainer():
         if self.config['uncertainty_method'] == "pred_entropy":
                 self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
+                self.threshold_list = np.linspace(0.001, 0.999, 10)
         elif self.config['uncertainty_method'] == "pred_var":
                 self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36]

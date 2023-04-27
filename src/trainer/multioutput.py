@@ -98,6 +98,7 @@ class TrainerMCDropout(TrainerMultiOutput):
 class TrainerEnsemble(TrainerMCDropout):
 
     def infer(self):
+        classes_mode = False
         self.h, self.w, self.c = self.image1_pad.shape
         self.c = self.channels
         patch_size_rows = self.h//self.n_rows
@@ -110,7 +111,8 @@ class TrainerEnsemble(TrainerMCDropout):
 
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:
-                # prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, inference_times), dtype = np.float32)
+                if classes_mode == True:
+                    self.prob_rec_classes = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
                 self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
 
             new_model = utils_v1.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
@@ -119,7 +121,7 @@ class TrainerEnsemble(TrainerMCDropout):
             self.patchesHandler.class_n = class_n
 
             with tf.device('/cpu:0'):
-                for tm in range(0,self.config["inference_times"]):
+                for tm in range(0,self.config["inference_times"]):    
                     print('time: ', tm)
                     
                     # Recinstructing predicted map
@@ -144,17 +146,23 @@ class TrainerEnsemble(TrainerMCDropout):
                             new_model, self.image1_pad, self.h, self.w, 
                             # model, image1_pad, h, w, 
                             num_patches_x, num_patches_y, patch_size_rows, 
-                            patch_size_cols)
+                            patch_size_cols, classes_mode=classes_mode)
                             # patch_size_cols, a = args_network)
-                            
+                    # self.prob_tmp = prob_reconstructed.copy()
+                    # prob_reconstructed = prob_reconstructed
                     ts_time =  time.time() - start_test
 
                     if self.config["save_probabilities"] == True:
                         np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
                     else:
-                        self.prob_rec[:,:,tm] = prob_reconstructed
-                    
+                        if classes_mode == True:
+                            self.prob_rec_classes[:,:,:,tm] = prob_reconstructed
+                        else:
+                            self.prob_rec[:,:,tm] = prob_reconstructed     
                     del prob_reconstructed
+                if classes_mode == True:
+                    self.prob_rec = self.prob_rec_classes[:,:,1,:]
+                    self.prob_rec_classes = np.transpose(self.prob_rec_classes, axes=(3, 0, 1, 2))
         del self.image1_pad
 
     def run_predictor_repetition_single_entropy(self):

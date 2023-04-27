@@ -3,7 +3,7 @@ import numpy as np
 
 from icecream import ic
 import matplotlib.pyplot as plt
-
+import pdb
 
 epsilon = 1e-15
 def show_im(im, ax, title = "", cmap = "jet"):
@@ -28,11 +28,20 @@ def predictive_variance(pred_probs):
 def predictive_entropy(pred_probs):
     pred_mean = get_mean(pred_probs) # shape (patch_len, patch_len, class_n)
     pred_entropy = np.zeros((pred_mean.shape[0:2]))
-
     K = pred_mean.shape[-1]
     for k in range(K):
         pred_entropy = pred_entropy + pred_mean[..., k] * np.log(pred_mean[..., k] + epsilon) 
-    pred_entropy = - pred_entropy / K
+    pred_entropy = - pred_entropy / np.log(K)
+    return pred_entropy
+
+def predictive_entropy(pred_probs):
+    pred_mean = get_mean(pred_probs) # shape (patch_len, patch_len, class_n)
+    pred_entropy = np.zeros((pred_mean.shape[0:2]))
+    # pdb.set_trace()
+    K = pred_mean.shape[-1]
+    for k in range(K):
+        pred_entropy = pred_entropy + pred_mean[..., k] * np.log(pred_mean[..., k] + epsilon) 
+    pred_entropy = - pred_entropy / np.log(K)
     return pred_entropy
 
 
