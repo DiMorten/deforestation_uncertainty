@@ -32,7 +32,7 @@ def predictive_entropy(pred_probs):
     K = pred_mean.shape[-1]
     for k in range(K):
         pred_entropy = pred_entropy + pred_mean[..., k] * np.log(pred_mean[..., k] + epsilon) 
-    pred_entropy = - pred_entropy / K
+    pred_entropy = - pred_entropy / np.log(K)
     return pred_entropy
 
 

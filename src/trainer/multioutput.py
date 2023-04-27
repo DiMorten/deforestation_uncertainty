@@ -68,11 +68,15 @@ class TrainerMultiOutput(Trainer):
 
     def getMeanProb(self):
         self.mean_prob = np.mean(self.prob_rec, axis = -1)
-            
+        if self.classes_mode == True:
+            self.mean_prob = self.mean_prob[...,1]            
 
     def preprocessProbRec(self):
-        self.prob_rec = np.transpose(self.prob_rec, (2, 0, 1))
-        self.prob_rec = np.expand_dims(self.prob_rec, axis = -1)
+        if self.classes_mode == False:
+            self.prob_rec = np.transpose(self.prob_rec, (2, 0, 1))
+            self.prob_rec = np.expand_dims(self.prob_rec, axis = -1)
+        else:
+            self.prob_rec = np.transpose(self.prob_rec, (3, 0, 1, 2))
 
     def setUncertainty(self):
 
@@ -107,11 +111,13 @@ class TrainerEnsemble(TrainerMCDropout):
 
 
         class_n = 3
-
+        self.classes_mode = True
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:
-                # prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, inference_times), dtype = np.float32)
-                self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
+                if self.classes_mode == False:
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
+                else:
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
 
             new_model = utils_v1.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
                 nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training = False)
@@ -144,7 +150,7 @@ class TrainerEnsemble(TrainerMCDropout):
                             new_model, self.image1_pad, self.h, self.w, 
                             # model, image1_pad, h, w, 
                             num_patches_x, num_patches_y, patch_size_rows, 
-                            patch_size_cols)
+                            patch_size_cols, classes_mode = self.classes_mode)
                             # patch_size_cols, a = args_network)
                             
                     ts_time =  time.time() - start_test
@@ -152,8 +158,8 @@ class TrainerEnsemble(TrainerMCDropout):
                     if self.config["save_probabilities"] == True:
                         np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
                     else:
-                        self.prob_rec[:,:,tm] = prob_reconstructed
-                    
+                        self.prob_rec[...,tm] = prob_reconstructed
+
                     del prob_reconstructed
         del self.image1_pad
 
