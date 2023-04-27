@@ -65,6 +65,13 @@ def padForGeorreferencing(im, pad_value = -1):
     im_pad = np.pad(im_pad, ((0,4000), (3000,0)), constant_values = pad_value)
     ic(im_pad.shape)
     return im_pad
+def padForGeorreferencingPA(im, pad_value = -1):
+    
+    ic(im.shape)
+    im_pad = np.pad(im, ((0,0), (0,3)), constant_values = pad_value)
+
+    ic(im_pad.shape)
+    return im_pad
 def padForGeorreferencingChannels(im):
     pad_value = -1
     print(im.shape)

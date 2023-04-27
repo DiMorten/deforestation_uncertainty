@@ -527,11 +527,17 @@ class Trainer():
                         utils_v1.unpadIm(self.uncertainty_map, self.npad), self.mask_tr_val, mask_return_value = 2),
                 self.label_mask_val)
 
-    def getSUEO(self):
+    def getOtherUncertaintyMetrics(self):
         self.sUEO = _metrics.getSUEO(self.uncertainty,
                          self.label_mask_current_deforestation_test,
                          self.predicted_test)
-        return self.sUEO
+        
+        self.ece_score = _metrics.ece_score( 1 - self.uncertainty, 
+                                            self.predicted_test,
+                                      self.label_mask_current_deforestation_test)
+        return self.sUEO, self.ece_score
+    
+
     def getUncertaintyAAValues(self):
 
 

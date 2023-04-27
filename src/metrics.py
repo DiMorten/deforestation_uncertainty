@@ -310,23 +310,6 @@ def getAA_Recall(uncertainty, label_mask_current_deforestation_test,
     metrics_list = np.asarray(metrics_list)
     return metrics_list       
 
-def getUEO(predicted, label, uncertainty_thresholded): 
-    # print(np.unique(predicted), np.unique(label)) 
-    error = np.abs(predicted-label).astype(np.uint8) 
-    # print("np.unique(error)", np.unique(error)) 
-    UEO = metrics.jaccard_score(error, uncertainty_thresholded) 
-    # print("UEO:", UEO) 
-    # pdb.set_trace() 
- 
-    return UEO 
-def getSUEO(predicted, label, uncertainty):
-    error = np.abs(predicted-label).astype(np.float32) 
-    error = 1 - error
-    print(error.shape, uncertainty.shape)
-    # pdb.set_trace()
-    sUEO = 2*np.sum(error*uncertainty)/np.sum(np.square(error)+np.square(uncertainty))
-    return sUEO
-
 def getUncertaintyMetricsAudited(uncertainty, label_mask_current_deforestation_test, 
         predicted_test, threshold_list):
     
@@ -559,3 +542,68 @@ def matrics_AA_recall(thresholds_, prob_map, ref_reconstructed, mask_amazon_ts_,
     metrics_ = np.asarray(metrics_all)
     return metrics_
 '''
+
+
+# ============= OTHER UNCERTAINTY METRICS ========== #
+
+
+def getUEO(predicted, label, uncertainty_thresholded): 
+    # print(np.unique(predicted), np.unique(label)) 
+    error = np.abs(predicted-label).astype(np.uint8) 
+    # print("np.unique(error)", np.unique(error)) 
+    UEO = metrics.jaccard_score(error, uncertainty_thresholded) 
+    # print("UEO:", UEO) 
+    # pdb.set_trace() 
+ 
+    return UEO 
+def getSUEO(predicted, label, uncertainty):
+    error = np.abs(predicted-label).astype(np.float32) 
+    # error = 1 - error
+    print(error.shape, uncertainty.shape)
+    # pdb.set_trace()
+    sUEO = 2*np.sum(error*uncertainty)/np.sum(np.square(error)+np.square(uncertainty))
+    return sUEO
+
+def ece_score(confidence, py_index, y_test, n_bins=10):
+    """Compute the Expected Calibration Error score
+    
+    Parameters
+    ----------
+    py : Vector of predicted class probabilities
+    y_test: Vector of reference class
+    Returns
+    -------
+    float
+        ECE score
+    """
+    # py = np.array(py)
+    y_test = np.array(y_test)
+    if y_test.ndim > 1:
+        y_test = np.argmax(y_test, axis=1)
+    # py_index = np.argmax(py, axis=1)
+    '''
+    py_value = []
+    for i in range(py.shape[0]):
+        py_value.append(py[i, py_index[i]]) # get confidence for argmax predicted class
+    py_value = np.array(py_value)
+    '''
+    acc, conf = np.zeros(n_bins), np.zeros(n_bins)
+    Bm = np.zeros(n_bins)
+    for m in range(n_bins):
+        a, b = m / n_bins, (m + 1) / n_bins
+        for i in range(confidence.shape[0]):
+            # if py_value[i] > a and py_value[i] <= b:
+            if confidence[i] > a and confidence[i] <= b:  
+                Bm[m] += 1 # Bm is the count of samples for each bin m
+                if py_index[i] == y_test[i]:
+                    acc[m] += 1
+                # conf[m] += py_value[i]
+                conf[m] += confidence[i]
+        if Bm[m] != 0:
+            acc[m] = acc[m] / Bm[m]
+            conf[m] = conf[m] / Bm[m]
+    ece = 0
+    for m in range(n_bins):
+        ece += Bm[m] * np.abs((acc[m] - conf[m]))
+    return ece / sum(Bm)
+
