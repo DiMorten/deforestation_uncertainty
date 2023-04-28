@@ -148,10 +148,8 @@ class TrainerEnsemble(TrainerMCDropout):
                     '''
                     prob_reconstructed = self.patchesHandler.infer(
                             new_model, self.image1_pad, self.h, self.w, 
-                            # model, image1_pad, h, w, 
                             num_patches_x, num_patches_y, patch_size_rows, 
                             patch_size_cols, classes_mode = self.classes_mode)
-                            # patch_size_cols, a = args_network)
                             
                     ts_time =  time.time() - start_test
 

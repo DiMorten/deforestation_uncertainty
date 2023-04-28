@@ -240,11 +240,15 @@ class Trainer():
         ic(self.path_models+ '/' + self.method +'_'+str(0)+'.h5')
         model = utils_v1.load_model(self.path_models+ '/' + self.method +'_'+str(0)+'.h5', compile=False)
         class_n = 3
-
+        self.classes_mode = True
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:
+                if self.classes_mode == False:
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
+                else:
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
+
                 # self.prob_rec = np.zeros((image1_pad.shape[0],image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
-                self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
 
             new_model = utils_v1.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
                 nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None)
@@ -257,6 +261,7 @@ class Trainer():
             metrics_all =[]
             with tf.device('/cpu:0'):
                 for tm in range(0,self.config["inference_times"]):
+
                     print('time: ', tm)
 
                     
@@ -272,17 +277,15 @@ class Trainer():
                     '''
                     prob_reconstructed = self.patchesHandler.infer(
                             new_model, self.image1_pad, self.h, self.w, 
-                            # model, image1_pad, h, w, 
                             num_patches_x, num_patches_y, patch_size_rows, 
-                            patch_size_cols)
-                            # patch_size_cols, a = args_network)
+                            patch_size_cols, classes_mode = self.classes_mode)
                             
                     ts_time =  time.time() - start_test
 
                     if self.config["save_probabilities"] == True:
                         np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
                     else:
-                        self.prob_rec[:,:,tm] = prob_reconstructed
+                        self.prob_rec[...,tm] = prob_reconstructed
                     
                     metrics_all.append(ts_time)
                     del prob_reconstructed

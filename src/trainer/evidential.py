@@ -266,7 +266,7 @@ class TrainerEvidential(Trainer):
                 prob = alpha / S 
 
                 Y = y_true
-                loss = loss_eq5(Y, alpha, class_n, global_step, self.annealing_step) # 10*3753/32
+                loss = loss_eq5(Y, alpha, class_n, global_step, self.annealing_step, weights) # 10*3753/32
 
                 e = getError(Y, belief)
 
