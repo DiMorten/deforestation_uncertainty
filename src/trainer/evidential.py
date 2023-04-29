@@ -24,6 +24,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 import pdb
+import math
+from math import gamma
+from operator import mul
 
 corners = np.array([[0, 0], [1, 0], [0.5, 0.75**0.5]])
 AREA = 0.5 * 1 * 0.75**0.5
@@ -41,29 +44,32 @@ def xy2bc(xy, tol=1.e-4):
 
 class Dirichlet(object):
     def __init__(self, alpha):
-        from math import gamma
-        from operator import mul
+
         self._alpha = np.array(alpha)
         self._coef = gamma(np.sum(self._alpha)) / \
                            np.multiply.reduce([gamma(a) for a in self._alpha])
     def pdf(self, x):
         '''Returns pdf value for `x`.'''
-        from operator import mul
         return self._coef * np.multiply.reduce([xx ** (aa - 1)
                                                for (xx, aa)in zip(x, self._alpha)])
     
 def draw_pdf_contours(dist, nlevels=200, subdiv=8, **kwargs):
-    import math
 
     refiner = tri.UniformTriRefiner(triangle)
     trimesh = refiner.refine_triangulation(subdiv=subdiv)
     pvals = [dist.pdf(xy2bc(xy)) for xy in zip(trimesh.x, trimesh.y)]
-
+    print("trimesh.x", trimesh.x)
+    print("trimesh.y", trimesh.y)
+    print("xy2bc(xy)", xy2bc(trimesh.x[0], trimesh.y[0]))
+    print("pvals", pvals)
     plt.tricontourf(trimesh, pvals, nlevels, cmap='jet', **kwargs)
     plt.axis('equal')
     plt.xlim(0, 1)
     plt.ylim(0, 0.75**0.5)
     plt.axis('off')
+
+
+
 
 def relu_evidence(logits):
     return tf.nn.relu(logits)
@@ -622,6 +628,24 @@ class TrainerEvidential(Trainer):
 
     def getMassFcn(self, alpha = [5, 5, 5]):
         draw_pdf_contours(Dirichlet(alpha))
+
+    def getMassFcn2D(self, alpha = [5, 5]):
+        def draw_pdf_contours_2d(dist, nlevels=200, **kwargs):
+
+            # mesh = np.array([np.linspace(0, 1, 10), 1 - np.linspace(0, 1, 10)])
+            mesh_x = np.linspace(0, 1, nlevels)
+            mesh_y = 1 - np.linspace(0, 1, nlevels)
+
+            pvals = [dist.pdf(np.array(xy)) for xy in zip(mesh_x, mesh_y)]
+            print(pvals)
+            
+            plt.plot(mesh_y, pvals)
+            plt.xlabel('Input simplex')
+            plt.ylabel('Dirichlet PDF')
+            
+
+        draw_pdf_contours_2d(Dirichlet(alpha))
+
 
 class TrainerEvidentialUEO(TrainerEvidential):
     def plotLossTerms(self):
