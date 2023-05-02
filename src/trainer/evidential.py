@@ -640,7 +640,7 @@ class TrainerEvidential(Trainer):
             print(pvals)
             
             plt.plot(mesh_y, pvals)
-            plt.xlabel('Input simplex')
+            plt.xlabel('Predicted probability (Deforestation)')
             plt.ylabel('Dirichlet PDF')
             
 
