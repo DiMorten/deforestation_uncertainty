@@ -163,15 +163,7 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 		self.input_image_shape = len(self.dataset.image_channels[0])
 		ic(self.input_image_shape)
 		ic(self.dataset.image_channels)
-	'''
-	def infer(self, new_model, image1_pad, h, w, 
-                    num_patches_x, num_patches_y, patch_size_rows, 
-                    patch_size_cols):
-		image1_pad = image1_pad[..., self.dataset.image_channels[-1]]
-		super().infer(new_model, image1_pad, h, w, 
-                    num_patches_x, num_patches_y, patch_size_rows, 
-                    patch_size_cols)
-	'''
+
 	def trainTestSplit(self, coords, mask_tr_val, patch_size):
 		coords_current_date_train, coords_current_date_val = super().trainTestSplit(
 			coords, mask_tr_val, patch_size)

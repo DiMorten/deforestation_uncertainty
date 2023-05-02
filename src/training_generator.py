@@ -19,16 +19,24 @@ def batch_generator(batches, image, reference, target_size, number_class):
         for i in range(batch_x.shape[0]):
             # print("batch_x", batch_x[i][:10, :10])	
         
-            if np.random.rand()<0.3:
+            n_augmentations = 6
+            augmentation_id = np.random.choice(n_augmentations)
+            if augmentation_id == 0:
                 batch_x[i] = np.rot90(batch_x[i], 1)
-                
-            if np.random.rand() >= 0.3 and np.random.rand() <= 0.5:
+
+            if augmentation_id == 1:
+                batch_x[i] = np.rot90(batch_x[i], 2)
+
+            if augmentation_id == 2:
+                batch_x[i] = np.rot90(batch_x[i], 3)
+
+            if augmentation_id == 3:
                 batch_x[i] = np.flip(batch_x[i], 0)
-            
-            if np.random.rand() > 0.5 and np.random.rand() <= 0.7:
+
+            if augmentation_id == 4:
                 batch_x[i] = np.flip(batch_x[i], 1)
                 
-            if np.random.rand() > 0.7:
+            if augmentation_id == 5:
                 batch_x[i] = batch_x[i]
                 
             batch_img[i] = image[batch_x[i]] 
