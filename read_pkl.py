@@ -1,6 +1,6 @@
 
 import pickle
-filename = 'log.pkl'
+filename = 'log_evidential_dirichletplot1.pkl'
 with open(filename, 'rb') as handle:
     b = pickle.load(handle)
 

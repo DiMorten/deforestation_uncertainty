@@ -129,7 +129,8 @@ class Logger():
                         cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
                         maskBackground = [False, True, False, True],
                         invertMask = [False, False, False, False])
-                plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertainty1.png', dpi=150, bbox_inches='tight')
+                plt.savefig('output/figures/{}PredictSampleUncertainty1_exp{}.png'.format(
+                    trainer.dataset.__class__.__name__, trainer.exp_id), dpi=150, bbox_inches='tight')
 
                 _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
                         trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
@@ -138,7 +139,8 @@ class Logger():
                         cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
                         maskBackground = [False, True, False, True],
                         invertMask = [False, False, False, False])
-                plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertainty2.png', dpi=150, bbox_inches='tight')
+                plt.savefig('output/figures/{}PredictSampleUncertainty2_exp{}.png'.format(
+                    trainer.dataset.__class__.__name__, trainer.exp_id), dpi=150, bbox_inches='tight')
 
     def plotCropSample(self, trainer):
 

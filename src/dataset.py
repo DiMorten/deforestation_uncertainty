@@ -101,6 +101,20 @@ class PA(Dataset):
 		self.tiles_tr = [1,3,5,8,11,13,14,20] 
 		self.tiles_val = [6,19]
 		self.patch_deforestation_percentage = 0.2
+
+		self.snippet_coords = {
+			"snippet_id0": [
+				[550, 550], # 10,1 alpha
+				[210, 610], #harder 1,1 alpha
+				[207, 617], # easy 1,1 alpha
+				[800, 200] # easy 1,10 alpha
+			],
+			"snippet_id1": [
+				[550, 115], # 10,1 alpha # I think will diverge from ensemble
+				[430, 950] # Will diverge from ensemble
+			]
+		}
+
 	def loadLabel(self):
 		label = np.load(self.paths.label + self.label_filename).astype('uint8')
 		return label

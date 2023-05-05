@@ -517,7 +517,8 @@ class TrainerEvidential(Trainer):
                 # Saving test time
                 np.save(self.path_exp+'/metrics_ts.npy', metrics_)
         del self.image1_pad
-
+        
+        self.alpha_unpad = self.alpha_reconstructed[:self.label_mask.shape[0], :self.label_mask.shape[1]]
 
     def applyProbabilityThreshold(self):
         print(self.mean_prob.shape)
@@ -646,7 +647,28 @@ class TrainerEvidential(Trainer):
 
         draw_pdf_contours_2d(Dirichlet(alpha))
 
-
+    def getPOIValues(self):
+        lims = self.dataset.previewLims1
+        self.snippet_poi_results = []
+        for coord in self.dataset.snippet_coords["snippet_id0"]:
+            self.snippet_poi_results.append(
+                {"snippet_id": 0,
+                    "coords": coord, # 10,1 alpha
+                    "reference": self.label_mask[lims[0]:lims[1], lims[2]:lims[3]][coord[0], coord[1]],
+                    "predicted": self.predicted_unpad[lims[0]:lims[1], lims[2]:lims[3]][coord[0], coord[1]],
+                    "alpha": self.alpha_unpad[lims[0]:lims[1], lims[2]:lims[3]][coord[0], coord[1]]}
+            )
+        
+        lims = self.dataset.previewLims2
+        for coord in self.dataset.snippet_coords["snippet_id1"]:
+            self.snippet_poi_results.append(
+                {"snippet_id": 1,
+                    "coords": coord, # 10,1 alpha
+                    "reference": self.label_mask[lims[0]:lims[1], lims[2]:lims[3]][coord[0], coord[1]],
+                    "predicted": self.predicted_unpad[lims[0]:lims[1], lims[2]:lims[3]][coord[0], coord[1]],
+                    "alpha": self.alpha_unpad[lims[0]:lims[1], lims[2]:lims[3]][coord[0], coord[1]]}
+            )
+        return self.snippet_poi_results
 class TrainerEvidentialUEO(TrainerEvidential):
     def plotLossTerms(self):
         super().plotLossTerms()

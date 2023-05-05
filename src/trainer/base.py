@@ -183,6 +183,7 @@ class Trainer():
     # to-do: pass to predictor. to do that, pass data to dataset class (dataset.image_stack, dataset.label, etc)
 
     def run_predictor(self):
+        out = {}
         self.setPadding()
         self.infer()
         self.loadPredictedProbabilities()
@@ -208,12 +209,22 @@ class Trainer():
         self.getErrorMaskToShowRGB()
         self.setUncertainty()
         self.getValidationValues2()
-        self.getTestValues2()
+        self.getTestValues2()        
+        self.logger.plotCropSample(self)
+
+        self.getUncertaintyToShow()
+
+        sUEO, ece_score = self.getOtherUncertaintyMetrics()
+        out['other_uncertainty_metrics'] = {'sUEO': sUEO, 'ece_score': ece_score}
+        self.getPOIValues()
+        out['snippet_poi_results'] = self.snippet_poi_results
         # self.getUncertaintyAAValues()
         # trainer.getUncertaintyAAAuditedValues()
         self.getOptimalUncertaintyThreshold()
         result = self.getUncertaintyMetricsFromOptimalThreshold()
-        return result
+        out['uncertainty_result'] = result
+        return out
+    
     def setPadding(self):
         self.metrics_ts = []
         self.n_pool = 3
@@ -538,6 +549,7 @@ class Trainer():
         self.ece_score = _metrics.ece_score( 1 - self.uncertainty, 
                                             self.predicted_test,
                                       self.label_mask_current_deforestation_test)
+        # self.ece_score = 0
         print(self.ece_score)
         return self.sUEO, self.ece_score
     

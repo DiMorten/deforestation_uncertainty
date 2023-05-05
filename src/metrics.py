@@ -251,12 +251,12 @@ def getAA_Recall(uncertainty, label_mask_current_deforestation_test,
         label_current_deforestation_test_classified_incorrect = label_mask_current_deforestation_test[
             predicted_thresholded == 1]
 
-        print(label_current_deforestation_test_classified_correct.shape,
-            predicted_test_classified_correct.shape)
+        ## print(label_current_deforestation_test_classified_correct.shape,
+        ##     predicted_test_classified_correct.shape)
         cm_correct = metrics.confusion_matrix(
             label_current_deforestation_test_classified_correct,
             predicted_test_classified_correct)
-        print("cm_correct", cm_correct)
+        ## print("cm_correct", cm_correct)
 
         TN_L = cm_correct[0,0]
         FN_L = cm_correct[1,0]
@@ -270,7 +270,7 @@ def getAA_Recall(uncertainty, label_mask_current_deforestation_test,
             label_current_deforestation_test_classified_incorrect,
             predicted_test_classified_incorrect)
 
-        print("cm_incorrect", cm_incorrect)
+        ## print("cm_incorrect", cm_incorrect)
 
         if cm_incorrect.shape[0] != 2: 
             ic(np.all(label_current_deforestation_test_classified_incorrect) == 0) 
