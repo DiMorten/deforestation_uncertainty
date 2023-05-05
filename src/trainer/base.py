@@ -209,11 +209,12 @@ class Trainer():
         self.getErrorMaskToShowRGB()
         self.setUncertainty()
         self.getValidationValues2()
-        self.getTestValues2()        
+        self.getTestValues2() 
+        
+        self.getUncertaintyToShow()
         self.logger.plotCropSample(self)
 
-        self.getUncertaintyToShow()
-
+        
         sUEO, ece_score = self.getOtherUncertaintyMetrics()
         out['other_uncertainty_metrics'] = {'sUEO': sUEO, 'ece_score': ece_score}
         self.getPOIValues()

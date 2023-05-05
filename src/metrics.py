@@ -188,7 +188,8 @@ def saveRgbErrorMask(error_mask_to_show, dim = None):
             [0, 0, 0],
             [45, 150, 255],
             [255, 146, 36],
-            [44, 160, 44]]) # past deforestation
+            # [44, 160, 44]]) # past deforestation
+            [147, 96, 86]]) # past deforestation
 
 
     

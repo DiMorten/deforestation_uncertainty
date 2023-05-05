@@ -46,8 +46,11 @@ class Dirichlet(object):
     def __init__(self, alpha):
 
         self._alpha = np.array(alpha)
-        self._coef = gamma(np.sum(self._alpha)) / \
+        try:
+            self._coef = gamma(np.sum(self._alpha)) / \
                            np.multiply.reduce([gamma(a) for a in self._alpha])
+        except:
+            self._coef = float('inf')
     def pdf(self, x):
         '''Returns pdf value for `x`.'''
         return self._coef * np.multiply.reduce([xx ** (aa - 1)
@@ -68,6 +71,26 @@ def draw_pdf_contours(dist, nlevels=200, subdiv=8, **kwargs):
     plt.ylim(0, 0.75**0.5)
     plt.axis('off')
 
+def getMassFcn2D(alpha = [5, 5], normalize_pvals = False):
+    def draw_pdf_contours_2d(dist, nlevels=200, **kwargs):
+
+        # mesh = np.array([np.linspace(0, 1, 10), 1 - np.linspace(0, 1, 10)])
+        mesh_x = np.linspace(0, 1, nlevels)
+        mesh_y = 1 - np.linspace(0, 1, nlevels)
+
+        pvals = [dist.pdf(np.array(xy)) for xy in zip(mesh_x, mesh_y)]
+        # print(pvals)
+        
+        if normalize_pvals == True:
+            plt.plot(mesh_y, pvals/np.max(pvals))
+        else:
+            plt.plot(mesh_y, pvals)
+        
+        plt.xlabel('Predicted probability (Deforestation)')
+        plt.ylabel('Dirichlet PDF')
+        
+
+    draw_pdf_contours_2d(Dirichlet(alpha))
 
 
 
@@ -631,21 +654,7 @@ class TrainerEvidential(Trainer):
         draw_pdf_contours(Dirichlet(alpha))
 
     def getMassFcn2D(self, alpha = [5, 5]):
-        def draw_pdf_contours_2d(dist, nlevels=200, **kwargs):
-
-            # mesh = np.array([np.linspace(0, 1, 10), 1 - np.linspace(0, 1, 10)])
-            mesh_x = np.linspace(0, 1, nlevels)
-            mesh_y = 1 - np.linspace(0, 1, nlevels)
-
-            pvals = [dist.pdf(np.array(xy)) for xy in zip(mesh_x, mesh_y)]
-            print(pvals)
-            
-            plt.plot(mesh_y, pvals)
-            plt.xlabel('Predicted probability (Deforestation)')
-            plt.ylabel('Dirichlet PDF')
-            
-
-        draw_pdf_contours_2d(Dirichlet(alpha))
+        getMassFcn2D(alpha)
 
     def getPOIValues(self):
         lims = self.dataset.previewLims1
