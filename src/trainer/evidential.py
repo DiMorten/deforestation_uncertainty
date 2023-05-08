@@ -467,7 +467,7 @@ class TrainerEvidential(Trainer):
         del self.train_gen_batch, self.valid_gen_batch        
 
     def plotLossTerms(self):
-        self.logger.plotLossTerms(self.history)
+        self.logger.plotLossTerms(self)
 
     def plotAnnealingCoef(self):
         self.logger.plotAnnealingCoef(self.history)

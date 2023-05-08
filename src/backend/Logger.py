@@ -39,53 +39,57 @@ class Logger():
                 maskBackground = [False, False, False, False],
                 invertMask = [False, False, False, False])        
 
-    def plotHistory(self, history):
-        plt.plot(history.history['loss'])
-        plt.plot(history.history['val_loss'])
+    def plotHistory(self, trainer):
+        plt.clf()
+        plt.plot(trainer.history.history['loss'])
+        plt.plot(trainer.history.history['val_loss'])
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
         plt.legend(['train', 'val'], loc='upper left')
-        plt.savefig('loss_history.png')
+        plt.savefig('loss_history_exp{}.png'.format(trainer.exp))
 
 
-    def plotLossTerms(self, history):
+    def plotLossTerms(self, trainer):
         l = ['loss', 'val_loss', 'KL_term', 'val_KL_term', 'loglikelihood_term', 'val_loglikelihood_term']
 
 
         plt.figure(2)
-        plt.plot(history.history[l[0]])
-        plt.plot(history.history[l[1]])
-        plt.plot(history.history[l[2]])
-        plt.plot(history.history[l[3]])
-        plt.plot(history.history[l[4]])
-        plt.plot(history.history[l[5]])
+        plt.clf()
+        plt.plot(trainer.history.history[l[0]])
+        plt.plot(trainer.history.history[l[1]])
+        plt.plot(trainer.history.history[l[2]])
+        plt.plot(trainer.history.history[l[3]])
+        plt.plot(trainer.history.history[l[4]])
+        plt.plot(trainer.history.history[l[5]])
 
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
         plt.legend(l, loc='upper left')
-        plt.savefig('loss_history.png')
+        plt.savefig('loss_history_exp{}.png'.format(trainer.exp))
 
         plt.figure(3)
-        plt.plot(history.history[l[2]])
-        plt.plot(history.history[l[3]])
+        plt.clf()
+        plt.plot(trainer.history.history[l[2]])
+        plt.plot(trainer.history.history[l[3]])
 
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
         plt.legend(l[2:4], loc='upper left')
-        plt.savefig('loss_history.png')
+        plt.savefig('loss_history_KL_term_exp{}.png'.format(trainer.exp))
 
         plt.figure(4)
-        plt.plot(history.history[l[4]])
-        plt.plot(history.history[l[5]])
+        plt.clf()
+        plt.plot(trainer.history.history[l[4]])
+        plt.plot(trainer.history.history[l[5]])
 
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
         plt.legend(l[4:6], loc='upper left')
-        plt.savefig('loss_history.png')
+        plt.savefig('loss_history_log_likelihood_term_exp{}.png'.format(trainer.exp))
 
     def plotAnnealingCoef(self, history):
         plt.figure(5)
@@ -129,8 +133,10 @@ class Logger():
                         cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
                         maskBackground = [False, True, False, True],
                         invertMask = [False, False, False, False])
-                plt.savefig('output/figures/{}PredictSampleUncertainty1_exp{}.png'.format(
-                    trainer.dataset.__class__.__name__, trainer.exp_id), dpi=150, bbox_inches='tight')
+                save_name = 'output/figures/{}PredictSampleUncertainty1_exp{}.png'.format(
+                    trainer.dataset.__class__.__name__, str(trainer.exp))
+                print("Saving crop sample 1 in",save_name)
+                plt.savefig(save_name, dpi=150, bbox_inches='tight')
 
                 _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
                         trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
@@ -139,8 +145,10 @@ class Logger():
                         cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
                         maskBackground = [False, True, False, True],
                         invertMask = [False, False, False, False])
-                plt.savefig('output/figures/{}PredictSampleUncertainty2_exp{}.png'.format(
-                    trainer.dataset.__class__.__name__, trainer.exp_id), dpi=150, bbox_inches='tight')
+                save_name = 'output/figures/{}PredictSampleUncertainty2_exp{}.png'.format(
+                    trainer.dataset.__class__.__name__, str(trainer.exp))
+                print("Saving crop sample 2 in",save_name)                
+                plt.savefig(save_name, dpi=150, bbox_inches='tight')
 
     def plotCropSample(self, trainer):
 
@@ -161,7 +169,9 @@ class Logger():
                     cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
                     maskBackground = [False, True, False, True],
                     invertMask = [False, False, False, False], uncertainty_vlims = uncertainty_vlims)
-            plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertainty1.png', dpi=150, bbox_inches='tight')
+            save_name = 'output/figures/{}PredictSampleUncertainty1_exp{}.png'.format(
+                trainer.dataset.__class__.__name__, str(trainer.exp))
+            plt.savefig(save_name, dpi=150, bbox_inches='tight')
 
             _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
                     trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
@@ -170,7 +180,9 @@ class Logger():
                     cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
                     maskBackground = [False, True, False, True],
                     invertMask = [False, False, False, False], uncertainty_vlims = uncertainty_vlims)
-            plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertainty2.png', dpi=150, bbox_inches='tight')
+            save_name = 'output/figures/{}PredictSampleUncertainty2_exp{}.png'.format(
+                trainer.dataset.__class__.__name__, str(trainer.exp))
+            plt.savefig(save_name, dpi=150, bbox_inches='tight')
 
             _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
                     trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 

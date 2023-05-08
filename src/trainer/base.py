@@ -170,14 +170,16 @@ class Trainer():
         self.getGenerators()
         self.fixChannelNumber()
         self.train()
-
+        self.plotHistory()
+        self.plotLossTerms()
+        
     def snipDataset(self, idx=0):
         self.logger.snipDataset(idx, self.coords_train, self.patchesHandler, 
             self.image_stack, self.label_mask)
 
 
     def plotHistory(self):
-        self.logger.plotHistory(self.history)
+        self.logger.plotHistory(self)
 
 
     # to-do: pass to predictor. to do that, pass data to dataset class (dataset.image_stack, dataset.label, etc)
@@ -217,8 +219,8 @@ class Trainer():
         
         sUEO, ece_score = self.getOtherUncertaintyMetrics()
         out['other_uncertainty_metrics'] = {'sUEO': sUEO, 'ece_score': ece_score}
-        self.getPOIValues()
-        out['snippet_poi_results'] = self.snippet_poi_results
+        # self.getPOIValues()
+        # out['snippet_poi_results'] = self.snippet_poi_results
         # self.getUncertaintyAAValues()
         # trainer.getUncertaintyAAAuditedValues()
         self.getOptimalUncertaintyThreshold()
