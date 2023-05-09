@@ -1,3 +1,4 @@
+import os
 class Paths():
     pass
 
@@ -70,6 +71,14 @@ class PathsPara(Paths):
             'PA_S2_2015_B9_B10_B11_crop.tif', 
             'PA_S2_2015_B12_crop.tif'] 
         }
+
+        landsat_base = 'D:/Jorge/datasets/landsat/PA/'
+        self.landsat = [
+            os.path.join(landsat_base, 'landsat_PA_2018'),
+            os.path.join(landsat_base, 'landsat_PA_2019'),
+            os.path.join(landsat_base, 'landsat_PA_2020'),
+
+        ]
 class PathsMT(Paths): 
     def __init__(self): 
         self.optical_im = 'D:/Jorge/datasets/sentinel2/MT_2019_2020/' 

@@ -194,6 +194,51 @@ class Logger():
                     colorbar = True)
             plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertaintyColorbar.png', dpi=150, bbox_inches='tight')
 
+
+    def plotCropSampleLandsat(self, trainer):
+
+        uncertainty_vlims = [np.min(trainer.uncertainty_to_show), np.max(trainer.uncertainty_to_show)]
+
+        self.plotCropSampleFlag = True
+        if self.plotCropSampleFlag == True:
+            ic(trainer.dataset.previewLims1, trainer.dataset.previewLims2)
+            lims = trainer.dataset.previewLims1
+            ic(np.unique(trainer.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]]))
+            lims = trainer.dataset.previewLims2
+            ic(np.unique(trainer.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
+
+            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
+                    trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
+                    lims = trainer.dataset.previewLims1, 
+                    titles = ['Snippet', 'Predicted Probability', 'Predicted', 'Uncertainty'],
+                    cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
+                    maskBackground = [False, True, False, True],
+                    invertMask = [False, False, False, False], uncertainty_vlims = uncertainty_vlims)
+            save_name = 'output/figures/{}PredictSampleUncertainty1_exp{}.png'.format(
+                trainer.dataset.__class__.__name__, str(trainer.exp))
+            plt.savefig(save_name, dpi=150, bbox_inches='tight')
+
+            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
+                    trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
+                    lims = trainer.dataset.previewLims2, 
+                    titles = ['Snippet', 'Predicted Probability', 'Predicted', 'Uncertainty'],
+                    cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
+                    maskBackground = [False, True, False, True],
+                    invertMask = [False, False, False, False], uncertainty_vlims = uncertainty_vlims)
+            save_name = 'output/figures/{}PredictSampleUncertainty2_exp{}.png'.format(
+                trainer.dataset.__class__.__name__, str(trainer.exp))
+            plt.savefig(save_name, dpi=150, bbox_inches='tight')
+
+            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
+                    trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
+                    lims = trainer.dataset.previewLims2, 
+                    titles = ['Snippet', 'Predicted Probability', 'Predicted', 'Uncertainty'],
+                    cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
+                    maskBackground = [False, True, False, True],
+                    invertMask = [False, False, False, False], uncertainty_vlims = uncertainty_vlims,
+                    colorbar = True)
+            plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertaintyColorbar.png', dpi=150, bbox_inches='tight')
+
     def plotCropSampleT0T1(self, trainer):
         previewBandsT0 = [3,2,1]
         previewBandsT1 = [13,12,11]
