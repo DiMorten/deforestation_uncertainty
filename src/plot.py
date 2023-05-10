@@ -177,25 +177,31 @@ def plotCropSample5(im1, im2, im3, im4, im5, lims = None,
     plt.savefig('Para' + ' normalized RGB.png', dpi=300, bbox_inches='tight')
 
 
-def plotCropSample6(im1, im2, im3, im4, im5, im6, lims = None, 
-        titles = ['T_{-2}', 'T_{-1}', 'T_0', 'Secondary Veg.', 'Past deforestation'],
+def plotCropSample6(ims, lims = None, 
+        titles = ['T_{-2}', 'T_{-1}', 'T_0', 
+                  'Predicted Probability', 'Predicted', 'Uncertainty'],
         cmaps = [plt.cm.gray, plt.cm.gray, plt.cm.gray, plt.cm.gray, plt.cm.gray],
         maskBackground = [False, False, False, False, False],
         invertMask = [False, False, False, False, False],
-        uncertainty_vlims = [0, 1], colorbar = False):
-    fig, axes = plt.subplots(1, 5)
-    fig.set_figheight(20)
-    fig.set_figwidth(20)
+        uncertainty_vlims = [0, 1], polygons = [], colorbar = False):
+    # fig, axes = plt.subplots(2, 3, figsize=(8,6))
+    fig, axes = plt.subplots(2, 3, figsize=(12,9))
     
+    # fig, axes = plt.subplots(2, 3, figsize=(12,8))
+    
+    #fig.tight_layout()
+    axes = axes.flatten()
+
+    # fig.set_figheight(5)
+    # fig.set_figwidth(20)
+
+    # fig.set_figheight(5)
+    # fig.set_figwidth(15)
+    fig.subplots_adjust(hspace=0.0)
     if lims is not None:
-        im1 = im1[lims[0]:lims[1], lims[2]:lims[3]]
-        im2 = im2[lims[0]:lims[1], lims[2]:lims[3]]
-        im3 = im3[lims[0]:lims[1], lims[2]:lims[3]]
-        im4 = im4[lims[0]:lims[1], lims[2]:lims[3]]
-        im5 = im5[lims[0]:lims[1], lims[2]:lims[3]]
-        im6 = im6[lims[0]:lims[1], lims[2]:lims[3]]
-
-
+        for idx in range(len(ims)):
+            ims[idx] = ims[idx][lims[0]:lims[1], lims[2]:lims[3]]
+    '''
     if maskBackground[2] == True:
         im3 = applyBackgroundMask(im3, im5)
     if maskBackground[3] == True:
@@ -204,28 +210,38 @@ def plotCropSample6(im1, im2, im3, im4, im5, im6, lims = None,
         im5 = applyBackgroundMask(im5, im5)
     if maskBackground[5] == True:
         im6 = applyBackgroundMask(im6, im6)
-
+    '''
+    '''
     if invertMask[2] == True:
         im3 = invertMaskFromIm(im3)
     if invertMask[3] == True:
         im4 = invertMaskFromIm(im4)
     if invertMask[4] == True:
         im5 = invertMaskFromIm(im5)
-
-
-    axes[0].imshow(im1, cmap=cmaps[0])
-    axes[1].imshow(im2, cmap=cmaps[0])
-    plot = axes[2].imshow(im3, cmap=cmaps[2], vmin=0, vmax=1)
+    '''
+    font = {'family': "Times New Roman",
+        'color':  'white',
+        'weight': 'bold',
+        'size': 14,
+        }
+    
+    
+    for idx in range(3):
+        axes[idx].imshow(ims[idx], cmap=cmaps[idx])
+        for polygon in polygons:
+            axes[idx].text(polygon['coords'][0], polygon['coords'][1], polygon['text'], fontdict=font)
+    
+    plot = axes[3].imshow(ims[3], cmap=cmaps[3], vmin=0, vmax=1)
     if colorbar == True:
-        divider = make_axes_locatable(axes[2])
+        divider = make_axes_locatable(axes[3])
         cax = divider.append_axes("bottom", size="5%", pad=0.05)
         plt.colorbar(plot, cax=cax, orientation="horizontal")
 
 
-    axes[3].imshow(im4, cmap=cmaps[3])
-    plot = axes[4].imshow(im5, cmap=cmaps[4], vmin=uncertainty_vlims[0], vmax=uncertainty_vlims[1])
+    axes[4].imshow(ims[4], cmap=cmaps[4])
+    plot = axes[5].imshow(ims[5], cmap=cmaps[5], vmin=uncertainty_vlims[0], vmax=uncertainty_vlims[1])
     if colorbar == True:
-        divider = make_axes_locatable(axes[4])
+        divider = make_axes_locatable(axes[5])
         cax = divider.append_axes("bottom", size="5%", pad=0.05)
         plt.colorbar(plot, cax=cax, orientation="horizontal") 
 

@@ -1,6 +1,8 @@
 import pathlib
 import matplotlib.pyplot as plt
 import src.plot as _plt
+import importlib
+importlib.reload(_plt)
 import numpy as np
 from icecream import ic
 class Logger():
@@ -195,7 +197,7 @@ class Logger():
             plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertaintyColorbar.png', dpi=150, bbox_inches='tight')
 
 
-    def plotCropSampleLandsat(self, trainer):
+    def plotCropSampleLandsat(self, trainer, landsat_ims):
 
         uncertainty_vlims = [np.min(trainer.uncertainty_to_show), np.max(trainer.uncertainty_to_show)]
 
@@ -207,37 +209,54 @@ class Logger():
             lims = trainer.dataset.previewLims2
             ic(np.unique(trainer.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
 
-            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
-                    trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
+            ims = [landsat_ims[0], landsat_ims[1], landsat_ims[2],
+                    trainer.mean_prob, 
+                    trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show]
+            print([x.shape for x in ims])
+            prodes_dates = ['21/07/2018', '24/07/2019', '26/07/2020']
+            titles = ['Snippet $\mathregular{T_{-1}}$'+' ({})'.format(prodes_dates[0]), 
+                      'Snippet $\mathregular{T_{0}}$'+' ({})'.format(prodes_dates[1]), 
+                      'Snippet $\mathregular{T_{1}}$'+' ({})'.format(prodes_dates[2]), 
+                            'Predicted Probability $\mathregular{T_{0}}$', 
+                            'Predicted $\mathregular{T_{0}}$', 
+                            'Uncertainty $\mathregular{T_{0}}$']
+            cmaps = [plt.cm.gray, plt.cm.gray, plt.cm.gray,
+                             'jet', plt.cm.gray, 'jet']
+            polygons = [{"coords": [150, 800], "text": "C"},
+                        {"coords": [360, 450], "text": "D"},
+                        {"coords": [550, 265], "text": "E"}]
+            _plt.plotCropSample6(ims[:], 
                     lims = trainer.dataset.previewLims1, 
-                    titles = ['Snippet', 'Predicted Probability', 'Predicted', 'Uncertainty'],
-                    cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
-                    maskBackground = [False, True, False, True],
-                    invertMask = [False, False, False, False], uncertainty_vlims = uncertainty_vlims)
-            save_name = 'output/figures/{}PredictSampleUncertainty1_exp{}.png'.format(
+                    titles = titles,
+                    cmaps = cmaps,
+                    uncertainty_vlims = uncertainty_vlims,
+                    polygons = polygons)
+            save_name = 'output/figures/{}PredictSampleUncertaintyLandsat1_exp{}.png'.format(
+                trainer.dataset.__class__.__name__, str(trainer.exp))
+            plt.savefig(save_name, dpi=150, bbox_inches='tight')
+            
+            polygons = [{"coords": [70, 530], "text": "A"},
+                        {"coords": [900, 410], "text": "B"}]
+            _plt.plotCropSample6(ims[:], 
+                    lims = trainer.dataset.previewLims2, 
+                    titles = titles,
+                    cmaps = cmaps,
+                    uncertainty_vlims = uncertainty_vlims,
+                    polygons = polygons)
+            save_name = 'output/figures/{}PredictSampleUncertaintyLandsat2_exp{}.png'.format(
                 trainer.dataset.__class__.__name__, str(trainer.exp))
             plt.savefig(save_name, dpi=150, bbox_inches='tight')
 
-            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
-                    trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
+            _plt.plotCropSample6(ims[:], 
                     lims = trainer.dataset.previewLims2, 
-                    titles = ['Snippet', 'Predicted Probability', 'Predicted', 'Uncertainty'],
-                    cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
-                    maskBackground = [False, True, False, True],
-                    invertMask = [False, False, False, False], uncertainty_vlims = uncertainty_vlims)
-            save_name = 'output/figures/{}PredictSampleUncertainty2_exp{}.png'.format(
-                trainer.dataset.__class__.__name__, str(trainer.exp))
-            plt.savefig(save_name, dpi=150, bbox_inches='tight')
-
-            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
-                    trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
-                    lims = trainer.dataset.previewLims2, 
-                    titles = ['Snippet', 'Predicted Probability', 'Predicted', 'Uncertainty'],
-                    cmaps = [plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
-                    maskBackground = [False, True, False, True],
-                    invertMask = [False, False, False, False], uncertainty_vlims = uncertainty_vlims,
+                    titles = titles,
+                    cmaps = cmaps,
+                    #maskBackground = [False, True, False, True],
+                    #invertMask = [False, False, False, False], 
+                    uncertainty_vlims = uncertainty_vlims,
+                    polygons = polygons,
                     colorbar = True)
-            plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertaintyColorbar.png', dpi=150, bbox_inches='tight')
+            plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertaintyLandsatColorbar.png', dpi=150, bbox_inches='tight')
 
     def plotCropSampleT0T1(self, trainer):
         previewBandsT0 = [3,2,1]

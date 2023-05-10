@@ -74,9 +74,9 @@ class PathsPara(Paths):
 
         landsat_base = 'D:/Jorge/datasets/landsat/PA/'
         self.landsat = [
-            os.path.join(landsat_base, 'landsat_PA_2018'),
-            os.path.join(landsat_base, 'landsat_PA_2019'),
-            os.path.join(landsat_base, 'landsat_PA_2020'),
+            os.path.join(landsat_base, 'landsat_PA_2018.tif'),
+            os.path.join(landsat_base, 'landsat_PA_2019.tif'),
+            os.path.join(landsat_base, 'landsat_PA_2020.tif'),
 
         ]
 class PathsMT(Paths): 

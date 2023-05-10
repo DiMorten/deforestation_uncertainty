@@ -87,7 +87,7 @@ class TrainerMultiOutput(Trainer):
             self.uncertainty_map = uncertainty.mutual_information(self.prob_rec).astype(np.float32)
 
         elif self.config['uncertainty_method'] == "pred_entropy":
-            self.uncertainty_map = uncertainty.predictive_entropy(self.prob_rec).astype(np.float32)
+            self.uncertainty_map = uncertainty.predictive_entropy(self.prob_rec, self.classes_mode).astype(np.float32)
 
         elif self.config['uncertainty_method'] == "KL":
             self.uncertainty_map = uncertainty.expected_KL_divergence(self.prob_rec).astype(np.float32)
@@ -111,7 +111,7 @@ class TrainerEnsemble(TrainerMCDropout):
 
 
         class_n = 3
-        self.classes_mode = True
+        
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:
                 if self.classes_mode == False:
