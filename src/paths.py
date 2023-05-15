@@ -156,6 +156,13 @@ class PathsMT(Paths):
             'MT_S2_2016_07_21_08_07_B12_crop.tif'],
 
         }
+        landsat_base = 'D:/Jorge/datasets/landsat/MT/'
+        self.landsat = [
+            os.path.join(landsat_base, 'landsat_MT_2019.tif'),
+            os.path.join(landsat_base, 'landsat_MT_2020.tif'),
+            os.path.join(landsat_base, 'landsat_MT_2021.tif'),
+
+        ]
 class PathsMA(Paths): 
     def __init__(self): 
 

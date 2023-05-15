@@ -213,36 +213,39 @@ class Logger():
                     trainer.mean_prob, 
                     trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show]
             print([x.shape for x in ims])
-            prodes_dates = ['21/07/2018', '24/07/2019', '26/07/2020']
-            titles = ['Snippet $\mathregular{T_{-1}}$'+' ({})'.format(prodes_dates[0]), 
-                      'Snippet $\mathregular{T_{0}}$'+' ({})'.format(prodes_dates[1]), 
-                      'Snippet $\mathregular{T_{1}}$'+' ({})'.format(prodes_dates[2]), 
+
+            # trainer.dataset.prodes_dates = ['21/07/2018', '24/07/2019', '26/07/2020']
+            # trainer.dataset.prodes_dates = ['02/08/2019', '05/08/2020', '22/07/2021']
+            
+            titles = ['Snippet $\mathregular{T_{-1}}$'+' ({})'.format(trainer.dataset.prodes_dates[0]), 
+                      'Snippet $\mathregular{T_{0}}$'+' ({})'.format(trainer.dataset.prodes_dates[1]), 
+                      'Snippet $\mathregular{T_{1}}$'+' ({})'.format(trainer.dataset.prodes_dates[2]), 
                             'Predicted Probability $\mathregular{T_{0}}$', 
                             'Predicted $\mathregular{T_{0}}$', 
                             'Uncertainty $\mathregular{T_{0}}$']
             cmaps = [plt.cm.gray, plt.cm.gray, plt.cm.gray,
                              'jet', plt.cm.gray, 'jet']
-            polygons = [{"coords": [150, 800], "text": "C"},
-                        {"coords": [360, 450], "text": "D"},
-                        {"coords": [550, 265], "text": "E"}]
+
+            trainer.dataset.hspace = [-0.1, -0.1]
             _plt.plotCropSample6(ims[:], 
                     lims = trainer.dataset.previewLims1, 
                     titles = titles,
                     cmaps = cmaps,
                     uncertainty_vlims = uncertainty_vlims,
-                    polygons = polygons)
+                    polygons = trainer.dataset.polygons[0],
+                    hspace = trainer.dataset.hspace[0]) # -0.1
             save_name = 'output/figures/{}PredictSampleUncertaintyLandsat1_exp{}.png'.format(
                 trainer.dataset.__class__.__name__, str(trainer.exp))
             plt.savefig(save_name, dpi=150, bbox_inches='tight')
             
-            polygons = [{"coords": [70, 530], "text": "A"},
-                        {"coords": [900, 410], "text": "B"}]
+
             _plt.plotCropSample6(ims[:], 
                     lims = trainer.dataset.previewLims2, 
                     titles = titles,
                     cmaps = cmaps,
                     uncertainty_vlims = uncertainty_vlims,
-                    polygons = polygons)
+                    polygons = trainer.dataset.polygons[1],
+                    hspace = trainer.dataset.hspace[1]) # 0.
             save_name = 'output/figures/{}PredictSampleUncertaintyLandsat2_exp{}.png'.format(
                 trainer.dataset.__class__.__name__, str(trainer.exp))
             plt.savefig(save_name, dpi=150, bbox_inches='tight')
@@ -254,7 +257,7 @@ class Logger():
                     #maskBackground = [False, True, False, True],
                     #invertMask = [False, False, False, False], 
                     uncertainty_vlims = uncertainty_vlims,
-                    polygons = polygons,
+                    polygons = trainer.dataset.polygons[1],
                     colorbar = True)
             plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertaintyLandsatColorbar.png', dpi=150, bbox_inches='tight')
 

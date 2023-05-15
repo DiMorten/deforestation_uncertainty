@@ -115,6 +115,15 @@ class PA(Dataset):
 			]
 		}
 
+		self.polygons = [[{"coords": [150, 800], "text": "C"},
+                        {"coords": [360, 450], "text": "D"},
+                        {"coords": [550, 265], "text": "E"}],
+
+						[{"coords": [70, 530], "text": "A"},
+                        {"coords": [900, 410], "text": "B"}]]
+		self.prodes_dates_to_print = ['21/07/2018', '24/07/2019', '26/07/2020']
+		self.prodes_dates = [2018, 2019, 2020]
+
 	def loadLabel(self):
 		label = np.load(self.paths.label + self.label_filename).astype('uint8')
 		return label
@@ -136,6 +145,10 @@ class MT(Dataset):
 		self.previewLims1 = np.array([11500, 12500, 9000, 10000])
 
 		self.previewLims2 = np.array([5000, 6000, 9500, 10500])
+		# self.previewLims2 = np.array([5080, 6000, 9500, 10500])
+		
+		# self.previewLims2 = np.array([5000, 6000, 9420, 10420])
+
 		self.site = 'MT' 
 		 
 		self.lims = np.array([0, 20795-4000, 0+3000, 13420]) 
@@ -160,6 +173,20 @@ class MT(Dataset):
 				[430, 950] # Will diverge from ensemble
 			]
 		}
+
+		self.polygons = [[{"coords": [460, 720], "text": "L"},
+                        {"coords": [600, 950], "text": "M"},
+                        {"coords": [800, 100], "text": "N"}],
+
+						[{"coords": [200, 740], "text": "F"},
+                        {"coords": [770, 730], "text": "G"},
+						{"coords": [410, 470], "text": "H"},
+						{"coords": [500, 850], "text": "I"},
+						{"coords": [200, 650], "text": "J"},
+						{"coords": [670, 550], "text": "K"}]]
+		
+		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
+		self.prodes_dates = [2019, 2020, 2021]
 	def loadLabel(self): 
 		label = np.load(self.paths.label + self.label_filename).astype('uint8')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
  
@@ -347,6 +374,7 @@ class MultipleDates():
 			
 			if self.borderBuffer > 0:
 				label = self.removeBorderBufferFromLabel(label, self.borderBuffer)
+				print("Removing bufer................")
 			# if (self.site == 'PA' and date == 2019):	
 			# 	label = self.loadLabelFromProject()
 			# if (self.site == 'MT' and date == 2020):

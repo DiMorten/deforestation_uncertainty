@@ -345,6 +345,13 @@ class Trainer():
 
     def preprocessProbRec(self):
         pass
+    
+    def get_label_no_buffer(self):
+        self.dataset.borderBuffer = 0
+        self.label_no_buffer = self.dataset.loadLabel()
+        self.dataset.borderBuffer = 2
+        self.label_no_buffer = np.squeeze(self.label_no_buffer[:self.mask_tiles.shape[0], :self.mask_tiles.shape[1],:])
+
     def getUncertaintyToShow(self):
         
         self.uncertainty_to_show = self.uncertainty_map.copy()[:self.label_mask.shape[0], :self.label_mask.shape[1]]
@@ -486,7 +493,8 @@ class Trainer():
     def getErrorMaskToShowRGB(self):
         predicted_unpad_to_show = self.predicted_unpad.copy()
 
-        predicted_unpad_to_show[self.label_mask == 2] = 0
+        predicted_unpad_to_show[self.label_no_buffer == 2] = 0
+        
         print(np.unique(predicted_unpad_to_show))
         error_mask_to_show = _metrics.getRgbErrorMask(predicted_unpad_to_show, 
                 self.label_mask_current_deforestation).astype(np.uint8)

@@ -183,7 +183,8 @@ def plotCropSample6(ims, lims = None,
         cmaps = [plt.cm.gray, plt.cm.gray, plt.cm.gray, plt.cm.gray, plt.cm.gray],
         maskBackground = [False, False, False, False, False],
         invertMask = [False, False, False, False, False],
-        uncertainty_vlims = [0, 1], polygons = [], colorbar = False):
+        uncertainty_vlims = [0, 1], polygons = [], colorbar = False,
+        hspace=0.):
     # fig, axes = plt.subplots(2, 3, figsize=(8,6))
     fig, axes = plt.subplots(2, 3, figsize=(12,9))
     
@@ -197,10 +198,11 @@ def plotCropSample6(ims, lims = None,
 
     # fig.set_figheight(5)
     # fig.set_figwidth(15)
-    fig.subplots_adjust(hspace=0.0)
+    fig.subplots_adjust(hspace=hspace)
     if lims is not None:
         for idx in range(len(ims)):
             ims[idx] = ims[idx][lims[0]:lims[1], lims[2]:lims[3]]
+    print(ims[0].shape)
     '''
     if maskBackground[2] == True:
         im3 = applyBackgroundMask(im3, im5)
