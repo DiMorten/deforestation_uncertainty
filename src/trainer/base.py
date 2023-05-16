@@ -208,6 +208,7 @@ class Trainer():
         calculateMAPWithoutSmallPolygons = False
         if calculateMAPWithoutSmallPolygons == True:
             self.calculateMAPWithoutSmallPolygons()
+        self.get_label_no_buffer()
         self.getErrorMask()
         self.getErrorMaskToShowRGB()
         self.setUncertainty()
@@ -220,8 +221,11 @@ class Trainer():
         
         sUEO, ece_score = self.getOtherUncertaintyMetrics()
         out['other_uncertainty_metrics'] = {'sUEO': sUEO, 'ece_score': ece_score}
-        # self.getPOIValues()
-        # out['snippet_poi_results'] = self.snippet_poi_results
+        # optional
+        self.getPOIValues()
+        out['snippet_poi_results'] = self.snippet_poi_results
+        # end optional
+
         # self.getUncertaintyAAValues()
         # trainer.getUncertaintyAAAuditedValues()
         self.getOptimalUncertaintyThreshold()

@@ -88,10 +88,10 @@ def getMassFcn2D(alpha = [5, 5], normalize_pvals = False):
         
         plt.xlabel('Predicted probability (Deforestation)')
         plt.ylabel('Dirichlet PDF')
-        
+        # return mesh_y, pvals/np.max(pvals)        
 
     draw_pdf_contours_2d(Dirichlet(alpha))
-
+    # return x, y
 
 
 def relu_evidence(logits):
@@ -107,8 +107,8 @@ def softsign_evidence(logits):
     return tf.nn.softsign(logits)
 
 class TrainerEvidential(Trainer):
-    def __init__(self, config, dataset, patchesHandler, grid_idx=0):
-        super().__init__(config, dataset, patchesHandler, grid_idx=grid_idx)
+    def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
+        super().__init__(config, dataset, patchesHandler, logger, grid_idx=grid_idx)
         self.annealing_step  = config['Uncertainty']['annealing_step']
         self.times = 1
         self.network_architecture = utils_v1.build_resunet

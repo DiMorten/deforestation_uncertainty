@@ -591,6 +591,7 @@ def ece_score(confidence, py_index, y_test, n_bins=10):
     acc, conf = np.zeros(n_bins), np.zeros(n_bins)
     Bm = np.zeros(n_bins)
     for m in range(n_bins):
+        print("ECE. Starting bin {}...".format(m))
         a, b = m / n_bins, (m + 1) / n_bins
         for i in range(confidence.shape[0]):
             # if py_value[i] > a and py_value[i] <= b:
