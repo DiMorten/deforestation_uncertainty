@@ -108,6 +108,7 @@ def softsign_evidence(logits):
 
 class TrainerEvidential(Trainer):
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
+        config['classes_mode'] = False
         super().__init__(config, dataset, patchesHandler, logger, grid_idx=grid_idx)
         self.annealing_step  = config['Uncertainty']['annealing_step']
         self.times = 1

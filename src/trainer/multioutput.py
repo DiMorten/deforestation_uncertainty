@@ -96,6 +96,25 @@ class TrainerMultiOutput(Trainer):
             self.uncertainty_map = uncertainty.single_experiment_entropy(
                 self.prob_rec[self.pred_entropy_single_idx]).astype(np.float32)
 
+    def getPOIValues(self):
+        self.snippet_poi_results = []
+
+        lims_snippets = [self.dataset.previewLims1, self.dataset.previewLims2]
+        for snippet_id, lims in enumerate(lims_snippets):
+            for coord in self.dataset.snippet_coords["snippet_id{}".format(snippet_id)]:
+                dict_ = {"snippet_id": snippet_id,
+                        "coords": coord, # 10,1 alpha
+                        "reference": self.label_mask[lims[0]:lims[1], lims[2]:lims[3]][coord[0], coord[1]]}
+                
+                predicted_coord = []
+                for idx in range(self.prob_rec.shape[0]):
+                    predicted_coord.append(self.prob_rec[idx][lims[0]:lims[1], lims[2]:lims[3]][coord[0], coord[1]])
+                predicted_coord = np.array(predicted_coord)
+                dict_["predicted"] = predicted_coord
+
+                self.snippet_poi_results.append(dict_)
+
+        return self.snippet_poi_results
 class TrainerMCDropout(TrainerMultiOutput):
     pass
 

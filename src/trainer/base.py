@@ -22,7 +22,7 @@ from scipy import optimize
 
 class Trainer():
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
-        self.classes_mode = False
+        self.classes_mode = config['classes_mode']
         self.config = config
         self.dataset = dataset
         self.patch_size = 128
