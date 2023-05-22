@@ -265,7 +265,7 @@ class Trainer():
                 if self.classes_mode == False:
                     self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
                 else:
-                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n - 1, self.config["inference_times"]), dtype = np.float32)
 
                 # self.prob_rec = np.zeros((image1_pad.shape[0],image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
             print("Dropout training mode: {}".format(self.config['dropout_training']))

@@ -94,7 +94,7 @@ class TrainerMultiOutput(Trainer):
 
         elif self.config['uncertainty_method'] == "pred_entropy_single":
             self.uncertainty_map = uncertainty.single_experiment_entropy(
-                self.prob_rec[self.pred_entropy_single_idx]).astype(np.float32)
+                self.prob_rec[self.pred_entropy_single_idx], self.classes_mode).astype(np.float32)
 
     def getPOIValues(self):
         self.snippet_poi_results = []
@@ -145,7 +145,7 @@ class TrainerEnsemble(TrainerMCDropout):
                 if self.classes_mode == False:
                     self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
                 else:
-                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n - 1, self.config["inference_times"]), dtype = np.float32)
 
             new_model = utils_v1.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
                 nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training = False)
