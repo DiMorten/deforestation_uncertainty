@@ -33,21 +33,29 @@ def predictive_entropy(pred_probs, classes_mode = False):
     for k in range(K):
         pred_entropy = pred_entropy + pred_mean[..., k] * np.log(pred_mean[..., k] + epsilon) 
     if classes_mode == True:
-        pred_entropy = - pred_entropy / np.log(K)
+        # pred_entropy = - pred_entropy / np.log(K)
+        pred_entropy = - pred_entropy / K
+
     else:
         pred_entropy = - pred_entropy / K
     
     return pred_entropy
 
 
-def single_experiment_entropy(pred_prob):
+def single_experiment_entropy(pred_prob, classes_mode = False):
     pred_entropy = np.zeros(pred_prob.shape[0:2])
     ic(pred_entropy.shape)
     
     K = pred_prob.shape[-1]
     for k in range(K):
         pred_entropy = pred_entropy + pred_prob[..., k] * np.log(pred_prob[..., k] + epsilon) 
-    pred_entropy = - pred_entropy / K
+    if classes_mode == True:
+        pred_entropy = - pred_entropy / np.log(K)
+        # pred_entropy = - pred_entropy / K
+
+    else:
+        pred_entropy = - pred_entropy / K
+
     return pred_entropy
 
 def mutual_information(pred_probs):

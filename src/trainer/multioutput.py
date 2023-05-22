@@ -27,7 +27,7 @@ class TrainerMultiOutput(Trainer):
         super().__init__(config, dataset, patchesHandler, logger, grid_idx=grid_idx)
         self.network_architecture = utils_v1.build_resunet_dropout_spatial
         self.pred_entropy_single_idx = 0
-
+        
     def train(self):
 
         metrics_all = []
@@ -116,7 +116,16 @@ class TrainerMultiOutput(Trainer):
 
         return self.snippet_poi_results
 class TrainerMCDropout(TrainerMultiOutput):
-    pass
+    def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
+        config['dropout_training'] = True
+        super().__init__(config, dataset, patchesHandler, logger, grid_idx)
+        self.default_log_name = 'log_mcd.pkl'
+
+class TrainerSingleRun(TrainerMultiOutput):
+    def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
+        config['dropout_training'] = False
+        super().__init__(config, dataset, patchesHandler, logger, grid_idx)
+        self.default_log_name = 'log_single_run.pkl'
 
 class TrainerEnsemble(TrainerMCDropout):
 

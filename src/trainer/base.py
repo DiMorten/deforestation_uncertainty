@@ -32,7 +32,7 @@ class Trainer():
         self.logger = logger
         self.patchesHandler = patchesHandler
 
-
+        self.default_log_name = 'log.pkl'
         self.times = 1
         self.method = 'resunet'
         self.nb_filters = [16, 32, 64, 128, 256]
@@ -268,9 +268,9 @@ class Trainer():
                     self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
 
                 # self.prob_rec = np.zeros((image1_pad.shape[0],image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
-
+            print("Dropout training mode: {}".format(self.config['dropout_training']))
             new_model = utils_v1.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
-                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None)
+                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training=self.config['dropout_training'])
 
             for l in range(1, len(model.layers)):
                 new_model.layers[l].set_weights(model.layers[l].get_weights())
