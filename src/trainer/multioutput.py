@@ -119,13 +119,13 @@ class TrainerMCDropout(TrainerMultiOutput):
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
         config['dropout_training'] = True
         super().__init__(config, dataset, patchesHandler, logger, grid_idx)
-        self.default_log_name = 'log_mcd.pkl'
+        self.default_log_name = 'output/log/log_mcd.pkl'
 
 class TrainerSingleRun(TrainerMultiOutput):
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
         config['dropout_training'] = False
         super().__init__(config, dataset, patchesHandler, logger, grid_idx)
-        self.default_log_name = 'log_single_run.pkl'
+        self.default_log_name = 'output/log/log_single_run.pkl'
 
 class TrainerEnsemble(TrainerMCDropout):
 
