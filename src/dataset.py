@@ -123,6 +123,7 @@ class PA(Dataset):
                         {"coords": [900, 410], "text": "B"}]]
 		self.prodes_dates_to_print = ['21/07/2018', '24/07/2019', '26/07/2020']
 		self.prodes_dates = [2018, 2019, 2020]
+		self.hspace = [-0.1, -0.1]
 
 	def loadLabel(self):
 		label = np.load(self.paths.label + self.label_filename).astype('uint8')
@@ -187,6 +188,7 @@ class MT(Dataset):
 		
 		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
 		self.prodes_dates = [2019, 2020, 2021]
+		self.hspace = [-0.1, 0.]
 	def loadLabel(self): 
 		label = np.load(self.paths.label + self.label_filename).astype('uint8')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
  

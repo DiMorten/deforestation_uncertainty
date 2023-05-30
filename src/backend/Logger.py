@@ -217,16 +217,16 @@ class Logger():
             # trainer.dataset.prodes_dates = ['21/07/2018', '24/07/2019', '26/07/2020']
             # trainer.dataset.prodes_dates = ['02/08/2019', '05/08/2020', '22/07/2021']
             
-            titles = ['Snippet $\mathregular{T_{-1}}$'+' ({})'.format(trainer.dataset.prodes_dates[0]), 
-                      'Snippet $\mathregular{T_{0}}$'+' ({})'.format(trainer.dataset.prodes_dates[1]), 
-                      'Snippet $\mathregular{T_{1}}$'+' ({})'.format(trainer.dataset.prodes_dates[2]), 
-                            'Predicted Probability $\mathregular{T_{0}}$', 
-                            'Predicted $\mathregular{T_{0}}$', 
-                            'Uncertainty $\mathregular{T_{0}}$']
+            titles = ['Snippet $\mathregular{T_{-1}}$'+' ({})'.format(trainer.dataset.prodes_dates_to_print[0]), 
+                      'Snippet $\mathregular{T_{0}}$'+' ({})'.format(trainer.dataset.prodes_dates_to_print[1]), 
+                      'Snippet $\mathregular{T_{1}}$'+' ({})'.format(trainer.dataset.prodes_dates_to_print[2]), 
+                            'Prediction Probability at $\mathregular{T_{0}}$', 
+                            'Prediction at $\mathregular{T_{0}}$', 
+                            'Uncertainty at $\mathregular{T_{0}}$']
             cmaps = [plt.cm.gray, plt.cm.gray, plt.cm.gray,
                              'jet', plt.cm.gray, 'jet']
 
-            trainer.dataset.hspace = [-0.1, -0.1]
+            trainer.dataset.hspace = [-0.1, 0.03]
             _plt.plotCropSample6(ims[:], 
                     lims = trainer.dataset.previewLims1, 
                     titles = titles,
