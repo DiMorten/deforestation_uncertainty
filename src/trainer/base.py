@@ -32,7 +32,7 @@ class Trainer():
         self.logger = logger
         self.patchesHandler = patchesHandler
 
-        self.default_log_name = 'log.pkl'
+        self.default_log_name = 'output/log/log.pkl'
         self.times = 1
         self.method = 'resunet'
         self.nb_filters = [16, 32, 64, 128, 256]
