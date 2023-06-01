@@ -139,7 +139,7 @@ class PatchesHandler():
 				else:
 					predicted = new_model.predict(np.expand_dims(patch, axis=0)).astype(np.float32)
 					# predicted[...,0] += predicted[...,-1] # add past deforestation prob. to "not current deforestation"
-					predicted[...,0] = 1 - predicted[...,1]
+					# predicted[...,0] = 1 - predicted[...,1]
 					predicted = predicted[...,0:-1]
 				img_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = predicted
 		del patch, predicted
