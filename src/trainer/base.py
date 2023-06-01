@@ -584,7 +584,8 @@ class Trainer():
                 else:
                     self.threshold_list = [0.0025, 0.025, 0.05, 0.1, 0.2, 0.4, 
                         0.5, 0.6, 0.7, 0.8, 0.9, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
-                
+                    # self.threshold_list = [0.13, 0.15, 0.2, 0.225, 
+                    #     0.25, 0.27, 0.3, 0.34, 0.36, 0.45, 0.55, 0.65, 0.8]
         elif self.config['uncertainty_method'] == "pred_var":
                 self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36]

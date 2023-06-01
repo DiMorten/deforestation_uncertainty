@@ -37,7 +37,8 @@ def predictive_entropy(pred_probs, classes_mode = False):
         pred_entropy = - pred_entropy / np.log(K)
 
     else:
-        pred_entropy = - pred_entropy / K
+        # pred_entropy = - pred_entropy / K
+        pred_entropy = - pred_entropy * 2 / np.log(2)
     
     return pred_entropy
 
