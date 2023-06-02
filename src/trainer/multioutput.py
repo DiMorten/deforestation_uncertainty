@@ -22,6 +22,7 @@ from scipy import optimize
 from src.trainer.base import Trainer
 import src.loss
 import src.uncertainty as uncertainty
+import pathlib
 class TrainerMultiOutput(Trainer):
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
         super().__init__(config, dataset, patchesHandler, logger, grid_idx=grid_idx)
@@ -151,7 +152,7 @@ class TrainerEnsemble(TrainerMCDropout):
                 nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training = False)
 
             self.patchesHandler.class_n = class_n
-
+            pathlib.Path(self.path_maps).mkdir(parents=True, exist_ok=True)
             with tf.device('/cpu:0'):
                 for tm in range(0,self.config["inference_times"]):
                     print('time: ', tm)
@@ -182,7 +183,8 @@ class TrainerEnsemble(TrainerMCDropout):
                     ts_time =  time.time() - start_test
 
                     if self.config["save_probabilities"] == True:
-                        np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
+                        
+                        np.save(os.path.join(self.path_maps, 'prob_'+str(tm)+'.npy'),prob_reconstructed) 
                     else:
                         self.prob_rec[...,tm] = prob_reconstructed
 

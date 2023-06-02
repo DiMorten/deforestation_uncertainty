@@ -34,8 +34,8 @@ def predictive_entropy(pred_probs, classes_mode = False):
     for k in range(K):
         pred_entropy = pred_entropy + pred_mean[..., k] * np.log(pred_mean[..., k] + epsilon) 
     if classes_mode == True:
-        pred_entropy = - pred_entropy / np.log(K)
-
+        # pred_entropy = - pred_entropy / np.log(K)
+        pred_entropy = - pred_entropy / K
     else:
         # pred_entropy = - pred_entropy / K
         pred_entropy = - pred_entropy * 2 / np.log(2)
