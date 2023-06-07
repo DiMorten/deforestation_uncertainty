@@ -152,7 +152,7 @@ class TrainerEnsemble(TrainerMCDropout):
                 nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training = False)
 
             self.patchesHandler.class_n = class_n
-            pathlib.Path(self.path_maps).mkdir(parents=True, exist_ok=True)
+            # pathlib.Path(self.path_maps).mkdir(parents=True, exist_ok=True)
             with tf.device('/cpu:0'):
                 for tm in range(0,self.config["inference_times"]):
                     print('time: ', tm)

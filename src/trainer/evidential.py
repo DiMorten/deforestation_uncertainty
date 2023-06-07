@@ -253,9 +253,6 @@ class TrainerEvidential(Trainer):
                 return loss
             return loss
 
-
-
-
         def dice_coef(y_true, y_pred, smooth=100):        
             y_true_f = K.flatten(y_true)
             y_pred_f = K.flatten(y_pred)

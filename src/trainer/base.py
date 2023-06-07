@@ -582,7 +582,7 @@ class Trainer():
                     self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                             0.25, 0.27, 0.3, 0.34, 0.36, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
                 else:
-                    self.threshold_list = [0.0025, 0.025, 0.05, 0.1, 0.2, 0.4, 
+                    self.threshold_list = [0.025, 0.05, 0.1, 0.2, 0.4, 
                         0.5, 0.6, 0.7, 0.8, 0.9, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
                     # self.threshold_list = [0.13, 0.15, 0.2, 0.225, 
                     #     0.25, 0.27, 0.3, 0.34, 0.36, 0.45, 0.55, 0.65, 0.8]
@@ -609,6 +609,8 @@ class Trainer():
 
                 self.threshold_list = [0.13, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36, 0.45, 0.55, 0.65, 0.8]
+                self.threshold_list = [0.025, 0.05, 0.1, 0.15, 0.2, 0.225, 
+                        0.25, 0.27, 0.3, 0.34, 0.36, 0.45, 0.55, 0.65, 0.8, 0.9, 0.95]
 
                 # self.threshold_list = [ 0.15, 0.2,  
                 #          0.3, 0.35, 0.4, 0.5, 0.6, 0.7]
@@ -670,7 +672,7 @@ class Trainer():
 
 
 
-    def plotUncertaintyAA(self):
+    def plotUncertaintyAA(self, normalize_xlim = False):
 
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
         fig.set_figheight(5)
@@ -725,6 +727,10 @@ class Trainer():
         ax3.hlines(y = 3, xmin = self.xlim_adjusted[0], xmax = self.xlim_adjusted[1],
                 colors = (0.2, 0.2, 0.2),
                 label = '3% AA')
+
+        if normalize_xlim == True:
+            self.xlim_adjusted = (0,1)
+
 
         ax3.set_xlim(self.xlim_adjusted)
 

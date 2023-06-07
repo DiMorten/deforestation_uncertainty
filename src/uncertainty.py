@@ -30,15 +30,16 @@ def predictive_entropy(pred_probs, classes_mode = False):
     pred_entropy = np.zeros((pred_mean.shape[0:2]))
 
     K = pred_mean.shape[-1]
-    print("K shape {}, pred_mean shape {}".format(K, pred_mean.shape))
+    print("K = {}, pred_mean shape {}".format(K, pred_mean.shape))
     for k in range(K):
         pred_entropy = pred_entropy + pred_mean[..., k] * np.log(pred_mean[..., k] + epsilon) 
     if classes_mode == True:
-        # pred_entropy = - pred_entropy / np.log(K)
-        pred_entropy = - pred_entropy / K
+        pred_entropy = - pred_entropy / np.log(K)
+        # pred_entropy = - pred_entropy / K
     else:
         # pred_entropy = - pred_entropy / K
-        pred_entropy = - pred_entropy * 2 / np.log(2)
+        # pred_entropy = - pred_entropy * 2 / np.log(2)
+        pred_entropy = - pred_entropy / np.log(2)
     
     return pred_entropy
 
