@@ -8,12 +8,10 @@ from icecream import ic
 import numpy as np
 from src.dataset import (
     MultipleDates,
-    PA, PADeforestationTime, PADistanceMap, PAMultipleDates,
-    MTDeforestationTime,
+    PA, PADistanceMap, PAMultipleDates,
     MTMultipleDates
 )
 
-# from src.dataset_legacy import MTDeforestationTime
 from src import training_generator as generator
 from src.patchesHandler import PatchesHandler, PatchesHandlerMultipleDates, PatchesHandlerEvidential
 
@@ -53,7 +51,6 @@ dataset = PAMultipleDates(dates = dates, # dates = [2017, 2018, 2019]. [2018, 20
 # dataset = MTMultipleDates(dates = dates, # dates = [2016,2017,2018,2019]
 # 	addPastDeforestationInput = addPastDeforestationInput,
 # 	borderBuffer = 2)	
-# dataset = MTDeforestationTime()	
 # [2016, 2017, 2018]
 
 

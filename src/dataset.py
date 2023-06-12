@@ -188,7 +188,7 @@ class MT(Dataset):
 		
 		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
 		self.prodes_dates = [2019, 2020, 2021]
-		self.hspace = [-0.1, 0.]
+		self.hspace = [-0.1, 0.03]
 	def loadLabel(self): 
 		label = np.load(self.paths.label + self.label_filename).astype('uint8')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] 
  
@@ -451,23 +451,17 @@ class MultipleDates():
 		label[label_from_project == 2] = 2
 		return label
 
-class PADeforestationTime(DeforestationTime, PA):
-	pass
 
-class PAMultipleDates(MultipleDates, PADeforestationTime):
+class PAMultipleDates(MultipleDates, DeforestationTime, PA):
 	pass
 
  
- 
-class MTDeforestationTime(DeforestationTime, MT): 
-	pass
 
-class MTMultipleDates(MultipleDates, MTDeforestationTime):
+class MTMultipleDates(MultipleDates, DeforestationTime, MT):
 	pass
 
 
-class MADeforestationTime(DeforestationTime, MA):
-	pass
 
-class MAMultipleDates(MultipleDates, MADeforestationTime):
+
+class MAMultipleDates(MultipleDates, DeforestationTime, MA):
 	pass

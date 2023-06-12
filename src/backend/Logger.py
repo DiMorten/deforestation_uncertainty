@@ -226,7 +226,7 @@ class Logger():
             cmaps = [plt.cm.gray, plt.cm.gray, plt.cm.gray,
                              'jet', plt.cm.gray, 'jet']
 
-            trainer.dataset.hspace = [-0.1, 0.03]
+            # trainer.dataset.hspace = [-0.1, 0.03]
             _plt.plotCropSample6(ims[:], 
                     lims = trainer.dataset.previewLims1, 
                     titles = titles,
@@ -258,7 +258,8 @@ class Logger():
                     #invertMask = [False, False, False, False], 
                     uncertainty_vlims = uncertainty_vlims,
                     polygons = trainer.dataset.polygons[1],
-                    colorbar = True)
+                    colorbar = True,
+                    hspace = trainer.dataset.hspace[1])
             plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertaintyLandsatColorbar.png', dpi=150, bbox_inches='tight')
 
     def plotCropSampleT0T1(self, trainer):

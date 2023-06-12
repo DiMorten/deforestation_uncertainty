@@ -51,11 +51,13 @@ class LandsatLoader():
 				2: [255, 255, 0]} # [255, 0, 0]
 		for idx in range(len(label_dates)):
 			label_dates[idx] = self.get_borders_from_label(label_dates[idx], borderBuffer=3)
+
+
+		for chan in range(3):
+			ims[2][...,chan][label_dates[1] == 1] = color[1][chan]
 		for idx, (im, label_date) in enumerate(zip(ims, label_dates)):
 			if idx != 0:
 				for chan in range(3):
 					im[...,chan][label_date == 1] = color[idx][chan]
 
-		for chan in range(3):
-			ims[2][...,chan][label_dates[1] == 1] = color[1][chan]
 		return ims

@@ -128,7 +128,12 @@ class TrainerSingleRun(TrainerMultiOutput):
         super().__init__(config, dataset, patchesHandler, logger, grid_idx)
         self.default_log_name = 'output/log/log_single_run.pkl'
 
-class TrainerEnsemble(TrainerMCDropout):
+# class TrainerEnsemble(TrainerMCDropout):
+class TrainerEnsemble(TrainerMultiOutput):
+    def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
+        config['dropout_training'] = False
+        super().__init__(config, dataset, patchesHandler, logger, grid_idx)
+        self.default_log_name = 'output/log/log_ensemble.pkl'
 
     def infer(self):
         self.h, self.w, self.c = self.image1_pad.shape
