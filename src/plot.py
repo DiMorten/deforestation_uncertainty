@@ -320,4 +320,4 @@ def show_im(im, ax, title = "", cmap = "jet"):
     plt.title(title)
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
-    plt.colorbar(im_plt, cax=cax) 
+    plt.colorbar(im_plt, cax=cax)

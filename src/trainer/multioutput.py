@@ -23,6 +23,7 @@ from src.trainer.base import Trainer
 import src.loss
 import src.uncertainty as uncertainty
 import pathlib
+import pdb
 class TrainerMultiOutput(Trainer):
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
         super().__init__(config, dataset, patchesHandler, logger, grid_idx=grid_idx)
