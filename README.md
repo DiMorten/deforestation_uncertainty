@@ -1,6 +1,22 @@
 # This is the code for the paper "Semi-Automatic Monitoring of Deforestation in the Brazilian Amazon: Uncertainty Estimation and Characterization of High Uncertainty Areas"
 
-MC Dropout:
+## Installation
+
+These instructions were tested in Windows 10
+
+1. We provide the `environment.yml` file. In conda, install the environment running: `conda env create -f environment.yml`
+2. Activate the environment: `conda activate tf2`
+3. Install GDAL 3.4.3 for Python 3.9
+   - Go to https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal
+   - Download `GDAL-3.4.3-cp39-cp39-win_amd64.whl`
+   - Install running: `pip install GDAL-3.4.3-cp39-cp39-win_amd64.whl`
+4. Install rasterio 1.2.10 for Python 3.9
+    - Go to https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal
+    - Download `rasterio-1.2.10-cp39-cp39-win_amd64.whl`
+    - Install running: `pip install rasterio-1.2.10-cp39-cp39-win_amd64.whl`
+
+
+## MC Dropout:
 
 1. Set the data in the folder structure from section _Folder structure_
 2. Open the train_mc_dropout.ipynb notebook
@@ -20,7 +36,7 @@ MC Dropout:
 4. Run all
 
 -------------
-# Run in batch (Multiple training and inference executions)
+## Run in batch (Multiple training and inference executions)
 
 In the paper, multiple training and inference runs are applied for each uncertainty method (10 repetitions). To run those repetitions, use train_grid_execution.ipynb
 
