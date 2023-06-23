@@ -15,8 +15,11 @@ These instructions were tested in Windows 10
     - Download `rasterio-1.2.10-cp39-cp39-win_amd64.whl`
     - Install running: `pip install rasterio-1.2.10-cp39-cp39-win_amd64.whl`
 
+## Folder structure
 
-## MC Dropout:
+
+
+## MCD (Execute a single experiment)
 
 1. Set the data in the folder structure from section _Folder structure_
 2. Open the train_mc_dropout.ipynb notebook
@@ -36,27 +39,29 @@ These instructions were tested in Windows 10
 4. Run all
 
 -------------
-## Run in batch (Multiple training and inference executions)
+## Run in batch (Multiple executions)
+This script allows training for single run, MCD and ensemble methods.
+It also allows inference for single run and MCD methods.
+For inference on ensemble method go to the next section.
 
-In the paper, multiple training and inference runs are applied for each uncertainty method (10 repetitions). To run those repetitions, use train_grid_execution.ipynb
+In the paper, multiple training and inference runs are applied for each uncertainty method (10 repetitions). To run those repetitions, use `train_grid_execution.ipynb`
 
 1. Set the data in the folder structure from section _Folder structure_
-2. Open the train_grid_execution.ipynb notebook
+2. Open the `train_grid_execution.ipynb` notebook
 3. Configure the training run using the _config_ dictionary. 
-    - training: If True, training is done. Default: False
-    - inferring: If True, inference is done. Default: True
-    - site: Dataset site. Options are presented next. Default: "PA"
+    - `training`: If True, training is done. Default: False
+    - `inferring`: If True, inference is done. Default: True
+    - `site`: Dataset site. Options are presented next. Default: "PA"
         - "MT" (Mato Grosso)
         - "PA" (Para)
-    - mode: Uncertainty mode. Options are presented next. Default: 'mcd' (Monte Carlo Dropout)
+    - `training_date`: Training with current or earlier pair of dates. Options: "current", "earlier". Default: "earlier"
+    - `mode`: Uncertainty mode. Options are presented next. Default: 'mcd' (Monte Carlo Dropout)
         - mcd: Monte Carlo Dropout
         - single_run: Entropy from a single inference run
         - ensemble: Ensemble (Only training. For inference, use train_ensemble.ipynb)
-    - 
 
-MCD
 
-Ensemble:
+## Inference on Ensemble:
 
 1. Set the data in the folder structure from section _Folder structure_
 2. Configure the training run using the _config_ dictionary. 
