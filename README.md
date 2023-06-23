@@ -16,7 +16,7 @@ These instructions were tested in Windows 10
     - Install running: `pip install rasterio-1.2.10-cp39-cp39-win_amd64.whl`
 
 ## Dataset folder structure
-
+```
 .
 ├── datasets/                    # Test files (alternatively `spec` or `tests`)
 │   ├── sentinel2/          
@@ -38,6 +38,7 @@ These instructions were tested in Windows 10
 │   ├── integration         # End-to-end, integration tests (alternatively `e2e`)
 │   └── unit                # Unit tests
 └── ...
+```
 
 ## MCD (Execute a single experiment)
 
