@@ -15,9 +15,29 @@ These instructions were tested in Windows 10
     - Download `rasterio-1.2.10-cp39-cp39-win_amd64.whl`
     - Install running: `pip install rasterio-1.2.10-cp39-cp39-win_amd64.whl`
 
-## Folder structure
+## Dataset folder structure
 
-
+.
+├── datasets/                    # Test files (alternatively `spec` or `tests`)
+│   ├── sentinel2/          
+│   │   ├── Para_2017/          #
+│   │   │   ├──cloudmask_Para_2017.npy
+│   │   │   ├──PA_S2_2017_B1_B2_B3_crop.tif      # bands 1,2,3 for Para 2017
+│   │   │   ├──PA_S2_2017_B4_B5_B6_crop.tif      # bands 4,5,6 for Para 2017
+│   │   │   └── ...
+│   │   ├── Para_2018/          
+│   │   │   ├──cloudmask_Para_2018.npy
+│   │   │   ├──COPERNICUS_S2_20180721_20180726_B1_B2_B3.tif      # bands 1,2,3 for Para 2019
+│   │   │   ├──COPERNICUS_S2_20180721_20180726_B4_B5_B6.tif      # bands 4,5,6 for Para 2019
+│   │   │   └── ...
+│   │   ├── Para_2019/   
+│   │   │   ├──cloudmask_Para_2019.npy
+│   │   │   ├──COPERNICUS_S2_20190721_20190726_B1_B2_B3.tif      # bands 1,2,3 ofPara 2019
+│   │   │   ├──COPERNICUS_S2_20190721_20190726_B4_B5_B6.tif      # bands 1,2,3 ofPara 2019
+│   │   │   └── ...
+│   ├── integration         # End-to-end, integration tests (alternatively `e2e`)
+│   └── unit                # Unit tests
+└── ...
 
 ## MCD (Execute a single experiment)
 
@@ -59,6 +79,8 @@ In the paper, multiple training and inference runs are applied for each uncertai
         - mcd: Monte Carlo Dropout
         - single_run: Entropy from a single inference run
         - ensemble: Ensemble (Only training. For inference, use train_ensemble.ipynb)
+   - inference_times: Number of inference times for the ensemble
+   - uncertainty_method: Select uncertainty metric. Options: "pred_entropy": Predictive entropy, "pred_var": Predictive variance, "MI": Mutual Information, "KL": Kullback-Leibler Divergence. Default: "pred_entropy"
 
 
 ## Inference on Ensemble:
@@ -69,7 +91,5 @@ In the paper, multiple training and inference runs are applied for each uncertai
     - inference_times: Number of inference times for the ensemble
     - uncertainty_method: Select uncertainty metric. Options: "pred_entropy": Predictive entropy, "pred_var": Predictive variance, "MI": Mutual Information, "KL": Kullback-Leibler Divergence. Default: "pred_entropy"
     - removePolygons: If True, remove polygons with an area smaller to 6.25ha, following PRODES methodology. Default: True
-    - 
 
-    - 
 4. Run train_ensemble.ipynb
