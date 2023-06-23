@@ -222,8 +222,8 @@ class Trainer():
         sUEO, ece_score = self.getOtherUncertaintyMetrics()
         out['other_uncertainty_metrics'] = {'sUEO': sUEO, 'ece_score': ece_score}
         # optional
-        self.getPOIValues()
-        out['snippet_poi_results'] = self.snippet_poi_results
+        # self.getPOIValues()
+        # out['snippet_poi_results'] = self.snippet_poi_results
         # end optional
 
         # self.getUncertaintyAAValues()
