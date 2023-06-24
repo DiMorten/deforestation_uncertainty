@@ -31,7 +31,7 @@ These instructions were tested in Windows 10
 │   │   ├── PA_2018/          
 │   │   │   ├──cloudmask_PA_2018.npy
 │   │   │   ├──COPERNICUS_S2_20180721_20180726_B1_B2_B3.tif      # bands 1,2,3 for Para 2018
-│   │   │   ├──COPERNICUS_S2_20180721_20180726_B4_B5_B6.tif      # bands 4,5,6 for Para 2019
+│   │   │   ├──COPERNICUS_S2_20180721_20180726_B4_B5_B6.tif      # bands 4,5,6 for Para 2018
 │   │   │   └── ...
 │   │   ├── PA_2019/   
 │   │   │   ├──cloudmask_PA_2019.npy
