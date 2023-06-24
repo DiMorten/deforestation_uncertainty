@@ -10,16 +10,16 @@ class PathsPara(Paths):
 
         self.deforestation_time_name = 'deforestation_time_normalized_2018_2019.npy'
         self.deforestation_before_2008 = 'D:/Jorge/datasets/deforestation/deforestation_before_2008/deforestation_before_2008_para.tif'
-        self.hydrography = 'D:/Jorge/datasets/deforestation/Para/hydgrography.tif'
+        self.hydrography = 'D:/Jorge/datasets/deforestation/PA/hydgrography.tif'
         
-        self.deforestation_past_years = 'D:/Jorge/datasets/deforestation/Para/deforestation_past_years.tif'
+        self.deforestation_past_years = 'D:/Jorge/datasets/deforestation/PA/deforestation_past_years.tif'
 
         self.deforestation_time = {
-            2019: 'D:/Jorge/datasets/regeneration/Para/deforestation_time_normalized_2019.npy',
-            2018: 'D:/Jorge/datasets/regeneration/Para/deforestation_time_normalized_2018.npy',
-            2017: 'D:/Jorge/datasets/regeneration/Para/deforestation_time_normalized_2017.npy',
-            2016: 'D:/Jorge/datasets/regeneration/Para/deforestation_time_normalized_2016.npy',
-            2015: 'D:/Jorge/datasets/regeneration/Para/deforestation_time_normalized_2015.npy',
+            2019: 'D:/Jorge/datasets/deforestation/PA/deforestation_time_normalized_2019.npy',
+            2018: 'D:/Jorge/datasets/deforestation/PA/deforestation_time_normalized_2018.npy',
+            2017: 'D:/Jorge/datasets/deforestation/PA/deforestation_time_normalized_2017.npy',
+            2016: 'D:/Jorge/datasets/deforestation/PA/deforestation_time_normalized_2016.npy',
+            2015: 'D:/Jorge/datasets/deforestation/PA/deforestation_time_normalized_2015.npy',
         } 
 
         self.distance_map_past_deforestation = 'D:/jorg/phd/fifth_semester/project_forestcare/dataset_deforestation/Para_2019/distance_map_past_deforestation.npy'
@@ -31,22 +31,21 @@ class PathsPara(Paths):
         self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/'
 
         self.optical_im_past_dates = {
-            2019: self.optical_im_folder + 'Para_2019/',
-            2018: self.optical_im_folder + 'Para_2018/',
-            2017: self.optical_im_folder + 'Para_2017/',
-            2016: self.optical_im_folder + 'Para_2016/',
-            2015: self.optical_im_folder + 'Para_2015/'
+            2019: self.optical_im_folder + 'PA_2019/',
+            2018: self.optical_im_folder + 'PA_2018/',
+            2017: self.optical_im_folder + 'PA_2017/',
+            2016: self.optical_im_folder + 'PA_2016/',
+            2015: self.optical_im_folder + 'PA_2015/'
         }
 
         self.cloud_mask = {
-            2019: self.optical_im_folder + 'Para_2019/' + 'cloudmask_Para_2019.npy',
-            2018: self.optical_im_folder + 'Para_2018/' + 'cloudmask_Para_2018.npy',
-            2017: self.optical_im_folder + 'Para_2017/' + 'cloudmask_Para_2017.npy',
-            2016: self.optical_im_folder + 'Para_2016/' + 'cloudmask_Para_2016.npy',
-            2015: self.optical_im_folder + 'Para_2015/' + 'cloudmask_Para_2015.npy'
+            2019: self.optical_im_folder + 'PA_2019/' + 'cloudmask_PA_2019.npy',
+            2018: self.optical_im_folder + 'PA_2018/' + 'cloudmask_PA_2018.npy',
+            2017: self.optical_im_folder + 'PA_2017/' + 'cloudmask_PA_2017.npy',
+            2016: self.optical_im_folder + 'PA_2016/' + 'cloudmask_PA_2016.npy',
+            2015: self.optical_im_folder + 'PA_2015/' + 'cloudmask_PA_2015.npy'
         }
 
-        self.labelFromProject = 'D:/Jorge/datasets/deforestation/Para_2018_2019/mask_label_17730x9203.npy'
 
         self.im_filenames = {
             2020: ['S2_PA_2020_07_15_B1_B2_B3.tif',
@@ -92,10 +91,10 @@ class PathsMT(Paths):
         self.deforestation_past_years = 'D:/Jorge/datasets/deforestation/MT/deforestation_past_years.tif' 
 
         self.deforestation_time = { 
-            2019: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2019.npy', 
-            2018: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2018.npy', 
-            2017: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2017.npy', 
-            2016: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2016.npy' 
+            2019: 'D:/Jorge/datasets/deforestation/MT/deforestation_time_normalized_2019.npy', 
+            2018: 'D:/Jorge/datasets/deforestation/MT/deforestation_time_normalized_2018.npy', 
+            2017: 'D:/Jorge/datasets/deforestation/MT/deforestation_time_normalized_2017.npy', 
+            2016: 'D:/Jorge/datasets/deforestation/MT/deforestation_time_normalized_2016.npy' 
         }  
  
         self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/'
@@ -116,7 +115,6 @@ class PathsMT(Paths):
             2016: self.optical_im_folder + 'MT_2016/' + 'cloudmask_MT_2016.npy'
         }
 
-        self.labelFromProject = 'D:/Jorge/datasets/deforestation/MT_2019_2020/ref_2019_2020_20798x13420.npy'
 
         self.im_filenames = {
             2020: ['S2_R1_MT_2020_08_03_2020_08_15_B1_B2.tif',

@@ -1,5 +1,5 @@
 
-from src.backend.Logger import Logger
+from src.Logger import Logger
 import utils_v1
 from icecream import ic
 import numpy as np

@@ -10,7 +10,7 @@ import cv2
 import src.rasterTools as rasterTools
 
 from src.dataset import (
-    PA, PADeforestationTime, PADistanceMap, PAMultipleDates, MTMultipleDates,
+    PA, PADistanceMap, PAMultipleDates, MTMultipleDates,
     MT, 
     MA
 )

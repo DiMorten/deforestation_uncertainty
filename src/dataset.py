@@ -440,16 +440,6 @@ class MultipleDates():
 		# plt.axis('off')
 		return label
 
-	def loadLabelFromProject(self):
-		ic(self.paths.labelFromProject)
-		label = np.load(self.paths.labelFromProject).astype(np.uint8)[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]]
-		return label
-
-	def addProjectPastDeforestationToLabel(self, label):
-		ic(self.paths.labelFromProject)
-		label_from_project = self.loadLabelFromProject()
-		label[label_from_project == 2] = 2
-		return label
 
 
 class PAMultipleDates(MultipleDates, DeforestationTime, PA):
