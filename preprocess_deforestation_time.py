@@ -10,127 +10,41 @@ from src.dataset import (
     PA, MT, MA,
     PAMultipleDates, MTMultipleDates, MAMultipleDates
 )
-# path_image_unnormalized = 'E:/Jorge/dataset_deforestation/Para_2020/'
-# path_label = 'E:/Jorge/dataset_deforestation/Para/'
 
-# dataset = 'Para_2020'
-# dataset = 'Para_2020'
-# dataset = 'MT_2019_2020'
-# dataset = 'MT_2020'
-dataset = 'MA_2020'
-# dataset = 'Para_2016'
-# dataset = 'Para_2017'
-# dataset = 'Para_2018'
-# dataset = 'Para_2019'
-
-# dataset = 'Para_2018_2019'
-# dataset = 'MT_2019_2020'
-
-# dataset = 'MT_2020'
-# dataset = 'MT_2016'
-ic(dataset)
+config = {
+    'dataset': 'PA',
+    'year': 2020, # latest year
+}
 mask_input = 'deforestation_time'
 loadDeforestationBefore2008Flag = True
-if dataset == 'Para_2020':
-    if mask_input == 'deforestation_time':
-        dataset = PAMultipleDates()
-        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
-        im_filename_normalized = 'deforestation_time_normalized_2020.npy'
-        im_filenames = ['deforestation_past_years.tif']
-        latest_year = 2020
 
-elif dataset == 'Para_2019':
-    if mask_input == 'deforestation_time':
-        dataset = PAMultipleDates()
-        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
-        im_filename_normalized = 'deforestation_time_normalized_2019.npy'
-        # im_filenames = ['deforestation_past_years.tif']
-        im_filenames = ['']
-        latest_year = 2019
+latest_year = config['year']
+
+if config['dataset'] == 'PA':
+    dataset = PAMultipleDates()
+elif config['dataset'] == 'MT':
+    dataset = MTMultipleDates()
+elif config['dataset'] == 'MA':
+    dataset = MAMultipleDates()
+
+ic(dataset)
 
 
-elif dataset == 'Para_2018':
-    if mask_input == 'deforestation_time':
-        dataset = PAMultipleDates()
-        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
-        im_filename_normalized = 'deforestation_time_normalized_2018.npy'
-        im_filenames = ['']
-        latest_year = 2018
-
-elif dataset == 'Para_2017':
-    if mask_input == 'deforestation_time':
-        dataset = PAMultipleDates()
-        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
-        im_filename_normalized = 'deforestation_time_normalized_2017.npy'
-        im_filenames = ['deforestation_past_years.tif']
-        latest_year = 2017
-
-elif dataset == 'Para_2016':
-    if mask_input == 'deforestation_time':
-        dataset = PAMultipleDates()
-        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
-        im_filename_normalized = 'deforestation_time_normalized_2016.npy'
-        im_filenames = ['deforestation_past_years.tif']
-        latest_year = 2016
-
-elif dataset == 'Para_2015':
-    if mask_input == 'deforestation_time':
-        dataset = PAMultipleDates()
-        path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
-        im_filename_normalized = 'deforestation_time_normalized_2015.npy'
-        im_filenames = ['deforestation_past_years.tif']
-        latest_year = 2015
-
-elif dataset == 'Para_2018_2019':
-    if mask_input == 'deforestation_time':
-        dataset = PA()
-        path_image_unnormalized = dataset.paths.label # 'D:/Jorge/datasets/deforestation/Para/'
-        im_filename_normalized = 'deforestation_time_normalized_2018_2019.npy'
-        im_filenames = ['deforestation_past_years.tif']  
-        latest_year = 2018
-elif dataset == 'MT_2019_2020':
-    if mask_input == 'deforestation_time':
-        dataset = MT()
-        path_image_unnormalized = dataset.paths.label # 'D:/Jorge/datasets/deforestation/Para/'
-        im_filename_normalized = 'deforestation_time_normalized_2019_2020.npy'
-        im_filenames = ['deforestation_past_years.tif']  
-        latest_year = 2019
-elif dataset == 'MT_2020':
-    if mask_input == 'deforestation_time':
-        dataset = MT()
-        path_image_unnormalized = dataset.paths.label # 'D:/Jorge/datasets/deforestation/Para/'
-        im_filename_normalized = 'deforestation_time_normalized_2020.npy'
-        im_filenames = ['deforestation_past_years.tif']  
-        latest_year = 2020
-elif dataset == 'MT_2018':
-    if mask_input == 'deforestation_time':
-        dataset = MT()
-        path_image_unnormalized = dataset.paths.label 
-        im_filename_normalized = 'deforestation_time_normalized_2018.npy'
-        im_filenames = ['deforestation_past_years.tif']  
-        latest_year = 2018
-elif dataset == 'MT_2017':
-    if mask_input == 'deforestation_time':
-        dataset = MT()
-        path_image_unnormalized = dataset.paths.label 
-        im_filename_normalized = 'deforestation_time_normalized_2017.npy'
-        im_filenames = ['deforestation_past_years.tif']  
-        latest_year = 2017
-elif dataset == 'MT_2016':
-    if mask_input == 'deforestation_time':
-        dataset = MT()
-        path_image_unnormalized = dataset.paths.label 
-        im_filename_normalized = 'deforestation_time_normalized_2016.npy'
-        im_filenames = ['deforestation_past_years.tif']  
-        latest_year = 2016
-elif dataset == 'MA_2020':
+if mask_input == 'deforestation_time':
+    path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
+    im_filename_normalized = 'deforestation_time_normalized_{}.npy'.format(latest_year)
+    im_filenames = ['deforestation_past_years.tif']
+    
+'''
+if dataset == 'MA' and latest_year == 2020:
     if mask_input == 'deforestation_time':
         dataset = MA()
         path_image_unnormalized = dataset.paths.deforestation_past_years
-        im_filename_normalized = 'deforestation_time_normalized_2020.npy'
+        im_filename_normalized = 'deforestation_time_normalized_{}.npy'.format(latest_year)
         im_filenames = ['']  
         latest_year = 2020
         loadDeforestationBefore2008Flag = False
+'''
 ic(dataset)
  
     
