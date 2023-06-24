@@ -46,6 +46,11 @@ These instructions were tested in Windows 10
 │   └── 
 └── ...
 ```
+## Cloud mask calculation
+Edit the `config` dictionary for configuration.
+   - "dataset": Options: "PA": Para site. "MT": Mato Grosso site.
+   - "year": year from the cloud mask to be calculated. Example: 2019
+The script will generate a NPY with the cloud mask which is used during training.
 
 ## MCD (Execute a single experiment)
 
