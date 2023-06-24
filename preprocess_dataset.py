@@ -10,10 +10,23 @@ import src.rasterTools as rasterTools
 from src.dataset import PA, PADeforestationTime, PADistanceMap, PAMultipleDates, MTMultipleDates, MT, MA
 
 # ======= INPUT PARAMETERS ============ # 
-dataset = MA()
-year = 2020
-maskOutClouds = True
+config = {
+    'dataset': 'MA',
+    'year': 2020, # latest year
+    'maskOutClouds': True,
+}
 # ======= END INPUT PARAMETERS ============ # 
+
+
+if config['dataset'] == 'PA':
+    dataset = PA()
+elif config['dataset'] == 'MT':
+    dataset = MT()
+elif config['dataset'] == 'MA':
+    dataset = MA()
+
+year = config['year']
+maskOutClouds = config['maskOutClouds']
 
 scale_list = None
 exclude60mBandsFlag = True
