@@ -53,6 +53,8 @@ Edit the `config` dictionary for configuration.
      
 The script will generate a NPY with the cloud mask which is used during training.
 
+Example: to train in PA site for [2018, 2019] dates, execute the script two times, once for each year (2018 and 2019)
+
 ## Calculate temporal distance to past deforestation 
 
 "Temporal distance to past deforestation" is used as an input to the network as explained in Section 2.3.
@@ -63,6 +65,20 @@ Edit the `config` dictionary for configuration.
    - "year": year from the latest image in the image pair. Example: 2019
      
 The script will generate a NPY with the cloud mask which is used during training.
+
+Example: to train in PA site for [2018, 2019] dates, execute the script only for the latest year (2019)
+
+## Generate the normalized input data
+
+Normalized input is pre-calculated. Use `preprocess_dataset.py` to normalize the input image.
+
+Edit the `config` dictionary for configuration.
+   - "dataset": Options: "PA": Para site. "MT": Mato Grosso site.
+   - "year": year from the latest image in the image pair. Example: 2019
+     
+The script will generate a NPY with the normalized input image which is used during training.
+
+Example: to train in PA site for [2018, 2019] dates, execute the script two times, once for each year (2018 and 2019)
 
 ## MCD (Execute a single experiment)
 
