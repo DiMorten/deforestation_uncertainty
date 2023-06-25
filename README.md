@@ -21,28 +21,28 @@ These instructions were tested in Windows 10
 ├── datasets/                                                                       # Dataset folder
 │   ├── deforestation/                                                              # Deforestation detection reference
 │   │   ├── deforestation_before_2008/deforestation_before_2008_para.tif            # Reference with deforestation before 2008
-│   │   ├── PA/deforestation_past_years.tif                                       # Reference with deforestation from 2008 until latest or present year
+│   │   ├── PA/deforestation_past_years.tif                                         # Reference with deforestation from 2008 until latest or present year
 │   ├── sentinel2/                                                                  # Input rasters for the network      
-│   │   ├── PA_2017/          #
-│   │   │   ├──cloudmask_PA_2017.npy
-│   │   │   ├──PA_S2_2017_B1_B2_B3_crop.tif      # bands 1,2,3 for Para 2017
-│   │   │   ├──PA_S2_2017_B4_B5_B6_crop.tif      # bands 4,5,6 for Para 2017
+│   │   ├── PA_2017/                                                                # Data for site PA and date 2017
+│   │   │   ├──cloudmask_PA_2017.npy                                                # Cloud mask (See cloud mask section)
+│   │   │   ├──PA_S2_2017_B1_B2_B3_crop.tif                                         # bands 1,2,3 for Para 2017
+│   │   │   ├──PA_S2_2017_B4_B5_B6_crop.tif                                         # bands 4,5,6 for Para 2017
 │   │   │   └── ...
 │   │   ├── PA_2018/          
 │   │   │   ├──cloudmask_PA_2018.npy
-│   │   │   ├──COPERNICUS_S2_20180721_20180726_B1_B2_B3.tif      # bands 1,2,3 for Para 2018
-│   │   │   ├──COPERNICUS_S2_20180721_20180726_B4_B5_B6.tif      # bands 4,5,6 for Para 2018
+│   │   │   ├──COPERNICUS_S2_20180721_20180726_B1_B2_B3.tif                          # bands 1,2,3 for Para 2018
+│   │   │   ├──COPERNICUS_S2_20180721_20180726_B4_B5_B6.tif                          # bands 4,5,6 for Para 2018
 │   │   │   └── ...
 │   │   ├── PA_2019/   
 │   │   │   ├──cloudmask_PA_2019.npy
-│   │   │   ├──COPERNICUS_S2_20190721_20190726_B1_B2_B3.tif      # bands 1,2,3 ofPara 2019
-│   │   │   ├──COPERNICUS_S2_20190721_20190726_B4_B5_B6.tif      # bands 1,2,3 ofPara 2019
+│   │   │   ├──COPERNICUS_S2_20190721_20190726_B1_B2_B3.tif                          # bands 1,2,3 ofPara 2019
+│   │   │   ├──COPERNICUS_S2_20190721_20190726_B4_B5_B6.tif                          # bands 1,2,3 ofPara 2019
 │   │   │   └── ...
-│   ├── landsat/                                                                  # Only for visualization as in Figures 7 to 10      
-│   │   ├── PA/                                                   # PA site
-│   │   │   ├── landsat_PA_2018.tif                               # T_{-1}
-│   │   │   ├── landsat_PA_2019.tif                               # T_{0}
-│   │   │   └── landsat_PA_2020.tif                               # T_{1}
+│   ├── landsat/                                                                     # Only for visualization as in Figures 7 to 10      
+│   │   ├── PA/                                                                      # PA site
+│   │   │   ├── landsat_PA_2018.tif                                                  # T_{-1}
+│   │   │   ├── landsat_PA_2019.tif                                                  # T_{0}
+│   │   │   └── landsat_PA_2020.tif                                                  # T_{1}
 │   └── 
 └── ...
 ```
