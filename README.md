@@ -40,9 +40,9 @@ These instructions were tested in Windows 10
 │   │   │   └── ...
 │   ├── landsat/                                                                     # Only for visualization as in Figures 7 to 10      
 │   │   ├── PA/                                                                      # PA site
-│   │   │   ├── landsat_PA_2018.tif                                                  # T_{-1}
-│   │   │   ├── landsat_PA_2019.tif                                                  # T_{0}
-│   │   │   └── landsat_PA_2020.tif                                                  # T_{1}
+│   │   │   ├── landsat_PA_2018.tif                                                  # Landsat T_{-1} image
+│   │   │   ├── landsat_PA_2019.tif                                                  # Landsat T_0 image
+│   │   │   └── landsat_PA_2020.tif                                                  # Landsat T_1 image
 │   └── 
 └── ...
 ```
