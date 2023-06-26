@@ -2,9 +2,9 @@ import os
 class Paths():
     pass
 
-class PathsPara(Paths):
+class PathsPA(Paths):
     def __init__(self):
-        self.reference_folder = 'D:/Jorge/datasets/deforestation/PA/'
+        self.reference_folder = 'C:/Users/jchamorro/Documents/jorge/datasets/deforestation/PA/'
         self.optical_im_folder = 'C:/Users/jchamorro/Documents/jorge/datasets/sentinel2/PA/'
 
         self.optical_im = os.path.join(self.optical_im_folder,  '2019')
@@ -20,7 +20,8 @@ class PathsPara(Paths):
 
         self.deforestation_time = {
             2019: os.path.join(self.reference_folder, 'deforestation_time_normalized_2019.npy'),
-            2018: os.path.join(self.reference_folder, 'deforestation_time_normalized_2018.npy')
+            2018: os.path.join(self.reference_folder, 'deforestation_time_normalized_2018.npy'),
+            2017: os.path.join(self.reference_folder, 'deforestation_time_normalized_2017.npy')
         } 
 
 
@@ -72,42 +73,40 @@ class PathsPara(Paths):
         ]
 class PathsMT(Paths): 
     def __init__(self): 
-        self.optical_im = 'D:/Jorge/datasets/sentinel2/MT_2019_2020/' 
-        self.label = 'D:/Jorge/datasets/deforestation/MT_2019_2020/' 
+        self.reference_folder = 'D:/Jorge/datasets/deforestation/MT/'
+        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/MT/'
         self.experiment = 'D:/Jorge/datasets/deforestation/experiments/MT/' 
 
-        self.deforestation_time_name = 'deforestation_time_normalized_2019_2020.npy'
+        self.optical_im = os.path.join(self.optical_im_folder,  '2020')
 
-        self.deforestation_before_2008 = 'D:/Jorge/datasets/deforestation/MT/deforestation_before_2008/deforestation_before_2008_MT.tif' 
-        self.hydrography = 'D:/Jorge/datasets/deforestation/MT/hydgrography.tif'
-        self.deforestation_past_years = 'D:/Jorge/datasets/deforestation/MT/deforestation_past_years.tif' 
+        self.deforestation_before_2008 = os.path.join(self.reference_folder, 'deforestation_before_2008_MT.tif') 
+        self.hydrography = os.path.join(self.reference_folder, 'hydgrography.tif')
+        self.deforestation_past_years = os.path.join(self.reference_folder, 'deforestation_past_years.tif') 
 
         self.deforestation_time = { 
-            2019: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2019.npy', 
-            2018: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2018.npy', 
-            2017: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2017.npy', 
-            2016: 'D:/Jorge/datasets/regeneration/MT/deforestation_time_normalized_2016.npy' 
+            2019: os.path.join(self.reference_folder, 'deforestation_time_normalized_2019.npy'),
+            2018: os.path.join(self.reference_folder, 'deforestation_time_normalized_2018.npy'),
+            2017: os.path.join(self.reference_folder, 'deforestation_time_normalized_2017.npy'),
+            2016: os.path.join(self.reference_folder, 'deforestation_time_normalized_2016.npy'),
         }  
  
-        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/'
 
         self.optical_im_past_dates = { 
-            2020: self.optical_im_folder + 'MT_2020/', 
-            2019: self.optical_im_folder + 'MT_2019/',  
-            2018: self.optical_im_folder + 'MT_2018/', 
-            2017: self.optical_im_folder + 'MT_2017/', 
-            2016: self.optical_im_folder + 'MT_2016/' 
+            2020: os.path.join(self.optical_im_folder,  '2020'),
+            2019: os.path.join(self.optical_im_folder,  '2019'),
+            2018: os.path.join(self.optical_im_folder,  '2018'),
+            2017: os.path.join(self.optical_im_folder,  '2017'),
+            2016: os.path.join(self.optical_im_folder,  '2016')
         }
 
         self.cloud_mask = {
-            2020: self.optical_im_folder + 'MT_2020/' + 'cloudmask_MT_2020.npy',
-            2019: self.optical_im_folder + 'MT_2019/' + 'cloudmask_MT_2019.npy',
-            2018: self.optical_im_folder + 'MT_2018/' + 'cloudmask_MT_2018.npy',
-            2017: self.optical_im_folder + 'MT_2017/' + 'cloudmask_MT_2017.npy',
-            2016: self.optical_im_folder + 'MT_2016/' + 'cloudmask_MT_2016.npy'
+            2020: os.path.join(self.optical_im_folder,  '2020', 'cloudmask_MT_2020.npy'),
+            2019: os.path.join(self.optical_im_folder,  '2019', 'cloudmask_MT_2019.npy'),
+            2018: os.path.join(self.optical_im_folder,  '2018', 'cloudmask_MT_2018.npy'),
+            2017: os.path.join(self.optical_im_folder,  '2017', 'cloudmask_MT_2017.npy'),
+            2016: os.path.join(self.optical_im_folder,  '2016', 'cloudmask_MT_2016.npy'),
         }
 
-        self.labelFromProject = 'D:/Jorge/datasets/deforestation/MT_2019_2020/ref_2019_2020_20798x13420.npy'
 
         self.im_filenames = {
             2020: ['S2_R1_MT_2020_08_03_2020_08_15_B1_B2.tif',
@@ -156,28 +155,28 @@ class PathsMT(Paths):
         ]
 class PathsMA(Paths): 
     def __init__(self): 
+        self.reference_folder = 'D:/Jorge/datasets/deforestation/MA/'
+        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/MA/'
 
         self.experiment = 'D:/Jorge/datasets/deforestation/experiments/MA/' 
 
-
-        self.hydrography = 'D:/Jorge/datasets/deforestation/MA/hydrography.tif'
-        self.deforestation_past_years = 'D:/Jorge/datasets/deforestation/MA/deforestation_past_years.tif' 
+        # deforestation_before_2008 already in reference
+        self.hydrography = os.path.join(self.reference_folder, 'hydgrography.tif')
+        self.deforestation_past_years = os.path.join(self.reference_folder, 'deforestation_past_years.tif')
  
         self.deforestation_time = {
-            2021: 'D:/Jorge/datasets/deforestation/MA/deforestation_time_normalized_2021.npy',
-            2020: 'D:/Jorge/datasets/deforestation/MA/deforestation_time_normalized_2020.npy'
+            2021: os.path.join(self.reference_folder, 'deforestation_time_normalized_2021.npy'),
+            2020: os.path.join(self.reference_folder, 'deforestation_time_normalized_2020.npy'),
         } 
 
-        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/'
-
         self.optical_im_past_dates = { 
-            2021: self.optical_im_folder + 'MA_2021/', 
-            2020: self.optical_im_folder + 'MA_2020/',  
+            2021: os.path.join(self.optical_im_folder,  '2021'), 
+            2020: os.path.join(self.optical_im_folder,  '2020'), 
         }
 
         self.cloud_mask = {
-            2021: self.optical_im_folder + 'MA_2021/' + 'cloudmask_MA_2021.npy',
-            2020: self.optical_im_folder + 'MA_2020/' + 'cloudmask_MA_2020.npy',
+            2021: os.path.join(self.optical_im_folder,  '2021', 'cloudmask_MA_2021.npy'), 
+            2020: os.path.join(self.optical_im_folder,  '2020', 'cloudmask_MA_2020.npy'), 
         }
 
         self.im_filenames = {

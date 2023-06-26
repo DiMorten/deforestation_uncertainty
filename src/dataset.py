@@ -4,10 +4,11 @@ from icecream import ic
 import pdb
 import scipy
 sys.path.append("..")
-from src.paths import PathsPara, PathsMT, PathsMA
+from src.paths import PathsPA, PathsMT, PathsMA
 import utils_v1
 import skimage
 import matplotlib.pyplot as plt
+import os
 class Dataset():
 
 	def loadInputImage(self): 
@@ -83,7 +84,7 @@ class Dataset():
 
 class PA(Dataset):
 	def __init__(self):
-		self.paths = PathsPara()
+		self.paths = PathsPA()
 
 		self.site = 'PA' 
 		 
@@ -276,7 +277,7 @@ class DeforestationTime():
 		# image_stack = self.addPastDeforestation(image_stack)
 		ic(image_stack.shape)
 		return image_stack  
-
+	'''
 	def addDeforestationTime(self, image_stack): 
 		deforestation_time = np.load(self.paths.label + self.paths.deforestation_time_name)[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]] # has past deforestation up to 2018 
 
@@ -290,7 +291,7 @@ class DeforestationTime():
 		image_stack = np.concatenate((deforestation_time, image_stack), axis = -1) 
 		del deforestation_time   
 		return image_stack
-		
+	'''
 
 
 class MultipleDates():
@@ -333,7 +334,7 @@ class MultipleDates():
 		image_stack = []
 		for date in self.dates:
 			image_stack.append(
-				np.load(self.paths.optical_im_past_dates[date] + 'optical_im.npy').astype('float32')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]]
+				np.load(os.path.join(self.paths.optical_im_past_dates[date], 'optical_im.npy')).astype('float32')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]]
 			)
 		image_stack = np.concatenate(image_stack, axis = -1)
 		'''
