@@ -41,7 +41,7 @@ These instructions were tested in Windows 10
 │   │   │   ├── 2019/   
 │   │   │   │   ├──cloudmask_PA_2019.npy
 │   │   │   │   ├──COPERNICUS_S2_20190721_20190726_B1_B2_B3.tif                # bands 1,2,3 for PA 2019 (T_1)
-│   │   │   │   ├──COPERNICUS_S2_20190721_20190726_B4_B5_B6.tif                # bands 1,2,3 for PA 2019 (T_1)
+│   │   │   │   ├──COPERNICUS_S2_20190721_20190726_B4_B5_B6.tif                # bands 4,5,6 for PA 2019 (T_1)
 │   │   └── └── └── ...
 │   ├── landsat/                                                               # Only for visualization as in Figures 7 to 10      
 │   │   ├── PA/                                                                # PA site
