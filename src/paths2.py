@@ -1,7 +1,7 @@
 class Paths():
     pass
 
-class PathsPara(Paths):
+class PathsPA(Paths):
     def __init__(self):
         self.optical_im = 'E:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/Para_10m/Sentinel2_2018/'
         self.label = 'E:/jorg/phd/fifth_semester/project_forestcare/cloud_removal/dataset/Para_10m/'
