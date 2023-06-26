@@ -19,35 +19,35 @@ These instructions were tested in Windows 10
 ## Dataset folder structure
 ```
 .
-├── datasets/                                                                       # Dataset folder
-│   ├── deforestation/                                                              # Deforestation detection reference
-│   │   ├── PA/                                                                     # Reference for PA site
-│   │   │   ├── deforestation_before_2008_PA.tif                                    # Reference with deforestation before 2008
-│   │   │   ├── deforestation_past_years.tif                                        # Reference with deforestation from 2008 until latest or present year
-│   │   │   ├── deforestation_time_normalized_2018.npy                              # See section "Calculate temporal distance to past deforestation"
-│   │   └── └── deforestation_time_normalized_2019.npy                              # See section "Calculate temporal distance to past deforestation"
-│   ├── sentinel2/                                                                  # Input rasters for the network      
-│   │   ├── PA/                                                                     # Sentinel2 data for PA site
-│   │   │   ├── 2017/                                                                # Data for PA site and 2017 date (T_{-1})
-│   │   │   │   ├──cloudmask_PA_2017.npy                                                # Cloud mask (See cloud mask section)
-│   │   │   │   ├──PA_S2_2017_B1_B2_B3_crop.tif                                         # bands 1,2,3 for PA 2017 (T_{-1})
-│   │   │   │   ├──PA_S2_2017_B4_B5_B6_crop.tif                                         # bands 4,5,6 for PA 2017 (T_{-1})
+├── datasets/                                                                  # Dataset folder
+│   ├── deforestation/                                                         # Deforestation detection reference
+│   │   ├── PA/                                                                # Reference for PA site
+│   │   │   ├── deforestation_before_2008_PA.tif                               # Reference with deforestation before 2008
+│   │   │   ├── deforestation_past_years.tif                                   # Reference with deforestation from 2008 until latest or present year
+│   │   │   ├── deforestation_time_normalized_2018.npy                         # See section "Calculate temporal distance to past deforestation"
+│   │   └── └── deforestation_time_normalized_2019.npy                         # See section "Calculate temporal distance to past deforestation"
+│   ├── sentinel2/                                                             # Input rasters for the network      
+│   │   ├── PA/                                                                # Sentinel2 data for PA site
+│   │   │   ├── 2017/                                                          # Data for PA site and 2017 date (T_{-1})
+│   │   │   │   ├──cloudmask_PA_2017.npy                                       # Cloud mask (See cloud mask section)
+│   │   │   │   ├──PA_S2_2017_B1_B2_B3_crop.tif                                # bands 1,2,3 for PA 2017 (T_{-1})
+│   │   │   │   ├──PA_S2_2017_B4_B5_B6_crop.tif                                # bands 4,5,6 for PA 2017 (T_{-1})
 │   │   │   │   └── ...
 │   │   │   ├── 2018/          
 │   │   │   │   ├──cloudmask_PA_2018.npy
-│   │   │   │   ├──COPERNICUS_S2_20180721_20180726_B1_B2_B3.tif                          # bands 1,2,3 for PA 2018 (T_0)
-│   │   │   │   ├──COPERNICUS_S2_20180721_20180726_B4_B5_B6.tif                          # bands 4,5,6 for PA 2018 (T_0)
+│   │   │   │   ├──COPERNICUS_S2_20180721_20180726_B1_B2_B3.tif                # bands 1,2,3 for PA 2018 (T_0)
+│   │   │   │   ├──COPERNICUS_S2_20180721_20180726_B4_B5_B6.tif                # bands 4,5,6 for PA 2018 (T_0)
 │   │   │   │   └── ...
 │   │   │   ├── 2019/   
 │   │   │   │   ├──cloudmask_PA_2019.npy
-│   │   │   │   ├──COPERNICUS_S2_20190721_20190726_B1_B2_B3.tif                          # bands 1,2,3 for PA 2019 (T_1)
-│   │   │   │   ├──COPERNICUS_S2_20190721_20190726_B4_B5_B6.tif                          # bands 1,2,3 for PA 2019 (T_1)
+│   │   │   │   ├──COPERNICUS_S2_20190721_20190726_B1_B2_B3.tif                # bands 1,2,3 for PA 2019 (T_1)
+│   │   │   │   ├──COPERNICUS_S2_20190721_20190726_B4_B5_B6.tif                # bands 1,2,3 for PA 2019 (T_1)
 │   │   └── └── └── ...
-│   ├── landsat/                                                                     # Only for visualization as in Figures 7 to 10      
-│   │   ├── PA/                                                                      # PA site
-│   │   │   ├── landsat_PA_2018.tif                                                  # Landsat T_{-1} image
-│   │   │   ├── landsat_PA_2019.tif                                                  # Landsat T_0 image
-│   └── └── └── landsat_PA_2020.tif                                                  # Landsat T_1 image
+│   ├── landsat/                                                               # Only for visualization as in Figures 7 to 10      
+│   │   ├── PA/                                                                # PA site
+│   │   │   ├── landsat_PA_2018.tif                                            # Landsat T_{-1} image
+│   │   │   ├── landsat_PA_2019.tif                                            # Landsat T_0 image
+│   └── └── └── landsat_PA_2020.tif                                            # Landsat T_1 image
 └── 
 ```
 ## Calculate cloud mask
