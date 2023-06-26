@@ -14,6 +14,7 @@ These instructions were tested in Windows 10
     - Go to https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal
     - Download `rasterio-1.2.10-cp39-cp39-win_amd64.whl`
     - Install running: `pip install rasterio-1.2.10-cp39-cp39-win_amd64.whl`
+5. Run `pip install -U numpy`
 
 ## Dataset folder structure
 ```
