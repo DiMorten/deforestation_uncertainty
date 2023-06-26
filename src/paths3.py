@@ -6,12 +6,10 @@ class PathsPA(Paths):
     def __init__(self):
         self.reference_folder = 'C:/Users/jchamorro/Documents/jorge/datasets/deforestation/PA/'
         self.optical_im_folder = 'C:/Users/jchamorro/Documents/jorge/datasets/sentinel2/PA/'
-
-        self.optical_im = os.path.join(self.optical_im_folder,  '2019')
-        self.label = 'D:/Jorge/datasets/deforestation/Para_2018_2019/'
         self.experiment = 'C:/Users/jchamorro/Documents/jorge/deforestation_experiments/'
 
-        self.deforestation_time_name = 'deforestation_time_normalized_2018_2019.npy'
+        self.optical_im = os.path.join(self.optical_im_folder,  '2019')
+
         self.deforestation_before_2008 = os.path.join(self.reference_folder, 'deforestation_before_2008_para.tif')
         
         self.hydrography = os.path.join(self.reference_folder, 'hydgrography.tif')
