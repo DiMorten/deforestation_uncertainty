@@ -33,39 +33,35 @@ class TrainerMultiOutput(Trainer):
     def train(self):
 
         metrics_all = []
-        # if self.training == True:
-        for tm in range(0,self.times):
-            print('time: ', tm)
 
-            rows = self.patch_size
-            cols = self.patch_size
-            adam = Adam(lr = self.config['learning_rate'] , beta_1=0.9) # 1e-3
-            
-            loss = src.loss.weighted_categorical_crossentropy(self.weights)
-            
-            input_shape = (rows, cols, self.channels)
-            self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n)
-            
-            self.model.compile(optimizer=adam, loss=loss, metrics=['accuracy'])
-            self.model.summary()
+        print('time: ', self.repetition_id)
 
-            earlystop = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=1, mode='min')
-            checkpoint = ModelCheckpoint(self.path_models+ '/' + self.method +'_'+str(tm)+'.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-            lr_reduce = ReduceLROnPlateau(factor=0.9, min_delta=0.0001, patience=5, verbose=1)
-            callbacks_list = [earlystop, checkpoint]
-            # train the model
-            start_training = time.time()
-            self.history = self.model.fit_generator(self.train_gen_batch,
-                                    steps_per_epoch=self.len_X_train*3//self.train_gen.batch_size,
-                                    validation_data=self.valid_gen_batch,
-                                    validation_steps=self.len_X_valid*3//self.valid_gen.batch_size,
-                                    epochs=100,
-                                    callbacks=callbacks_list)
-            end_training = time.time() - start_training
-            # metrics_all.append(end_training)
+        rows = self.patch_size
+        cols = self.patch_size
+        adam = Adam(lr = self.config['learning_rate'] , beta_1=0.9) # 1e-3
+        
+        loss = src.loss.weighted_categorical_crossentropy(self.weights)
+        
+        input_shape = (rows, cols, self.channels)
+        self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n)
+        
+        self.model.compile(optimizer=adam, loss=loss, metrics=['accuracy'])
+        self.model.summary()
 
-        # Saving training time
-        # np.save(path_exp+'/metrics_tr.npy', metrics_all)
+        earlystop = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=1, mode='min')
+        checkpoint = ModelCheckpoint(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+        lr_reduce = ReduceLROnPlateau(factor=0.9, min_delta=0.0001, patience=5, verbose=1)
+        callbacks_list = [earlystop, checkpoint]
+        # train the model
+        start_training = time.time()
+        self.history = self.model.fit_generator(self.train_gen_batch,
+                                steps_per_epoch=self.len_X_train*3//self.train_gen.batch_size,
+                                validation_data=self.valid_gen_batch,
+                                validation_steps=self.len_X_valid*3//self.valid_gen.batch_size,
+                                epochs=100,
+                                callbacks=callbacks_list)
+        end_training = time.time() - start_training
+
         del self.train_gen_batch, self.valid_gen_batch
 
     def getMeanProb(self):
@@ -166,11 +162,11 @@ class TrainerEnsemble(TrainerMultiOutput):
                     # Recinstructing predicted map
                     start_test = time.time()
 
-                    path_exp = self.dataset.paths.experiment + 'exp' + str(self.exp_ids[tm])
+                    path_exp = self.dataset.paths.experiment + 'exp' + str(self.exp) # exp_ids[tm]
                     path_models = path_exp + '/models'
                     # ic(path_models+ '/' + method +'_'+str(0)+'.h5')
-                    model = utils_v1.load_model(path_models+ '/' + self.method +'_'+str(0)+'.h5', compile=False)
-                    for l in range(1, len(model.layers)):
+                    model = utils_v1.load_model(path_models+ '/' + self.method +'_'+str(tm)+'.h5', compile=False)
+                    for l in range(1, len(model.layers)): #WHY 1?
                         new_model.layers[l].set_weights(model.layers[l].get_weights())
                     
                     '''
@@ -254,10 +250,8 @@ class TrainerEnsemble(TrainerMultiOutput):
         return results
 
         
-    def defineExperiment(self, exp_ids):
-        self.exp_ids = exp_ids
-        self.exp = self.exp_ids[0]
-
+    def defineExperiment(self, exp_id):
+        self.exp = exp_id
 
     def getPOIValues(self):
         self.snippet_poi_results = []

@@ -33,11 +33,11 @@ class PathsPA(Paths):
         }
 
         self.cloud_mask = {
-            2019: os.path.join(self.optical_im_folder,  '2019', 'cloudmask_Para_2019.npy'),
-            2018: os.path.join(self.optical_im_folder,  '2018', 'cloudmask_Para_2018.npy'),
-            2017: os.path.join(self.optical_im_folder,  '2017', 'cloudmask_Para_2017.npy'),
-            2016: os.path.join(self.optical_im_folder,  '2016', 'cloudmask_Para_2016.npy'),
-            2015: os.path.join(self.optical_im_folder,  '2015', 'cloudmask_Para_2015.npy'),
+            2019: os.path.join(self.optical_im_folder,  '2019', 'cloudmask_PA_2019.npy'),
+            2018: os.path.join(self.optical_im_folder,  '2018', 'cloudmask_PA_2018.npy'),
+            2017: os.path.join(self.optical_im_folder,  '2017', 'cloudmask_PA_2017.npy'),
+            2016: os.path.join(self.optical_im_folder,  '2016', 'cloudmask_PA_2016.npy'),
+            2015: os.path.join(self.optical_im_folder,  '2015', 'cloudmask_PA_2015.npy'),
         }
 
 

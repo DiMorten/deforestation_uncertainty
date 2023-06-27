@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from scipy import optimize  
 
 class Trainer():
-    def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
+    def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0, training_times=1):
         self.classes_mode = config['classes_mode']
         self.config = config
         self.dataset = dataset
@@ -33,7 +33,7 @@ class Trainer():
         self.patchesHandler = patchesHandler
 
         self.default_log_name = 'output/log/log.pkl'
-        self.times = 1
+        self.training_times = training_times
         self.method = 'resunet'
         self.nb_filters = [16, 32, 64, 128, 256]
         self.weights = [0.1, 0.9, 0]
@@ -45,7 +45,7 @@ class Trainer():
 
         self.network = None
         self.UncertaintyMethod = Enum('UncertaintyMethod', 'pred_var MI pred_entropy KL pred_entropy_single')
-
+        self.repetition_id = 0
     def defineExperiment(self, exp):
         self.exp = exp
 
@@ -247,6 +247,10 @@ class Trainer():
         self.image1_pad = np.pad(self.image_stack, pad_width=self.npad, mode='reflect')
         # del image_stack
         self.class_n = 3
+
+    def defineRepetitionId(self, repetition_id):
+        self.repetition_id = repetition_id
+
     def infer(self):
 
         self.h, self.w, self.c = self.image1_pad.shape
@@ -256,8 +260,8 @@ class Trainer():
         num_patches_x = int(self.h/patch_size_rows)
         num_patches_y = int(self.w/patch_size_cols)
 
-        ic(self.path_models+ '/' + self.method +'_'+str(0)+'.h5')
-        model = utils_v1.load_model(self.path_models+ '/' + self.method +'_'+str(0)+'.h5', compile=False)
+        ic(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5')
+        model = utils_v1.load_model(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', compile=False)
         class_n = 3
         
         if self.config["loadInference"] == False:
@@ -569,7 +573,6 @@ class Trainer():
         print(self.ece_score)
         return self.sUEO, self.ece_score
     
-
     def getUncertaintyAAValues(self):
 
 
@@ -579,13 +582,16 @@ class Trainer():
         # self.threshold_list = [0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.27, 0.3, 0.34, 0.36, np.max(uncertainty)-0.003]
         if self.config['uncertainty_method'] == "pred_entropy":
                 if self.classes_mode == False:
-                    self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
-                            0.25, 0.27, 0.3, 0.34, 0.36, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
+                        self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
+                                0.25, 0.27, 0.3, 0.34, 0.36, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
+                        # self.threshold_list = [0.0025, 0.025, 0.05, 0.1, 0.2, 0.4, 
+                        #         0.5, 0.6, 0.7, 0.8, 0.9, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
                 else:
-                    self.threshold_list = [0.025, 0.05, 0.1, 0.2, 0.4, 
+                        self.threshold_list = [0.0025, 0.025, 0.05, 0.075, 0.1, 0.2, 0.4, 
                         0.5, 0.6, 0.7, 0.8, 0.9, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
-                    # self.threshold_list = [0.13, 0.15, 0.2, 0.225, 
-                    #     0.25, 0.27, 0.3, 0.34, 0.36, 0.45, 0.55, 0.65, 0.8]
+                        
+                        # self.threshold_list = [0.13, 0.15, 0.2, 0.225, 
+                        # 0.25, 0.27, 0.3, 0.34, 0.36, 0.45, 0.55, 0.65, 0.8]
         elif self.config['uncertainty_method'] == "pred_var":
                 self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36]
@@ -609,8 +615,6 @@ class Trainer():
 
                 self.threshold_list = [0.13, 0.15, 0.2, 0.225, 
                         0.25, 0.27, 0.3, 0.34, 0.36, 0.45, 0.55, 0.65, 0.8]
-                self.threshold_list = [0.025, 0.05, 0.1, 0.15, 0.2, 0.225, 
-                        0.25, 0.27, 0.3, 0.34, 0.36, 0.45, 0.55, 0.65, 0.8, 0.9, 0.95]
 
                 # self.threshold_list = [ 0.15, 0.2,  
                 #          0.3, 0.35, 0.4, 0.5, 0.6, 0.7]

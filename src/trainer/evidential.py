@@ -107,11 +107,11 @@ def softsign_evidence(logits):
     return tf.nn.softsign(logits)
 
 class TrainerEvidential(Trainer):
-    def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
+    def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0, training_times=1):
         config['classes_mode'] = False
         super().__init__(config, dataset, patchesHandler, logger, grid_idx=grid_idx)
         self.annealing_step  = config['Uncertainty']['annealing_step']
-        self.times = 1
+        self.training_times = training_times
         self.network_architecture = utils_v1.build_resunet
         self.weights = config['weights']
         # 10*117
@@ -422,7 +422,7 @@ class TrainerEvidential(Trainer):
 
         metrics_all = []
 
-        for tm in range(0,self.times):
+        for tm in range(0,self.training_times):
             print('time: ', tm)
 
             rows = self.patch_size
@@ -483,8 +483,8 @@ class TrainerEvidential(Trainer):
         self.num_patches_x = int(self.h/self.patch_size_rows)
         num_patches_y = int(self.w/self.patch_size_cols)
 
-        ic(self.path_models+ '/' + self.method +'_'+str(0)+'.h5')
-        model = utils_v1.load_model(self.path_models+ '/' + self.method +'_'+str(0)+'.h5', compile=False)
+        ic(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5')
+        model = utils_v1.load_model(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', compile=False)
         self.class_n = 3
 
         if self.config["loadInference"] == False:
@@ -510,14 +510,7 @@ class TrainerEvidential(Trainer):
                     
                     # Recinstructing predicted map
                     start_test = time.time()
-                    '''
-                    args_network = {'patch_size_rows': patch_size_rows,
-                        'patch_size_cols': patch_size_cols,
-                        'c': c,
-                        'nb_filters': nb_filters,
-                        'class_n': class_n,
-                        'dropout_seed': self.inference_times}
-                    '''
+
                     prob_reconstructed, self.u_reconstructed, self.alpha_reconstructed = self.patchesHandler.infer(
                             new_model, self.image1_pad, self.h, self.w, 
                             # model, self.image1_pad, h, w, 
