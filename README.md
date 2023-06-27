@@ -127,6 +127,9 @@ In the paper, multiple training and inference runs are applied for each uncertai
    - inference_times: Number of inference times for the ensemble
    - uncertainty_method: Select uncertainty metric. Options: "pred_entropy": Predictive entropy, "pred_var": Predictive variance, "MI": Mutual Information, "KL": Kullback-Leibler Divergence. Default: "pred_entropy"
 
+### Analyzing log results
+
+The batch running script `train_grid_execution.ipynb` produces a log with metrics for each experiment repetition. Log is located in `output/log/log_{method}.pkl`. To observe its resulting metrics, use `log_analyze.ipynb`. Specify the log to analyze in the `filenames` variable as: `filenames = ['log_{method}.pkl]`. Results will be saved to CSV in `output/log/results.csv`.
 
 ## Inference on Ensemble:
 
