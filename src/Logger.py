@@ -7,8 +7,9 @@ import numpy as np
 from icecream import ic
 class Logger():
     def createLogFolders(self, dataset):
-        figures_path = 'output/figures' + dataset.__class__.__name__ + '/'
-        pathlib.Path(figures_path).mkdir(parents=True, exist_ok=True)
+        # figures_path = 'output/figures' + dataset.__class__.__name__ + '/'
+        # pathlib.Path(figures_path).mkdir(parents=True, exist_ok=True)
+        pathlib.Path("output/figures/").mkdir(parents=True, exist_ok=True)
         self.title_name = 'ResUnet'
     def plotFigure(self, figure, name='output/figure', cmap = plt.cm.gray, savefig=False, figsize=(15,15), dpi=200):
         plt.figure(figsize=figsize)

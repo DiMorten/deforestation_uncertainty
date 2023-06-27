@@ -19,7 +19,7 @@ import cv2
 from enum import Enum
 import matplotlib.pyplot as plt
 from scipy import optimize  
-
+import glob
 class Trainer():
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0, training_times=1):
         self.classes_mode = config['classes_mode']
@@ -881,3 +881,10 @@ class Trainer():
         return results
 
 
+    def get_repetition_ids(self, exp):
+        folder = os.path.join(self.paths.experiment, "exp{}".format(exp), "models")
+        repetition_ids = []
+        for name in glob.glob(folder):
+            repetition_ids.append(int(name.split("_")[-1].split(".")[0]))
+        return repetition_ids
+        
