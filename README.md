@@ -156,7 +156,7 @@ Use the script `run_single_experiment.ipynb`
         - "KL": Kullback-Leibler Divergence.
         - "pred_entropy_single": Used for "single run" experiment (Baseline). Automatically set if 
     - `removePolygons`: If True, remove polygons with an area smaller to 6.25ha, following PRODES methodology. Default: True
-    - `plotLandsat`: If True, plot from Figure 7 to 10. It is required to have Landsat images as input. Default: False
+    - `plotLandsat`: If True, plot from Figure 7 to 10. It is required to have Landsat images (See dataset folder structure). Default: False
  Default: "earlier"
 4. Run all
 
