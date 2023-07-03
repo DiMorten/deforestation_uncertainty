@@ -882,9 +882,10 @@ class Trainer():
 
 
     def get_repetition_ids(self, exp):
-        folder = os.path.join(self.paths.experiment, "exp{}".format(exp), "models")
+        folder = os.path.join(self.dataset.paths.experiment, "exp{}".format(exp), "models")
         repetition_ids = []
-        for name in glob.glob(folder):
-            repetition_ids.append(int(name.split("_")[-1].split(".")[0]))
+        for name in glob.glob("{}/*".format(folder)):
+            _id = name.split("_")[-1].split(".")[0]
+            repetition_ids.append(int(_id))
         return repetition_ids
         

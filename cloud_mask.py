@@ -12,6 +12,7 @@ import src.rasterTools as rasterTools
 from src.dataset import (
     PA, PADistanceMap, PAMultipleDates, MTMultipleDates,
     MT, 
+    MS,
     MA
 )
 # naming conventions: 
@@ -22,7 +23,8 @@ from src.dataset import (
 # [              BB      BG       BR                       BNIR                                  BSWIR1    BSWIR2 
  
 # ge. Bands 1, 2, 3, 8, 11, and 12 were utilized as BB , BG , BR , BNIR , BSWIR1 , and BSWIR2, respectively. 
- 
+
+
 def get_rescaled_data(data, limits): 
     return (data - limits[0]) / (limits[1] - limits[0]) 
  
@@ -111,40 +113,52 @@ def get_cloud_cloudshadow_mask(data_image, cloud_threshold = 0.2):
  
 if __name__ == '__main__': 
     # ======= INPUT PARAMETERS ============ # 
-    dataset = MA()
-    year = 2021
+
+    config = {
+        'dataset': 'MA',
+        'year': 2020, # latest year # MA: 2021
+        'maskOutClouds': True,
+    }
+    if config['dataset'] == 'PA':
+        dataset = PA()
+    elif config['dataset'] == 'MT':
+        dataset = MT()
+    elif config['dataset'] == 'MS':
+        dataset = MS()
+    elif config['dataset'] == 'MA':            
+        dataset = MA()
 
     addThinCloudMask = False
     apply_shadow_mask = False
     # ======= END INPUT PARAMETERS ============ # 
 
-    path_optical_im = dataset.paths.optical_im_past_dates[year]
+    path_optical_im = dataset.paths.optical_im_past_dates[config['year']]
 
     scale_list = None
 
     if type(dataset) == PA:
         
-        path_cirrus_band = dataset.paths.im_filenames[year][3]
+        path_cirrus_band = dataset.paths.im_filenames[config['year']][3]
         cirrus_band_id = 1
 
     elif type(dataset) == MT: 
 
-        path_cirrus_band = dataset.paths.im_filenames[year][5]
+        path_cirrus_band = dataset.paths.im_filenames[config['year']][5]
         cirrus_band_id = 0
 
     elif type(dataset) == MA:
 
-        path_cirrus_band = dataset.paths.im_filenames[year][10]
+        path_cirrus_band = dataset.paths.im_filenames[config['year']][10]
         cirrus_band_id = None
 
         resolution_list = [60, 10, 10, 10, 20, 20, 20, 10, 20, 60, 60, 20, 20]
         scale_list = [x/10 for x in resolution_list]
         ic(scale_list)
 
-    dataset_id = dataset.__class__.__name__ + '_' + str(year)
+    dataset_id = dataset.__class__.__name__ + '_' + str(config['year'])
     filename = dataset_id + '.npy' 
  
-    optical_im = rasterTools.loadOpticalIm(path_optical_im, dataset.paths.im_filenames[year], scale_list) 
+    optical_im = rasterTools.loadOpticalIm(path_optical_im, dataset.paths.im_filenames[config['year']], scale_list) 
     # optical_im = np.transpose(optical_im, (1, 2, 0)) 
     ic(optical_im.shape) 
  

@@ -153,6 +153,34 @@ class PathsMT(Paths):
             os.path.join(landsat_base, 'landsat_MT_2021.tif'),
 
         ]
+
+class PathsMS(Paths): 
+    def __init__(self): 
+        self.reference_folder = 'D:/Jorge/datasets/deforestation/MS/'
+        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/MS/'
+
+        self.experiment = 'D:/Jorge/datasets/deforestation/experiments/MS/' 
+
+        self.deforestation_before_2008 = os.path.join(self.reference_folder, 'deforestation_before_2000_MS.tif') 
+
+        self.hydrography = os.path.join(self.reference_folder, 'hydgrography.tif')
+        self.deforestation_past_years = os.path.join(self.reference_folder, 'deforestation_past_years.tif')
+ 
+        self.deforestation_time = {
+            2021: os.path.join(self.reference_folder, 'deforestation_time_normalized_2021.npy'),
+            2020: os.path.join(self.reference_folder, 'deforestation_time_normalized_2020.npy'),
+        } 
+
+        self.optical_im_past_dates = { 
+            2021: os.path.join(self.optical_im_folder,  '2021'), 
+            2020: os.path.join(self.optical_im_folder,  '2020'), 
+        }
+
+        self.cloud_mask = {
+            2021: os.path.join(self.optical_im_folder,  '2021', 'cloudmask_MA_2021.npy'), 
+            2020: os.path.join(self.optical_im_folder,  '2020', 'cloudmask_MA_2020.npy'), 
+        }
+
 class PathsMA(Paths): 
     def __init__(self): 
         self.reference_folder = 'D:/Jorge/datasets/deforestation/MA/'
