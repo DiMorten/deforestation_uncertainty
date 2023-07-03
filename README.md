@@ -50,6 +50,24 @@ These instructions were tested in Windows 10
 │   └── └── └── landsat_PA_2020.tif                                            # Landsat T_1 image
 └── 
 ```
+
+## Dataset downloading
+
+1. Input image downloading
+
+- Download each Sentinel-2 image using the link: 
+https://code.earthengine.google.com/2c31e8b0000a34fbc70c9e8d80dd7237
+
+- Upload the image ROI (Region of interest) as a `.shp` file, and load it in the `polygon` variable. 
+`S2_collection` is a list of images within the specified date range. Select the date range specified in Table 1. 
+The function `exportBands` exports the selected bands to a TIF file. To reduce computational complexity, export 3 bands per TIF file (Create separate TIF for bands 1,2,3, another for 4,5,6, another for 7,8,9, and another for 10,11,12).
+
+2. Obtaining reference
+
+- Go to http://terrabrasilis.dpi.inpe.br/downloads/
+- Yearly deforestation between 2008 and 2022: Download "Incremento anual no desmatamento - Shapefile (2008/2022)" as a SHP file. Convert it to raster and crop its dimensions to the desired ROI using QGIS. Save the TIF file in `dataset/deforestation/{site}/deforestation_past_years.tif`
+- Deforestation before 2008: Download "Máscara de área acumulada de supressão da vegetação nativa - Shapefile (2007)" as a SHP file. Convert it to raster and crop its dimensions to the desired ROI using QGIS. Save the TIF file in `dataset/deforestation/{site}/deforestation_before_2008_{site}.tif`
+
 ## Calculate cloud mask
 Edit the `config` dictionary for configuration.
    - "dataset": Options: "PA": Para site. "MT": Mato Grosso site.
