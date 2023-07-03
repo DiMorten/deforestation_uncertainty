@@ -104,6 +104,30 @@ The script will generate a NPY with the normalized input image which is used dur
 
 Example: to train in PA site for [2018, 2019] dates, execute the script two times, once for each year (2018 and 2019)
 
+## Run in batch (Multiple executions)
+This script allows training for single run, MCD and ensemble methods.
+It also allows inference for single run and MCD methods.
+For inference on ensemble method go to the next section.
+
+In the paper, multiple training and inference runs are applied for each uncertainty method (10 repetitions). To run those repetitions, use `train_grid_execution.ipynb`
+
+1. Set the data in the folder structure from section _Folder structure_
+2. Open the `train_grid_execution.ipynb` notebook
+3. Configure the training run using the _config_ dictionary. 
+    - `training`: If True, training is done. Default: False
+    - `training_times`: If training, specify number of training runs
+    - `inferring`: If True, inference is done. Default: True
+    - `site`: Dataset site. Options are presented next. Default: "PA"
+        - "MT" (Mato Grosso)
+        - "PA" (Para)
+    - `training_date`: Training with current or earlier pair of dates. Options: "current", "earlier". Default: "earlier"
+    - `mode`: Uncertainty mode. Options are presented next. Default: 'mcd' (Monte Carlo Dropout)
+        - mcd: Monte Carlo Dropout
+        - single_run: Entropy from a single inference run
+        - ensemble: Ensemble (Only training. For inference, use train_ensemble.ipynb)
+   - inference_times: Number of inference times for the ensemble
+   - uncertainty_method: Select uncertainty metric. Options: "pred_entropy": Predictive entropy, "pred_var": Predictive variance, "MI": Mutual Information, "KL": Kullback-Leibler Divergence. Default: "pred_entropy"
+
 ## MCD (Execute a single experiment)
 
 1. Set the data in the folder structure from section _Folder structure_
@@ -124,29 +148,6 @@ Example: to train in PA site for [2018, 2019] dates, execute the script two time
 4. Run all
 
 -------------
-## Run in batch (Multiple executions)
-This script allows training for single run, MCD and ensemble methods.
-It also allows inference for single run and MCD methods.
-For inference on ensemble method go to the next section.
-
-In the paper, multiple training and inference runs are applied for each uncertainty method (10 repetitions). To run those repetitions, use `train_grid_execution.ipynb`
-
-1. Set the data in the folder structure from section _Folder structure_
-2. Open the `train_grid_execution.ipynb` notebook
-3. Configure the training run using the _config_ dictionary. 
-    - `training`: If True, training is done. Default: False
-    - `inferring`: If True, inference is done. Default: True
-    - `site`: Dataset site. Options are presented next. Default: "PA"
-        - "MT" (Mato Grosso)
-        - "PA" (Para)
-    - `training_date`: Training with current or earlier pair of dates. Options: "current", "earlier". Default: "earlier"
-    - `mode`: Uncertainty mode. Options are presented next. Default: 'mcd' (Monte Carlo Dropout)
-        - mcd: Monte Carlo Dropout
-        - single_run: Entropy from a single inference run
-        - ensemble: Ensemble (Only training. For inference, use train_ensemble.ipynb)
-   - inference_times: Number of inference times for the ensemble
-   - uncertainty_method: Select uncertainty metric. Options: "pred_entropy": Predictive entropy, "pred_var": Predictive variance, "MI": Mutual Information, "KL": Kullback-Leibler Divergence. Default: "pred_entropy"
-
 ### Analyzing log results
 
 The batch running script `train_grid_execution.ipynb` produces a log with metrics for each experiment repetition. Log is located in `output/log/log_{method}.pkl`. To observe its resulting metrics, use `log_analyze.ipynb`. Specify the log to analyze in the `filenames` variable as: `filenames = ['log_{method}.pkl]`. Results will be saved to CSV in `output/log/results.csv`.
