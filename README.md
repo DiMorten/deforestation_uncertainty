@@ -55,6 +55,8 @@ These instructions were tested in Windows 10
 
 1. Input image downloading
 
+- Download the ROI `.shp` shapefile for PA and MT sites at https://drive.google.com/drive/folders/1O8Ivuc2JVB-iSMVrA5TXJRK2BZfOqxO7?usp=sharing
+
 - Download each Sentinel-2 image using the link: 
 https://code.earthengine.google.com/2c31e8b0000a34fbc70c9e8d80dd7237
 
@@ -62,6 +64,7 @@ https://code.earthengine.google.com/2c31e8b0000a34fbc70c9e8d80dd7237
 `S2_collection` is a list of images within the specified date range. Select the date range specified in Table 1. 
 The function `exportBands` exports the selected bands to a TIF file. To reduce computational complexity, export 3 bands per TIF file (Create separate TIF for bands 1,2,3, another for 4,5,6, another for 7,8,9, and another for 10,11,12).
 
+  
 2. Obtaining reference
 
 - Go to http://terrabrasilis.dpi.inpe.br/downloads/
