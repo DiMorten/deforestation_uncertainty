@@ -137,8 +137,11 @@ The batch running script `train_grid_execution.ipynb` produces a log with metric
 
 ## Inference on Ensemble:
 
+Use the script `run_single_experiment.ipynb`
+
 1. Set the data in the folder structure from section _Folder structure_
-2. Configure the training run using the _config_ dictionary. 
+2. Open the `run_single_experiment.ipynb` notebook
+3. Configure the training run using the _config_ dictionary. 
     - `training`: If True, training and inference is done. If False, only inference
     - `inference_times`: Number of inference times for the ensemble
     - `uncertainty_method`: Select uncertainty metric. Options: "pred_entropy": Predictive entropy, "pred_var": Predictive variance, "MI": Mutual Information, "KL": Kullback-Leibler Divergence. Default: "pred_entropy"
@@ -146,10 +149,12 @@ The batch running script `train_grid_execution.ipynb` produces a log with metric
 
 4. Run train_ensemble.ipynb
 
-## Visualizing a single MCD experiment 
+## Visualizing a single MCD, entropy or single run experiment:
+
+Use the script `run_single_experiment.ipynb`
 
 1. Set the data in the folder structure from section _Folder structure_
-2. Open the train_mc_dropout.ipynb notebook
+2. Open the `run_single_experiment.ipynb` notebook
 3. Configure the training run using the _config_ dictionary. 
     - `training`: If True, training and inference is done. If False, only inference
     - `inference_times`: Number of inference times for the MC Dropout calculation
