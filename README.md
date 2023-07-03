@@ -134,40 +134,29 @@ In the paper, multiple training and inference runs are applied for each uncertai
 
 The batch running script `train_grid_execution.ipynb` produces a log with metrics for each experiment repetition. Log is located in `output/log/log_{method}.pkl`. To observe its resulting metrics, use `log_analyze.ipynb`. Specify the log to analyze in the `filenames` variable as: `filenames = ['log_{method}.pkl]`. Results will be saved to CSV in `output/log/results.csv`.
 
-
-## Inference on Ensemble:
-
-Use the script `run_single_experiment.ipynb`
-
-1. Set the data in the folder structure from section _Folder structure_
-2. Open the `run_single_experiment.ipynb` notebook
-3. Configure the training run using the _config_ dictionary. 
-    - `training`: If True, training and inference is done. If False, only inference
-    - `inference_times`: Number of inference times for the ensemble
-    - `uncertainty_method`: Select uncertainty metric. Options: "pred_entropy": Predictive entropy, "pred_var": Predictive variance, "MI": Mutual Information, "KL": Kullback-Leibler Divergence. Default: "pred_entropy"
-    - `removePolygons`: If True, remove polygons with an area smaller to 6.25ha, following PRODES methodology. Default: True
-
-4. Run train_ensemble.ipynb
-
-## Visualizing a single MCD, entropy or single run experiment:
+## Visualizing a single MCD, ensemble or single run experiment:
 
 Use the script `run_single_experiment.ipynb`
 
 1. Set the data in the folder structure from section _Folder structure_
 2. Open the `run_single_experiment.ipynb` notebook
 3. Configure the training run using the _config_ dictionary. 
-    - `training`: If True, training and inference is done. If False, only inference
-    - `inference_times`: Number of inference times for the MC Dropout calculation
+    - `training`: If True, training is done.
+    - `inferring`: If True, inference is done.
+    - `site`: Dataset site. Options are presented next. Default: "PA"
+        - "MT" (Mato Grosso)
+        - "PA" (Para)
+    - `training_date`: Training date pair. Options: "earlier" for training with an earlier pair of dates, and "current" for training and testing on the same pair of dates.
+    - `mode`: Uncertainty mode. Values: "mcd" (Monte Carlo Dropout), "ensemble", "single_run" (Baseline). Default: "ensemble"
+    - `inference_times`: Number of inference times is automatically set to 10 for "mcd" and "ensemble", and 1 for "single_run"
     - `uncertainty_method`: Select uncertainty metric. Options are presented next. Default: "pred_entropy" 
         - "pred_entropy": Predictive entropy, 
         - "pred_var": Predictive variance, 
         - "MI": Mutual Information, 
-        - "KL": Kullback-Leibler Divergence. 
+        - "KL": Kullback-Leibler Divergence.
+        - "pred_entropy_single": Used for "single run" experiment (Baseline). Automatically set if 
     - `removePolygons`: If True, remove polygons with an area smaller to 6.25ha, following PRODES methodology. Default: True
-    - `site`: Dataset site. Options are presented next. Default: "PA"
-        - "MT" (Mato Grosso)
-        - "PA" (Para)
-    - `training_date`: Training date pair. Options: "earlier" for training with an earlier pair of dates, and "current" for training and testing on the same pair of dates. Default: "earlier"
+ Default: "earlier"
 4. Run all
 
 -------------
