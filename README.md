@@ -67,6 +67,7 @@ The function `exportBands` exports the selected bands to a TIF file. To reduce c
   
 2. Obtaining reference
 
+- Download the ROI `.shp` shapefile for PA and MT sites at https://drive.google.com/drive/folders/1O8Ivuc2JVB-iSMVrA5TXJRK2BZfOqxO7?usp=sharing
 - Go to http://terrabrasilis.dpi.inpe.br/downloads/
 - Yearly deforestation between 2008 and 2022: Download "Incremento anual no desmatamento - Shapefile (2008/2022)" as a SHP file. Convert it to raster and crop its dimensions to the desired ROI using QGIS. Save the TIF file in `dataset/deforestation/{site}/deforestation_past_years.tif`
 - Deforestation before 2008: Download "Máscara de área acumulada de supressão da vegetação nativa - Shapefile (2007)" as a SHP file. Convert it to raster and crop its dimensions to the desired ROI using QGIS. Save the TIF file in `dataset/deforestation/{site}/deforestation_before_2008_{site}.tif`
