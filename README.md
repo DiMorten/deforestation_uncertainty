@@ -71,6 +71,8 @@ The function `exportBands` exports the selected bands to a TIF file. To reduce c
 - Deforestation before 2008: Download "Máscara de área acumulada de supressão da vegetação nativa - Shapefile (2007)" as a SHP file. Convert it to raster and crop its dimensions to the desired ROI using QGIS. Save the TIF file in `dataset/deforestation/{site}/deforestation_before_2008_{site}.tif`
 
 ## Calculate cloud mask
+
+Use the `cloud_mask.py` script.
 Edit the `config` dictionary for configuration.
    - "dataset": Options: "PA": Para site. "MT": Mato Grosso site.
    - "year": year from the cloud mask to be calculated. Example: 2019
