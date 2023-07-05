@@ -33,7 +33,7 @@ class TrainerMultiOutput(Trainer):
     def train(self):
 
         metrics_all = []
-
+            
         print('time: ', self.repetition_id)
 
         rows = self.patch_size

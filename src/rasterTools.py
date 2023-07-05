@@ -1,5 +1,5 @@
 
-
+import os
 import numpy as np 
 import utils_v1
 from icecream import ic
@@ -25,8 +25,8 @@ def loadOpticalIm(path_optical_im, im_filenames, scale_list = None):
     band_count = 0 
  
     for i, im_filename in enumerate(im_filenames): 
-        ic(path_optical_im + im_filename)         
-        band = load_tiff_image(path_optical_im + im_filename).astype('float32') 
+        ic(os.path.join(path_optical_im, im_filename))         
+        band = load_tiff_image(os.path.join(path_optical_im, im_filename)).astype('float32') 
         ic(band.shape) 
         if len(band.shape) == 2: band = band[np.newaxis, ...] 
         if scale_list != None:

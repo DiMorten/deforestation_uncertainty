@@ -125,7 +125,8 @@ class PA(Dataset):
 		self.prodes_dates_to_print = ['21/07/2018', '24/07/2019', '26/07/2020']
 		self.prodes_dates = [2018, 2019, 2020]
 		self.hspace = [-0.1, -0.1]
-
+		self.previewBandsSnip = [[1,2,3],[11,12,13]]
+		self.bands = 10
 
 
 class MT(Dataset): 
@@ -179,6 +180,8 @@ class MT(Dataset):
 		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
 		self.prodes_dates = [2019, 2020, 2021]
 		self.hspace = [-0.1, 0.03]
+		self.previewBandsSnip = [[1,2,3],[11,12,13]]
+		self.bands = 10
 
 
 class MS(Dataset): 
@@ -230,7 +233,9 @@ class MS(Dataset):
 		
 		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
 		self.prodes_dates = [2019, 2020, 2021]
-		self.hspace = [-0.1, -0.1]
+		self.hspace = [-0.1, -0.1]				# 0,    1,2,3,4,5,6,7,8,9,10,    11,12,13,14,15,16,17,18,19,20  
+		self.previewBandsSnip = [[1,2,3],[5,6,7]]   # 0,      1,2,3,4,      5,6,7,8
+		self.bands = 4
 
 class MA(Dataset):
 	def __init__(self):
@@ -254,6 +259,8 @@ class MA(Dataset):
 		self.tiles_val = [6,19]
 
 		self.patch_deforestation_percentage = 0.02
+		
+
 	def loadLabel(self):
 		label = np.load(self.paths.label + self.label_filename).astype('uint8')
 		return label
@@ -319,30 +326,37 @@ class DeforestationTime():
 
 
 class MultipleDates():
-	def __init__(self, dates = [2017, 2018, 2019], addPastDeforestationInput = True, borderBuffer = 0):
+	def __init__(self, config=None, dates = [2018, 2019], addPastDeforestationInput = True, borderBuffer = 0):
 		super().__init__(addPastDeforestationInput)
+		self.config = config
 		self.dates = dates
-		# self.date_ids = [0,1]
+
+		# self.date_id corresponds to each valid date pair for training
+		# If a single date is used, then the date_id is 0
 		self.date_ids = range(len(dates[:-1]))
 		ic(list(self.date_ids))
+
 		self.image_channels = []
 
 		if self.addPastDeforestationInput == True:
 			# self.image_channels = [[0,] + list(range(2,22)),
 			# 	[1,] + list(range(12,32))]
 			for date_id in self.date_ids:
-				self.image_channels.append([date_id,] + list(range(date_id * 10 + len(self.date_ids), 
-					date_id * 10 + 20 + len(self.date_ids)))) 
+				self.image_channels.append([date_id,] + list(range(date_id * self.bands + len(self.date_ids), 
+					date_id * self.bands + self.bands*2 + len(self.date_ids)))) 
+				# self.image_channels.append([date_id,] + list(range(date_id * 10 + len(self.date_ids), 
+				# 	date_id * 10 + 20 + len(self.date_ids)))) 
+				
 			# image_channels_check = [[0,] + list(range(2,22)),
 			# 	[1,] + list(range(12,32))]
 			# assert image_channels_check == self.image_channels
 			
 		else:
 			for date_id in self.date_ids:
-				self.image_channels.append([date_id,] + list(range(date_id * 10, 
-					date_id * 10 + 20))) 
+				self.image_channels.append([date_id,] + list(range(date_id * self.bands, 
+					date_id * self.bands + self.bands*2))) 
 		ic(self.image_channels)
-
+		
 		self.borderBuffer = borderBuffer
 		# ic(self.image_channels == image_channels_check)
 
@@ -396,8 +410,9 @@ class MultipleDates():
 		label_per_date = []
 		for date in self.dates[1:]:
 			label = self.loadLabelFromDate(date)
-			label = self.addCloudMaskToLabel(label, date)
-			label = self.addCloudMaskToLabel(label, date - 1)
+			if self.config['use_cloud_mask'] == True:
+				label = self.addCloudMaskToLabel(label, date)
+				label = self.addCloudMaskToLabel(label, date - 1)
 			
 			if self.borderBuffer > 0:
 				label = self.removeBorderBufferFromLabel(label, self.borderBuffer)
@@ -470,13 +485,11 @@ class MultipleDates():
 class PAMultipleDates(MultipleDates, DeforestationTime, PA):
 	pass
 
- 
-
 class MTMultipleDates(MultipleDates, DeforestationTime, MT):
 	pass
 
-
-
-
 class MAMultipleDates(MultipleDates, DeforestationTime, MA):
+	pass
+
+class MSMultipleDates(MultipleDates, DeforestationTime, MS):
 	pass

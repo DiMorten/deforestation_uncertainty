@@ -1,3 +1,4 @@
+import os
 import numpy as np 
 import utils_v1
 from icecream import ic
@@ -7,16 +8,18 @@ from sklearn.preprocessing._data import _handle_zeros_in_scale
 import cv2
 import src.rasterTools as rasterTools
 
-from src.dataset import PA, PADeforestationTime, PADistanceMap, PAMultipleDates, MTMultipleDates, MT, MA
+from src.dataset import PA, PADistanceMap, PAMultipleDates, MTMultipleDates, MT, MA, MS
 
 # ======= INPUT PARAMETERS ============ # 
 config = {
-    'dataset': 'MA',
-    'year': 2020, # latest year
-    'maskOutClouds': True,
+    'dataset': 'MS',
+    'year': 2019, # latest year
+    'maskOutClouds': False,
+    'exclude60mBandsFlag': False
 }
 # ======= END INPUT PARAMETERS ============ # 
 
+scale_list = None
 
 if config['dataset'] == 'PA':
     dataset = PA()
@@ -24,14 +27,14 @@ elif config['dataset'] == 'MT':
     dataset = MT()
 elif config['dataset'] == 'MA':
     dataset = MA()
+elif config['dataset'] == 'MS':
+    dataset = MS()
+    config['maskOutClouds'] = False
+    config['exclude60mBandsFlag'] = False
 
-year = config['year']
-maskOutClouds = config['maskOutClouds']
 
-scale_list = None
-exclude60mBandsFlag = True
 
-path_optical_im = dataset.paths.optical_im_past_dates[year]
+path_optical_im = dataset.paths.optical_im_past_dates[config['year']]
 
 if type(dataset) == MA:
     resolution_list = [60, 10, 10, 10, 20, 20, 20, 10, 20, 60, 60, 20, 20]
@@ -64,19 +67,21 @@ def filter_outliers(img, bins=2**16-1, bth=0.001, uth=0.999, mask=[0]):
 createTif = True
 
 if createTif == True:
-
-    optical_im = rasterTools.loadOpticalIm(path_optical_im, dataset.paths.im_filenames[year], scale_list)
+    print("path_optical_im", path_optical_im)
+    print("dataset.paths.im_filenames[config['year']]", dataset.paths.im_filenames[config['year']])
+    print(scale_list)
+    optical_im = rasterTools.loadOpticalIm(path_optical_im, dataset.paths.im_filenames[config['year']], scale_list)
     ic(optical_im.shape)
     # pdb.set_trace()
     optical_im = np.transpose(optical_im, (1, 2, 0))
     ic(optical_im.shape)
-    if exclude60mBandsFlag == True:
-        optical_im = rasterTools.exclude60mBands(optical_im)
+    if config['exclude60mBandsFlag'] == True:
+        optical_im = exclude60mBands(optical_im)
     ic(optical_im.shape)
     # ic(np.min(optical_im), np.mean(optical_im), np.max(optical_im))
     # ic(np.count_nonzero(~np.isnan(optical_im)), np.count_nonzero(np.isnan(optical_im)))
-    if maskOutClouds == True:
-        cloud_cloudshadow_mask = np.load(dataset.paths.cloud_mask[year]).astype(np.uint8)
+    if config['maskOutClouds'] == True:
+        cloud_cloudshadow_mask = np.load(dataset.paths.cloud_mask[config['year']]).astype(np.uint8)
         cloud_mask = np.zeros_like(cloud_cloudshadow_mask)
         cloud_mask[cloud_cloudshadow_mask == 1] = 2
         del cloud_cloudshadow_mask
@@ -131,6 +136,7 @@ optical_im = normalizationManager.normalize(optical_im)
 ic(np.min(optical_im), np.average(optical_im), np.max(optical_im))
 
 # pdb.set_trace()
-np.save(path_optical_im + 'optical_im.npy', optical_im) 
+print("Saving in... {}".format(os.path.join(path_optical_im, 'optical_im.npy')))
+np.save(os.path.join(path_optical_im, 'optical_im.npy'), optical_im) 
 # plt.imshow(optical_im[...,[2,1,0]])
 # plt.show()

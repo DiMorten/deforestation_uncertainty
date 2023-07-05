@@ -69,6 +69,9 @@ class Trainer():
     def loadLabel(self):
         self.label_mask = self.dataset.loadLabel()
         print('Mask label shape: ', '\n', self.label_mask.shape, '\n', 'Unique values: ', '\n', np.unique(self.label_mask))
+    def maskNoDataAsNotConsideredClass(self):
+        print("self.image_stack.shape", self.image_stack.shape)
+        self.label_mask[self.image_stack[...,-1] == 0] = 2
 
 
     def createTrainValTestTiles(self):
@@ -175,7 +178,7 @@ class Trainer():
         self.plotLossTerms()
         
     def snipDataset(self, idx=0):
-        self.logger.snipDataset(idx, self.coords_train, self.patchesHandler, 
+        self.logger.snipDataset(self.dataset, idx, self.coords_train, self.patchesHandler, 
             self.image_stack, self.label_mask)
 
 
@@ -580,6 +583,9 @@ class Trainer():
         # self.threshold_list = [0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.27, 0.3, 0.34, 0.36]
 
         # self.threshold_list = [0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.27, 0.3, 0.34, 0.36, np.max(uncertainty)-0.003]
+        if self.config['uncertainty_method'] == "pred_entropy_single":
+            self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
+                                0.25, 0.27, 0.3, 0.34, 0.36, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
         if self.config['uncertainty_method'] == "pred_entropy":
                 if self.classes_mode == False:
                         self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 

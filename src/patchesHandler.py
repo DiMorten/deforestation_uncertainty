@@ -271,6 +271,10 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 			yield (batch_img, batch_ref)
 
 	def getPatch(self, image, reference, coord, patch_size=128, idx=0):
+		print("coord", coord[idx])
+		print("image_patch.shape", reference.shape)
+		print("reference_patch.shape", image.shape)
+
 		reference_patch = reference[coord[idx,0] : coord[idx,0] + patch_size,
 								coord[idx,1] : coord[idx,1] + patch_size, coord[idx,2]]
 		image_patch = image[coord[idx,0] : coord[idx,0] + patch_size,

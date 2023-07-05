@@ -115,7 +115,7 @@ if __name__ == '__main__':
     # ======= INPUT PARAMETERS ============ # 
 
     config = {
-        'dataset': 'MA',
+        'dataset': 'MS',
         'year': 2020, # latest year # MA: 2021
         'maskOutClouds': True,
     }

@@ -1,3 +1,4 @@
+import os
 import numpy as np 
 import utils_v1
 from icecream import ic
@@ -8,15 +9,18 @@ import src.rasterTools as rasterTools
 from sklearn.preprocessing._data import _handle_zeros_in_scale
 from src.dataset import (
     PA, MT, MA,
-    PAMultipleDates, MTMultipleDates, MAMultipleDates
+    PAMultipleDates, MTMultipleDates, MAMultipleDates, MSMultipleDates
 )
 
+ic.configureOutput(includeContext=True)
+# ======= INPUT PARAMETERS ============ #
 config = {
-    'dataset': 'PA',
-    'year': 2020, # latest year
+    'dataset': 'MS',
+    'year': 2019, # latest year
 }
 mask_input = 'deforestation_time'
 loadDeforestationBefore2008Flag = True
+# ======= END INPUT PARAMETERS ============ #
 
 latest_year = config['year']
 
@@ -26,14 +30,14 @@ elif config['dataset'] == 'MT':
     dataset = MTMultipleDates()
 elif config['dataset'] == 'MA':
     dataset = MAMultipleDates()
+elif config['dataset'] == 'MS':
+    dataset = MSMultipleDates()
 
 ic(dataset)
 
 
 if mask_input == 'deforestation_time':
-    path_image_unnormalized = dataset.paths.deforestation_past_years # 'D:/Jorge/datasets/deforestation/Para/'
-    im_filename_normalized = 'deforestation_time_normalized_{}.npy'.format(latest_year)
-    im_filenames = ['deforestation_past_years.tif']
+    out_filename = 'deforestation_time_normalized_{}.npy'.format(latest_year)
     
 '''
 if dataset == 'MA' and latest_year == 2020:
@@ -59,64 +63,63 @@ def exclude60mBands(image_unnormalized):
 
 createTif = True
 if createTif == True:
-    image_unnormalized = rasterTools.loadOpticalIm(path_image_unnormalized, im_filenames)
-    ic(image_unnormalized.shape)
+    deforestation_time = rasterTools.load_tiff_image(dataset.paths.deforestation_past_years)
+    ic(deforestation_time.shape)
     # pdb.set_trace()
-    image_unnormalized = np.transpose(image_unnormalized, (1, 2, 0))
-    ic(image_unnormalized.shape)
+    deforestation_time = np.expand_dims(deforestation_time, axis=-1)
+    ic(deforestation_time.shape)
     if mask_input == 'deforestation_time':
-        deforestation_areas = image_unnormalized.copy()
-        deforestation_areas[image_unnormalized != 0] = 1
-        ic(np.unique(image_unnormalized, return_counts=True))
+        deforestation_areas = deforestation_time.copy()
+        deforestation_areas[deforestation_time != 0] = 1
+        ic(np.unique(deforestation_time, return_counts=True))
 
         print("calculate time distance to latest year " + str(latest_year))
-        image_unnormalized = latest_year - image_unnormalized
-        ic(np.unique(image_unnormalized, return_counts=True))
+        deforestation_time = latest_year - deforestation_time
+        ic(np.unique(deforestation_time, return_counts=True))
 
         print("negative values are after the latest year. Set to 0")
-        image_unnormalized[image_unnormalized<0] = -1
-        ic(np.unique(image_unnormalized, return_counts=True))
+        deforestation_time[deforestation_time<0] = -1
+        ic(np.unique(deforestation_time, return_counts=True))
 
 
         print("add 1 for latest years areas to be equal to 1")
-        image_unnormalized = image_unnormalized + 1
-        ic(np.unique(image_unnormalized, return_counts=True))
+        deforestation_time = deforestation_time + 1
+        ic(np.unique(deforestation_time, return_counts=True))
 
 
         print("set non deforestated areas to 0")
-        image_unnormalized[deforestation_areas == 0] = 0
+        deforestation_time[deforestation_areas == 0] = 0
 
-        ic(np.unique(image_unnormalized, return_counts=True))
+        ic(np.unique(deforestation_time, return_counts=True))
         if loadDeforestationBefore2008Flag == True:
             print("adding deforestation before 2008")
             label_past_deforestation_before_2008 = dataset.loadPastDeforestationBefore2008()
-            deforestation_time_2008 = np.max(image_unnormalized)
+            deforestation_time_2008 = np.max(deforestation_time)
             ic(deforestation_time_2008)
-            image_unnormalized[label_past_deforestation_before_2008 != 0] = deforestation_time_2008 + 1
-            # image_unnormalized[label_past_deforestation_before_2008 == 1] = 2007
+            deforestation_time[label_past_deforestation_before_2008 != 0] = deforestation_time_2008 + 1
+            # deforestation_time[label_past_deforestation_before_2008 == 1] = 2007
 
-        ic(np.unique(image_unnormalized, return_counts=True))
+        ic(np.unique(deforestation_time, return_counts=True))
 
         '''
         label_past_deforestation = dataset.loadPastDeforestationLabel()
         deforestation_before_2008 = label_past_deforestation.copy()
-        deforestation_before_2008[np.squeeze(image_unnormalized)>deforestation_time_2008] = 0
+        deforestation_before_2008[np.squeeze(deforestation_time)>deforestation_time_2008] = 0
         ic(np.unique(deforestation_before_2008, return_counts=True))
-        image_unnormalized[deforestation_before_2008 == 1] = deforestation_time_2008 + 1
+        deforestation_time[deforestation_before_2008 == 1] = deforestation_time_2008 + 1
         '''
-        # ic(np.unique(image_unnormalized, return_counts=True))
+        # ic(np.unique(deforestation_time, return_counts=True))
     '''
     if subtractYears == True:
-        ic(np.unique(image_unnormalized, return_counts=True))
-        image_unnormalized = image_unnormalized - 2
-        image_unnormalized[image_unnormalized<0] = 0
-        ic(np.unique(image_unnormalized, return_counts=True))
+        ic(np.unique(deforestation_time, return_counts=True))
+        deforestation_time = deforestation_time - 2
+        deforestation_time[deforestation_time<0] = 0
+        ic(np.unique(deforestation_time, return_counts=True))
     '''
-    # ic(image_unnormalized.shape)
-    # np.save('optical_im_unnormalized.npy', image_unnormalized)
+    # ic(deforestation_time.shape)
+    # np.save('optical_im_unnormalized.npy', deforestation_time)
 else:
     pass
-    # image_unnormalized = np.load('optical_im_unnormalized.npy') 
  
 class NormalizationManager():
     def __init__(self, img, feature_range=[0, 1]):
@@ -141,15 +144,15 @@ class NormalizationManager():
         img += min_
         return img
 
-normalizationManager = NormalizationManager(image_unnormalized)
-image_unnormalized = normalizationManager.normalize(image_unnormalized)
-ic(np.min(image_unnormalized), np.average(image_unnormalized), np.max(image_unnormalized))
-ic(np.unique(image_unnormalized, return_counts=True))
+normalizationManager = NormalizationManager(deforestation_time)
+deforestation_time = normalizationManager.normalize(deforestation_time)
+ic(np.min(deforestation_time), np.average(deforestation_time), np.max(deforestation_time))
+ic(np.unique(deforestation_time, return_counts=True))
 # pdb.set_trace()
 
-folder = '/'.join((path_image_unnormalized).split('/')[:-1]) + '/'
-print("Saving to... ", folder + im_filename_normalized)
+folder = '/'.join((dataset.paths.deforestation_past_years).split('/')[:-1]) + '/'
+print("Saving to... ", os.path.join(folder, out_filename))
 
-np.save(folder + im_filename_normalized, image_unnormalized) 
+np.save(os.path.join(folder, out_filename), deforestation_time) 
 # plt.imshow(image_unnormalized[...,[2,1,0]])
 # plt.show()

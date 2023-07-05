@@ -5,6 +5,7 @@ import importlib
 importlib.reload(_plt)
 import numpy as np
 from icecream import ic
+import pdb
 class Logger():
     def createLogFolders(self, dataset):
         # figures_path = 'output/figures' + dataset.__class__.__name__ + '/'
@@ -29,12 +30,13 @@ class Logger():
 
         fig.savefig('output/figures/Para' + name, dpi=dpi, bbox_inches='tight')
 
-    def snipDataset(self, idx, coords_train, patchesHandler, image_stack, label_mask):
+    def snipDataset(self, dataset, idx, coords_train, patchesHandler, image_stack, label_mask):
         print(coords_train[idx])
         image_patch, reference_patch = patchesHandler.getPatch(
             image_stack, label_mask, coords_train, idx = idx)
-        ic(np.mean(image_patch[...,[1,2,3]]), np.mean(image_patch[...,[11,12,13]]))
-        _plt.plotCropSample4(image_patch[...,[1,2,3]], image_patch[...,[11,12,13]], 
+
+        ic(np.mean(image_patch[...,dataset.previewBandsSnip[0]]), np.mean(image_patch[...,dataset.previewBandsSnip[1]]))
+        _plt.plotCropSample4(image_patch[...,dataset.previewBandsSnip[0]], image_patch[...,dataset.previewBandsSnip[1]], 
                 reference_patch, reference_patch,
                 lims = None, 
                 titles = ['Optical T0', 'Optical T1', 'Reference', 'Reference 2'],
@@ -154,7 +156,6 @@ class Logger():
                 plt.savefig(save_name, dpi=150, bbox_inches='tight')
 
     def plotCropSample(self, trainer):
-
         uncertainty_vlims = [np.min(trainer.uncertainty_to_show), np.max(trainer.uncertainty_to_show)]
 
         self.plotCropSampleFlag = True
@@ -165,7 +166,7 @@ class Logger():
             lims = trainer.dataset.previewLims2
             ic(np.unique(trainer.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
 
-            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
+            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBandsSnip[-1]], trainer.mean_prob, 
                     trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
                     lims = trainer.dataset.previewLims1, 
                     titles = ['Snippet', 'Predicted Probability', 'Predicted', 'Uncertainty'],
@@ -176,7 +177,7 @@ class Logger():
                 trainer.dataset.__class__.__name__, str(trainer.exp))
             plt.savefig(save_name, dpi=150, bbox_inches='tight')
 
-            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
+            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBandsSnip[-1]], trainer.mean_prob, 
                     trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
                     lims = trainer.dataset.previewLims2, 
                     titles = ['Snippet', 'Predicted Probability', 'Predicted', 'Uncertainty'],
@@ -187,7 +188,7 @@ class Logger():
                 trainer.dataset.__class__.__name__, str(trainer.exp))
             plt.savefig(save_name, dpi=150, bbox_inches='tight')
 
-            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBands], trainer.mean_prob, 
+            _plt.plotCropSample4(trainer.image_stack[...,trainer.dataset.previewBandsSnip[-1]], trainer.mean_prob, 
                     trainer.error_mask_to_show_rgb[...,::-1], trainer.uncertainty_to_show, 
                     lims = trainer.dataset.previewLims2, 
                     titles = ['Snippet', 'Predicted Probability', 'Predicted', 'Uncertainty'],
@@ -264,8 +265,9 @@ class Logger():
             plt.savefig('output/figures/' + trainer.dataset.__class__.__name__ + 'PredictSampleUncertaintyLandsatColorbar.png', dpi=150, bbox_inches='tight')
 
     def plotCropSampleT0T1(self, trainer):
-        previewBandsT0 = [3,2,1]
-        previewBandsT1 = [13,12,11]
+        previewBandsT0 = trainer.dataset.previewBandsSnip[-2]
+        previewBandsT1 = trainer.dataset.previewBandsSnip[-1]
+
         uncertainty_vlims = [np.min(trainer.uncertainty_to_show), np.max(trainer.uncertainty_to_show)]
 
         self.plotCropSampleFlag = True

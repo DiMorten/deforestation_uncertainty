@@ -16,21 +16,44 @@ def batch_generator(batches, image, reference, target_size, number_class):
         batch_img = np.zeros((batch_x.shape[0], target_size, target_size, image.shape[-1]))
         batch_ref = np.zeros((batch_x.shape[0], target_size, target_size, number_class))
 
+        new_augmentations = True
         for i in range(batch_x.shape[0]):
-            # print("batch_x", batch_x[i][:10, :10])	
-        
-            if np.random.rand()<0.3:
-                batch_x[i] = np.rot90(batch_x[i], 1)
-                
-            if np.random.rand() >= 0.3 and np.random.rand() <= 0.5:
-                batch_x[i] = np.flip(batch_x[i], 0)
+            if new_augmentations == False:
+
+                # print("batch_x", batch_x[i][:10, :10])	
             
-            if np.random.rand() > 0.5 and np.random.rand() <= 0.7:
-                batch_x[i] = np.flip(batch_x[i], 1)
+                if np.random.rand()<0.3:
+                    batch_x[i] = np.rot90(batch_x[i], 1)
+                    
+                if np.random.rand() >= 0.3 and np.random.rand() <= 0.5:
+                    batch_x[i] = np.flip(batch_x[i], 0)
                 
-            if np.random.rand() > 0.7:
-                batch_x[i] = batch_x[i]
-                
+                if np.random.rand() > 0.5 and np.random.rand() <= 0.7:
+                    batch_x[i] = np.flip(batch_x[i], 1)
+                    
+                if np.random.rand() > 0.7:
+                    batch_x[i] = batch_x[i]
+            else:
+                n_augmentations = 6
+                augmentation_id = np.random.choice(n_augmentations)
+                if augmentation_id == 0:
+                    batch_x[i] = np.rot90(batch_x[i], 1)
+
+                if augmentation_id == 1:
+                    batch_x[i] = np.rot90(batch_x[i], 2)
+
+                if augmentation_id == 2:
+                    batch_x[i] = np.rot90(batch_x[i], 3)
+
+                if augmentation_id == 3:
+                    batch_x[i] = np.flip(batch_x[i], 0)
+
+                if augmentation_id == 4:
+                    batch_x[i] = np.flip(batch_x[i], 1)
+                    
+                if augmentation_id == 5:
+                    batch_x[i] = batch_x[i]                
+
             batch_img[i] = image[batch_x[i]] 
             batch_ref[i] = tf.keras.utils.to_categorical(reference[batch_x[i]] , number_class)
                        
