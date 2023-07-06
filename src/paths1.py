@@ -6,7 +6,7 @@ class PathsPA(Paths):
     def __init__(self):
         self.reference_folder = 'D:/Jorge/datasets/deforestation/PA/'
         self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/PA/'
-        self.experiment = 'D:/Jorge/datasets/deforestation/experiments/'
+        self.experiment = 'D:/Jorge/datasets/deforestation/experiments/PA/'
 
         self.optical_im = os.path.join(self.optical_im_folder,  '2019')
 
@@ -153,6 +153,38 @@ class PathsMT(Paths):
             os.path.join(landsat_base, 'landsat_MT_2021.tif'),
 
         ]
+
+class PathsMS(Paths): 
+    def __init__(self): 
+        self.reference_folder = 'D:/Jorge/datasets/deforestation/MS/'
+        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/MS/'
+
+        self.experiment = 'D:/Jorge/datasets/deforestation/experiments/MS/' 
+
+        self.deforestation_before_2008 = os.path.join(self.reference_folder, 'deforestation_before_2000_MS.tif') 
+
+        self.hydrography = os.path.join(self.reference_folder, 'hydgrography.tif')
+        self.deforestation_past_years = os.path.join(self.reference_folder, 'deforestation_past_years.tif')
+ 
+        self.deforestation_time = {
+            2020: os.path.join(self.reference_folder, 'deforestation_time_normalized_2020.npy'),
+            2019: os.path.join(self.reference_folder, 'deforestation_time_normalized_2019.npy'),
+        } 
+
+        self.optical_im_past_dates = { 
+            2020: os.path.join(self.optical_im_folder,  '2020'), 
+            2019: os.path.join(self.optical_im_folder,  '2019'), 
+        }
+
+        self.cloud_mask = {
+            2020: os.path.join(self.optical_im_folder,  '2020', 'cloudmask_MA_2020.npy'), 
+            2019: os.path.join(self.optical_im_folder,  '2019', 'cloudmask_MA_2019.npy'),
+        }
+        self.im_filenames = {
+            2019: ['Mosaico_SENTINEL_22473_Agosto2019_10m_8bits_EPG32722_crop.tif'],
+            2020: ['Mosaico_SENTINEL_22473_Agosto2020_TerraClass_10m_reprojected_crop.tif']
+        }
+
 class PathsMA(Paths): 
     def __init__(self): 
         self.reference_folder = 'D:/Jorge/datasets/deforestation/MA/'

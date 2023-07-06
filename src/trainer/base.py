@@ -71,7 +71,8 @@ class Trainer():
         print('Mask label shape: ', '\n', self.label_mask.shape, '\n', 'Unique values: ', '\n', np.unique(self.label_mask))
     def maskNoDataAsNotConsideredClass(self):
         print("self.image_stack.shape", self.image_stack.shape)
-        self.label_mask[self.image_stack[...,-1] == 0] = 2
+        condition = np.sum(self.image_stack[..., self.dataset.previewBandsSnip[0] + self.dataset.previewBandsSnip[1]], axis=-1)
+        self.label_mask[condition == 0] = 2
 
 
     def createTrainValTestTiles(self):

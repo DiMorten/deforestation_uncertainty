@@ -204,7 +204,10 @@ class MS(Dataset):
  
 
 		self.tiles_tr = [2,4,5,6,7,12,14,15,18,21,23,24]  
+		# self.tiles_val = [9,11,25] 
+		# self.tiles_val = [8,11,25] 
 		self.tiles_val = [9,11,25] 
+		
 		self.patch_deforestation_percentage = 0.2
 
 		self.snippet_coords = {
@@ -274,25 +277,6 @@ class MA(Dataset):
 		return label_past_deforestation
 
 
-class PADistanceMap(PA):
-	def loadInputImage(self):
-		image_stack = super().loadInputImage()
-		image_stack = self.addNpyBandToInput(image_stack, 
-				self.paths.distance_map_past_deforestation)
-		image_stack = self.addNpyBandToInput(image_stack, 
-				self.paths.distance_map_past_deforestation_2018)
-		image_stack = self.addNpyBandToInput(image_stack, 
-				self.paths.distance_map_past_deforestation_2017)
-		image_stack = self.addNpyBandToInput(image_stack, 
-				self.paths.distance_map_past_deforestation_2016)
-
-		ic(image_stack.shape)
-		return image_stack  
-	def addNpyBandToInput(self, image_stack, path):
-		band = np.load(path).astype(np.float32)
-		band = np.expand_dims(band, axis = -1)
-		image_stack = np.concatenate((band, image_stack), axis = -1)  
-		return image_stack    
 
 class DeforestationTime():
 	def __init__(self, addPastDeforestationInput = True):
@@ -417,12 +401,6 @@ class MultipleDates():
 			if self.borderBuffer > 0:
 				label = self.removeBorderBufferFromLabel(label, self.borderBuffer)
 				print("Removing bufer................")
-			# if (self.site == 'PA' and date == 2019):	
-			# 	label = self.loadLabelFromProject()
-			# if (self.site == 'MT' and date == 2020):
-			# 	label = self.addProjectPastDeforestationToLabel(label)
-
-				
 
 			label_per_date.append(
 				np.expand_dims(label, axis = -1)
