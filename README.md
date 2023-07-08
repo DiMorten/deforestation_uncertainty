@@ -134,7 +134,7 @@ In the paper, multiple training and inference runs are applied for each uncertai
 
 The batch running script `train_grid_execution.ipynb` produces a log with metrics for each experiment repetition. Log is located in `output/log/log_{method}.pkl`. To observe its resulting metrics, use `log_analyze.ipynb`. Specify the log to analyze in the `filenames` variable as: `filenames = ['log_{method}.pkl]`. Results will be saved to CSV in `output/log/results.csv`.
 
-## Visualizing a single MCD, ensemble or single run experiment:
+## Running and visualizing a single MCD, ensemble or single run experiment:
 
 Use the script `run_single_experiment.ipynb`
 
