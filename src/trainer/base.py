@@ -426,11 +426,10 @@ class Trainer():
 
         ic(predicted_test.shape)
 
-    def removeSmallPolygons(self):
+    def removeSmallPolygons(self, min_polygon_area = 625):
         self.removePolygons = True
         if self.removePolygons == True:
-            # remove polygons smaller than 625 px
-            min_polygon_area = 625 # pixels
+
 
             self.predicted_unpad, self.label_mask = _metrics.removeSmallPolygonsForMetrics(self.predicted_unpad, self.label_mask,
                 min_polygon_area)

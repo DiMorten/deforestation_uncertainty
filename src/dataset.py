@@ -355,9 +355,8 @@ class MultipleDates():
 		# self.addPastDeforestationInput = True
 		image_stack = []
 		for date in self.dates:
-			image_stack.append(
-				np.load(os.path.join(self.paths.optical_im_past_dates[date], 'optical_im.npy')).astype('float32')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]]
-			)
+			im = np.load(os.path.join(self.paths.optical_im_past_dates[date], 'optical_im.npy')).astype('float32')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]]
+			image_stack.append(im)
 		image_stack = np.concatenate(image_stack, axis = -1)
 		'''
 		image_stack = np.concatenate((

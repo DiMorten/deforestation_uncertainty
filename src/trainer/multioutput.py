@@ -62,7 +62,7 @@ class TrainerMultiOutput(Trainer):
                                 callbacks=callbacks_list)
         end_training = time.time() - start_training
 
-        del self.train_gen_batch, self.valid_gen_batch
+        # del self.train_gen_batch, self.valid_gen_batch
 
     def getMeanProb(self):
         self.mean_prob = np.mean(self.prob_rec, axis = -1)

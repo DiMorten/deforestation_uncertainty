@@ -8,7 +8,7 @@ from sklearn.preprocessing._data import _handle_zeros_in_scale
 import cv2
 import src.rasterTools as rasterTools
 
-from src.dataset import PA, PADistanceMap, PAMultipleDates, MTMultipleDates, MT, MA, MS
+from src.dataset import PA, PAMultipleDates, MTMultipleDates, MT, MA, MS
 
 # ======= INPUT PARAMETERS ============ # 
 config = {

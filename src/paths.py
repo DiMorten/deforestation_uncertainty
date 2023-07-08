@@ -184,6 +184,10 @@ class PathsMS(Paths):
             2019: ['Mosaico_SENTINEL_22473_Agosto2019_10m_8bits_EPG32722_crop.tif'],
             2020: ['Mosaico_SENTINEL_22473_Agosto2020_TerraClass_10m_reprojected_crop.tif']
         }
+        self.im_filenames = {
+            2019: ['merged_2019_crop.tif'],
+            2020: ['merged_2020_crop.tif']
+        }
 
 class PathsMA(Paths): 
     def __init__(self): 
