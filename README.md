@@ -106,6 +106,34 @@ The script will generate a NPY with the normalized input image which is used dur
 
 Example: to train in PA site for [2018, 2019] dates, execute the script two times, once for each year (2018 and 2019)
 
+## Running and visualizing a single MCD, ensemble or single run experiment:
+
+Use the script `run_single_experiment.ipynb`
+
+1. Set the data in the folder structure from section _Folder structure_
+2. Open the `run_single_experiment.ipynb` notebook
+3. Configure the training run using the _config_ dictionary. 
+    - `training`: If True, training is done.
+    - `inferring`: If True, inference is done.
+    - `site`: Dataset site. Options are presented next. Default: "PA"
+        - "MT" (Mato Grosso)
+        - "PA" (Para)
+    - `training_date`: Training date pair. Options: "earlier" for training with an earlier pair of dates, and "current" for training and testing on the same pair of dates.
+    - `mode`: Uncertainty mode. Values: "mcd" (Monte Carlo Dropout), "ensemble", "single_run" (Baseline). Default: "ensemble"
+    - `inference_times`: Number of inference times is automatically set to 10 for "mcd" and "ensemble", and 1 for "single_run"
+    - `uncertainty_method`: Select uncertainty metric. Options are presented next. Default: "pred_entropy" 
+        - "pred_entropy": Predictive entropy, 
+        - "pred_var": Predictive variance, 
+        - "MI": Mutual Information, 
+        - "KL": Kullback-Leibler Divergence.
+        - "pred_entropy_single": Used for "single run" experiment (Baseline). Automatically set if 
+    - `removePolygons`: If True, remove polygons with an area smaller to 6.25ha, following PRODES methodology. Default: True
+    - `plotLandsat`: If True, plot from Figure 7 to 10. It is required to have Landsat images (See dataset folder structure). Default: False
+ Default: "earlier"
+4. Run all
+
+-------------
+
 ## Run in batch (Multiple executions)
 This script allows training for single run, MCD and ensemble methods.
 It also allows inference for single run and MCD methods.
@@ -134,31 +162,4 @@ In the paper, multiple training and inference runs are applied for each uncertai
 
 The batch running script `train_grid_execution.ipynb` produces a log with metrics for each experiment repetition. Log is located in `output/log/log_{method}.pkl`. To observe its resulting metrics, use `log_analyze.ipynb`. Specify the log to analyze in the `filenames` variable as: `filenames = ['log_{method}.pkl]`. Results will be saved to CSV in `output/log/results.csv`.
 
-## Running and visualizing a single MCD, ensemble or single run experiment:
-
-Use the script `run_single_experiment.ipynb`
-
-1. Set the data in the folder structure from section _Folder structure_
-2. Open the `run_single_experiment.ipynb` notebook
-3. Configure the training run using the _config_ dictionary. 
-    - `training`: If True, training is done.
-    - `inferring`: If True, inference is done.
-    - `site`: Dataset site. Options are presented next. Default: "PA"
-        - "MT" (Mato Grosso)
-        - "PA" (Para)
-    - `training_date`: Training date pair. Options: "earlier" for training with an earlier pair of dates, and "current" for training and testing on the same pair of dates.
-    - `mode`: Uncertainty mode. Values: "mcd" (Monte Carlo Dropout), "ensemble", "single_run" (Baseline). Default: "ensemble"
-    - `inference_times`: Number of inference times is automatically set to 10 for "mcd" and "ensemble", and 1 for "single_run"
-    - `uncertainty_method`: Select uncertainty metric. Options are presented next. Default: "pred_entropy" 
-        - "pred_entropy": Predictive entropy, 
-        - "pred_var": Predictive variance, 
-        - "MI": Mutual Information, 
-        - "KL": Kullback-Leibler Divergence.
-        - "pred_entropy_single": Used for "single run" experiment (Baseline). Automatically set if 
-    - `removePolygons`: If True, remove polygons with an area smaller to 6.25ha, following PRODES methodology. Default: True
-    - `plotLandsat`: If True, plot from Figure 7 to 10. It is required to have Landsat images (See dataset folder structure). Default: False
- Default: "earlier"
-4. Run all
-
--------------
 
