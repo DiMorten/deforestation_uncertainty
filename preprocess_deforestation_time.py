@@ -9,14 +9,14 @@ import src.rasterTools as rasterTools
 from sklearn.preprocessing._data import _handle_zeros_in_scale
 from src.dataset import (
     PA, MT, MA,
-    PAMultipleDates, MTMultipleDates, MAMultipleDates, MSMultipleDates
+    PAMultipleDates, MTMultipleDates, MAMultipleDates, MSMultipleDates, PIMultipleDates
 )
 
 ic.configureOutput(includeContext=True)
 # ======= INPUT PARAMETERS ============ #
 config = {
-    'dataset': 'MS',
-    'year': 2019, # latest year
+    'dataset': 'PI',
+    'year': 2020, # latest year
 }
 mask_input = 'deforestation_time'
 loadDeforestationBefore2008Flag = True
@@ -32,6 +32,8 @@ elif config['dataset'] == 'MA':
     dataset = MAMultipleDates()
 elif config['dataset'] == 'MS':
     dataset = MSMultipleDates()
+elif config['dataset'] == 'PI':
+    dataset = PIMultipleDates()
 
 ic(dataset)
 

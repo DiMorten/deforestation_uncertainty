@@ -426,7 +426,8 @@ class Trainer():
 
         ic(predicted_test.shape)
 
-    def removeSmallPolygons(self, min_polygon_area = 625):
+    def removeSmallPolygons(self):
+        min_polygon_area = self.dataset.min_polygon_area
         self.removePolygons = True
         if self.removePolygons == True:
 

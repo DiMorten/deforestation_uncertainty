@@ -263,24 +263,6 @@ def resnet_block_dropout(x, n_filter, ind):
     x = Add()([x, s])
     return x
 
-
-def resnet_block_spatial_dropout(x, n_filter, dropout_seed, ind, training=True):
-    x_init = x
-
-    ## Conv 1
-    x = Conv2D(n_filter, (3, 3), activation='relu', padding="same", name = 'res1_net'+str(ind))(x)
-    # x = Dropout(0.5, name = 'drop_net'+str(ind))(x, training = True)
-    x = SpatialDropout2D(0.25, name = 'drop_net'+str(ind), seed = dropout_seed)(x, training = training)
-
-    ## Conv 2
-    x = Conv2D(n_filter, (3, 3), activation='relu', padding="same", name = 'res2_net'+str(ind))(x)
-    
-    ## Shortcut
-    s  = Conv2D(n_filter, (1, 1), activation='relu', padding="same", name = 'res3_net'+str(ind))(x_init)
-    
-    ## Add
-    x = Add()([x, s])
-    return x
 # Residual U-Net model
 def build_resunet(input_shape, nb_filters, n_classes, last_activation='softmax'):
     '''Base network to be shared (eq. to feature extraction)'''
@@ -362,6 +344,25 @@ def build_resunet_dropout(input_shape, nb_filters, n_classes):
                                                                                                            
     return Model(input_layer, output)
 
+
+
+def resnet_block_spatial_dropout(x, n_filter, dropout_seed, ind, training=True):
+    x_init = x
+
+    ## Conv 1
+    x = Conv2D(n_filter, (3, 3), activation='relu', padding="same", name = 'res1_net'+str(ind))(x)
+    # x = Dropout(0.5, name = 'drop_net'+str(ind))(x, training = True)
+    x = SpatialDropout2D(0.25, name = 'drop_net'+str(ind), seed = dropout_seed)(x, training = training)
+
+    ## Conv 2
+    x = Conv2D(n_filter, (3, 3), activation='relu', padding="same", name = 'res2_net'+str(ind))(x)
+    
+    ## Shortcut
+    s  = Conv2D(n_filter, (1, 1), activation='relu', padding="same", name = 'res3_net'+str(ind))(x_init)
+    
+    ## Add
+    x = Add()([x, s])
+    return x
 
 # Residual U-Net model
 def build_resunet_dropout_spatial(input_shape, nb_filters, n_classes, dropout_seed = None, last_activation='softmax', training=True):
