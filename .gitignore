@@ -128,3 +128,5 @@ dmypy.json
 *.pkl
 *.json
 *.csv
+*.h5
+logs/*
