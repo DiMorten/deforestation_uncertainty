@@ -60,15 +60,41 @@ class EvidentialLearning:
         
         return loss
 
+    '''
     def weighted_categorical_crossentropy_evidential_learning(self, weights):
         weights = K.variable(weights)
+        # change weights shape from (3,) to (1,1,1,3)
         def loss(y_truth,y_pred):
             S = tf.reduce_sum(y_pred, axis=3,keepdims=True)
             dgS = tf.math.digamma(S)
             dgalpha = tf.math.digamma(y_pred)
 
             term = tf.multiply(y_truth,tf.subtract(dgS,dgalpha))
-            term = term * weights
+            term = tf.multiply(term, weights)
+            A = tf.reduce_sum(term,axis=3,keepdims=True)
+            E = y_pred - 1
+            alp = tf.add(tf.multiply(E,tf.subtract(1.,y_truth)),1) 
+            B = self.KL(alp)
+            print("K.int_shape(A)", K.int_shape(A))
+            print("K.int_shape(tf.reduce_mean(A))", K.int_shape(tf.reduce_mean(A)))
+            print("K.int_shape(B)", K.int_shape(B))
+
+            loss = tf.reduce_mean(A) + (self.an_*B)             
+            
+            return loss
+        return loss
+        '''
+    def weighted_categorical_crossentropy_evidential_learning(self, weights):
+        weights = K.variable(weights)
+        # change weights shape from (3,) to (1,1,1,3)
+        def loss(y_truth,y_pred):
+
+            S = tf.reduce_sum(y_pred, axis=3,keepdims=True)
+            dgS = tf.math.digamma(S)
+            dgalpha = tf.math.digamma(y_pred)
+
+            term = tf.multiply(y_truth,tf.subtract(dgS,dgalpha))
+            term = tf.multiply(term, weights)
             A = tf.reduce_sum(term,axis=3,keepdims=True)
             E = y_pred - 1
             alp = tf.add(tf.multiply(E,tf.subtract(1.,y_truth)),1) 
@@ -95,6 +121,25 @@ class EvidentialLearning:
         C =  self.KL(alp)
         return (A + B) + (0.3*C)
 
+    def weighted_mse_loss(self, weights):
+        weights = K.variable(weights)
+        def loss(y_truth,y_pred):
+            S = tf.reduce_sum(y_pred, axis=3,keepdims=True)
+            E = y_pred - 1
+            prob = tf.math.divide_no_nan(y_pred,S)
+
+            A = tf.reduce_sum((y_truth-prob)**2, axis=3, keepdims=True) 
+            B = tf.reduce_sum(y_pred*(S-y_pred)/(S*S*(S+1)), axis=3, keepdims=True) 
+            
+            mse = A + B
+            mse = mse * weights
+            #annealing_coef = tf.minimum(1.0,tf.cast(global_step/annealing_step,tf.float32))
+            
+            alp = tf.add(tf.multiply(E,tf.subtract(1.,y_truth)),1) 
+            C =  self.KL(alp)
+            return mse + (0.3*C)
+        return loss
+
     def evidential_accuracy(self, y_truth,y_pred):
         pred = tf.argmax(y_pred,axis=3)
         truth = tf.argmax(y_truth,axis=3)
@@ -104,6 +149,7 @@ class EvidentialLearning:
     
     def updateAnnealingCoeficient(self, epoch):
         self.an_ = np.minimum([1.0],[(float(epoch)/75.0)])
+        # self.an_ = np.minimum([1.0],[(float(epoch)/10.0)])
     
 class DirichletLayer(tf.keras.layers.Layer):
   def __init__(self, num_outputs, **kwargs):

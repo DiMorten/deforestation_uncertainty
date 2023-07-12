@@ -53,8 +53,16 @@ def weighted_categorical_crossentropy(weights):
 			# clip to prevent NaN's and Inf's
 			y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())
 			loss = y_true * K.log(y_pred) + (1-y_true) * K.log(1-y_pred)
+
+			print("K.int_shape(y_pred)", K.int_shape(y_pred))
+			print("K.int_shape(y_true)", K.int_shape(y_true))
+			print("K.int_shape(loss)", K.int_shape(loss))
+			print("K.int_shape(weights)", K.int_shape(weights))
+
 			loss = loss * weights 
+			print("K.int_shape(loss)", K.int_shape(loss))
 			loss = - K.mean(loss, -1)
+			print("K.int_shape(loss)", K.int_shape(loss))
 
 			return loss
 		return loss

@@ -331,8 +331,10 @@ class ManagerEvidential2(ManagerMultiOutput):
         adam = Adam(lr = self.config['learning_rate'] , beta_1=0.9) # 1e-3
         
         # loss = src.loss.weighted_categorical_crossentropy(self.weights)
-        loss = self.el.categorical_crossentropy_envidential_learning
+        # loss = self.el.categorical_crossentropy_envidential_learning
         # loss = self.el.weighted_categorical_crossentropy_evidential_learning(self.weights)
+        loss = self.el.weighted_mse_loss(self.weights)
+
         input_shape = (rows, cols, self.channels)
         self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n)
         

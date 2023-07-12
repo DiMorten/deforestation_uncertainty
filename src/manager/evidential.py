@@ -424,9 +424,9 @@ class ManagerEvidential(Manager):
             
     #         loss = loss.weighted_categorical_crossentropy(weights)
             # loss = loss_evidential()
-            # loss = loss_evidential_mse(self.weights)
+            loss = loss_evidential_mse(self.weights)
             # loss = loss_evidential_UEO(self.weights)
-            loss = loss_evidential_dice(self.weights)
+            ## loss = loss_evidential_dice(self.weights)
             input_shape = (rows, cols, self.channels)
             self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n, last_activation=None)
             
