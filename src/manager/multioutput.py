@@ -192,7 +192,6 @@ class ManagerEvidential2(ManagerMultiOutput):
                         patch_size_cols, classes_mode = True)
                 prob_reconstructed, self.u_reconstructed = evidential.alpha_to_probability_and_uncertainty(
                     self.alpha_reconstructed)
-                prob_reconstructed = prob_reconstructed[...,1]
                 ts_time =  time.time() - start_test
 
                 if self.config["save_probabilities"] == True:
@@ -205,21 +204,30 @@ class ManagerEvidential2(ManagerMultiOutput):
         del self.image1_pad
 
 
+    def getMeanProb(self):
+        self.mean_prob = self.prob_rec
+      
+
     def applyProbabilityThreshold(self):
         print(self.mean_prob.shape)
-        self.predicted = np.zeros_like(self.mean_prob)
-        self.threshold = 0.5
 
-        self.predicted[self.mean_prob>=self.threshold] = 1
-        self.predicted[self.mean_prob<self.threshold] = 0
 
-        print(np.unique(self.predicted, return_counts=True))
-
-        self.predicted_unpad = self.predicted.copy()
+        self.predicted_unpad = np.argmax(self.mean_prob, axis=-1).astype(np.int8)
         self.predicted_unpad[self.label_mask == 2] = 0
-        ic(self.predicted_unpad.shape, self.predicted.shape)
-        del self.predicted
 
+        
+    def getValidationValuesForMetrics(self):
+        self.label_mask_val = self.label_mask[self.mask_tr_val == 2]
+        ic(self.label_mask_val.shape)
+
+        self.mean_prob_val = self.mean_prob[...,1][self.mask_tr_val == 2]
+
+        self.mean_prob_val = self.mean_prob_val[self.label_mask_val != 2]
+        self.label_mask_val_valid = self.label_mask_val[self.label_mask_val != 2]
+        ic(self.label_mask_val_valid.shape)
+
+        self.predicted_val = self.predicted_unpad[self.mask_tr_val == 2]
+        self.predicted_val = self.predicted_val[self.label_mask_val != 2]
     # to-do: pass to predictor. to do that, pass data to dataset class (dataset.image_stack, dataset.label, etc)
 
 
@@ -358,6 +366,23 @@ class ManagerEvidential2(ManagerMultiOutput):
 
         end_training = time.time() - start_training
         print('Training time: ', end_training)	
+
+    def getOptimalUncertaintyThreshold(self, AA = 0.03, bound = 0.0015):
+
+        def getAAFromUncertaintyThreshold(threshold): 
+            print(threshold)
+            metrics_values2 = _metrics.getAA_Recall(self.uncertainty, 
+                            self.label_mask_current_deforestation_test, 
+                            self.predicted_test, [threshold])
+            return np.abs(AA - metrics_values2[:,3].squeeze())
+
+        bounds = (np.min(self.uncertainty) + 0.0015, np.max(self.uncertainty)-0.0015)
+        ic(bounds)
+        minimum = optimize.minimize_scalar(getAAFromUncertaintyThreshold, 
+            method='bounded', bounds=bounds, tol=0.0001)
+        self.threshold_optimal = minimum.x
+        ic(self.threshold_optimal)
+
 # class ManagerEnsemble(ManagerMCDropout):
 class ManagerEnsemble(ManagerMultiOutput):
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
