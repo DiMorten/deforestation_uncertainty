@@ -46,6 +46,7 @@ class ManagerMultiOutput(Manager):
         cols = self.patch_size
         adam = Adam(lr = self.config['learning_rate'] , beta_1=0.9) # 1e-3
         
+        # loss = src.loss.weighted_categorical_crossentropy_ignore_index(self.weights, self.ignore_index)
         loss = src.loss.weighted_categorical_crossentropy(self.weights)
         
         input_shape = (rows, cols, self.channels)
@@ -152,7 +153,7 @@ class ManagerEvidential2(ManagerMultiOutput):
         ic(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5')
         model = load_model(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', 
             compile=False, custom_objects={"DirichletLayer": DirichletLayer })
-        class_n = 3
+        class_n = 2
         
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:

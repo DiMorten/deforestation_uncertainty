@@ -31,7 +31,8 @@ class Manager():
         self.patch_size = 128
         self.overlap = 0.7
         self.batch_size = 32
-        self.class_n = 3
+        self.class_n = 2
+        self.class_n_reference = 3
         self.logger = logger
         self.patchesHandler = patchesHandler
 
@@ -39,7 +40,8 @@ class Manager():
         self.training_times = training_times
         self.method = 'resunet'
         self.nb_filters = [16, 32, 64, 128, 256]
-        self.weights = [0.1, 0.9, 0]
+        self.weights = [0.1, 0.9]
+        self.ignore_index = 2
         # self.weights = [0.0025, 0.9975, 0]
         self.title_name = 'ResUnet'
 
@@ -152,9 +154,9 @@ class Manager():
 
         
         self.train_gen_batch = self.patchesHandler.batch_generator(self.train_gen,
-                self.image_stack, self.label_mask, self.patch_size, self.class_n)
+                self.image_stack, self.label_mask, self.patch_size, self.class_n_reference)
         self.valid_gen_batch = self.patchesHandler.batch_generator(self.valid_gen,
-                self.image_stack, self.label_mask, self.patch_size, self.class_n)
+                self.image_stack, self.label_mask, self.patch_size, self.class_n_reference)
 
     def fixChannelNumber(self):
         if type(self.patchesHandler) == PatchesHandlerMultipleDates:

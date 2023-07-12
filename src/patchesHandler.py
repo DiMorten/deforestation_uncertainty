@@ -122,7 +122,7 @@ class PatchesHandler():
 		if classes_mode == False:
 			img_reconstructed = np.zeros((h, w), dtype=np.float32)
 		else:
-			img_reconstructed = np.zeros((h, w, 3), dtype=np.float32)
+			img_reconstructed = np.zeros((h, w, 2), dtype=np.float32)
 
 		for i in range(0,num_patches_y):
 			for j in range(0,num_patches_x):

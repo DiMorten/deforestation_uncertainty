@@ -48,6 +48,8 @@ def weighted_categorical_crossentropy(weights):
 		weights = K.variable(weights)
 			
 		def loss(y_true, y_pred):
+			# y_true is of shape (N, H, W, C) with C the number of classes = 3. Ignore last index (ignore_index=2)
+			# y_pred is of shape (N, H, W, C) with C the number of classes = 2			
 			# scale predictions so that the class probas of each sample sum to 1
 			y_pred /= K.sum(y_pred, axis=-1, keepdims=True)
 			# clip to prevent NaN's and Inf's
@@ -66,5 +68,106 @@ def weighted_categorical_crossentropy(weights):
 
 			return loss
 		return loss
+
+
+
+def weighted_categorical_crossentropy(weights):
+		"""
+		A weighted version of keras.objectives.categorical_crossentropy
+		
+		Variables:
+			weights: numpy array of shape (C,) where C is the number of classes
+		
+		Usage:
+			weights = np.array([0.5,2,10]) # Class one at 0.5, class 2 twice the normal weights, class 3 10x.
+			loss = weighted_categorical_crossentropy(weights)
+			model.compile(loss=loss,optimizer='adam')
+		"""
+		
+		weights = K.variable(weights)
+			
+		def loss(y_true, y_pred):
+			# y_true is of shape (N, H, W, C) with C the number of classes = 3. Ignore last index (ignore_index=2)
+			# y_pred is of shape (N, H, W, C) with C the number of classes = 2			
+			# scale predictions so that the class probas of each sample sum to 1
+			y_true = y_true[:,:,:,0:2]
+			y_pred /= K.sum(y_pred, axis=-1, keepdims=True)
+			# clip to prevent NaN's and Inf's
+			y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())
+			loss = y_true * K.log(y_pred) + (1-y_true) * K.log(1-y_pred)
+
+			print("K.int_shape(y_pred)", K.int_shape(y_pred))
+			print("K.int_shape(y_true)", K.int_shape(y_true))
+			print("K.int_shape(loss)", K.int_shape(loss))
+			print("K.int_shape(weights)", K.int_shape(weights))
+
+			loss = loss * weights 
+			print("K.int_shape(loss)", K.int_shape(loss))
+			loss = - K.mean(loss, -1)
+			print("K.int_shape(loss)", K.int_shape(loss))
+
+			return loss
+		return loss
+'''		
+def weighted_categorical_crossentropy_ignore_index(weights, ignore_index):
+    """
+    A weighted version of keras.losses.categorical_crossentropy
+    with support for ignore_index.
+
+    Variables:
+        weights: numpy array of shape (C,) where C is the number of classes
+        ignore_index: int, the index of the class to ignore during loss calculation
+
+    Usage:
+        weights = np.array([0.5, 2, 10]) # Class one at 0.5, class 2 twice the normal weights, class 3 10x.
+        loss = weighted_categorical_crossentropy(weights, ignore_index)
+        model.compile(loss=loss, optimizer='adam')
+    """
+
+    weights = K.variable(weights)
+
+    def loss(y_true, y_pred):
+		# y_true is of shape (N, H, W, C) with C the number of classes = 3. Ignore last index (ignore_index=2)
+		# y_pred is of shape (N, H, W, C) with C the number of classes = 2
+        mask = tf.math.not_equal(y_true, ignore_index)
+        mask = tf.cast(mask, dtype=K.floatx())
+        y_true_masked = y_true * mask
+        # y_pred_masked = y_pred * mask
+
+        # Scale predictions so that the class probabilities of each sample sum to 1
+        y_pred /= K.sum(y_pred, axis=-1, keepdims=True)
+        # Clip to prevent NaN's and Inf's
+        y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())
+        
+        loss = y_true_masked * K.log(y_pred) + (1 - y_true_masked) * K.log(1 - y_pred)
+        loss = loss * weights
+        loss = -K.mean(loss, axis=-1)
+
+        return loss
+
+    return loss
+
+'''
+
+def weighted_cross_entropy_loss(loss_weights):
+    loss_object = tf.keras.losses.CategoricalCrossentropy(from_logits=True, reduction=tf.keras.losses.Reduction.NONE)
+
+    def loss_fn(y_true, y_pred):
+        # Adjust the number of classes in y_pred
+        adjusted_num_classes = y_true.shape[-1] - 1
+        adjusted_y_true = y_true[:, :, :, :-1]
+        
+        # Apply loss weights
+        per_pixel_loss = loss_object(adjusted_y_true, y_pred) * loss_weights
+
+        # Ignore specific indices
+        mask = tf.cast(tf.not_equal(tf.argmax(y_true, axis=-1), adjusted_num_classes), dtype=tf.float32)
+        per_pixel_loss *= mask
+
+        # Calculate mean loss
+        loss = tf.reduce_mean(per_pixel_loss)
+        return loss
+
+    return loss_fn
 
 
