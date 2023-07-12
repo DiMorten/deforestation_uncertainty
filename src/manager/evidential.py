@@ -152,11 +152,11 @@ class ManagerEvidential(Manager):
             print("term", term)
             loglikelihood = tf.reduce_sum(term, axis=-1, keepdims=True)
             print("loglikelihood", loglikelihood)
-            #global_step = tf.compat.v1.train.get_global_step
+
             KL_reg =  tf.minimum(1.0, tf.cast(global_step/annealing_step, tf.float32)) * KL((alpha - 1)*(1-p) + 1 , K)
             print("KL_reg", KL_reg)
             print("loglikelihood + KL_reg", loglikelihood + KL_reg)
-            # tf.keras.backend.set_value(KL_reg_monitor, tf.keras.backend.get_value(KL_reg))
+
             return loglikelihood + KL_reg
 
         def loss_eq_dice(p, alpha, K, global_step, annealing_step, weights):
@@ -213,14 +213,10 @@ class ManagerEvidential(Manager):
                 prob = alpha / tf.reduce_sum(alpha, axis = -1, keepdims=True) 
 
                 Y = y_true
-                # loss = loss_eq5(Y, alpha, class_n, global_step, 30) # 10*34
-                # loss = loss_eq5(Y, alpha, class_n, global_step, 40) # 10*34
+
                 loss = loss_eq5(Y, alpha, class_n, global_step, self.annealing_step, weights) # 10*3753/32
                 print("loss", loss)
-                #    loss = loss_eq5(Y, alpha, class_n, global_step, 15) # 10*34
-                #    loss = loss_eq5(Y, alpha, class_n, global_step, 5) # 10*34
-                #    loss = loss_eq5(Y, alpha, class_n, global_step, 60) # 10*34
-                # loss = loss * weights
+
                 loss = tf.reduce_mean(loss)
                 return loss
             return loss
@@ -243,14 +239,9 @@ class ManagerEvidential(Manager):
                 prob = alpha / tf.reduce_sum(alpha, axis = -1, keepdims=True) 
 
                 Y = y_true
-                # loss = loss_eq5(Y, alpha, class_n, global_step, 30) # 10*34
-                # loss = loss_eq5(Y, alpha, class_n, global_step, 40) # 10*34
+
                 loss = loss_eq_dice(Y, alpha, class_n, global_step, self.annealing_step, weights) # 10*3753/32
 
-                #    loss = loss_eq5(Y, alpha, class_n, global_step, 15) # 10*34
-                #    loss = loss_eq5(Y, alpha, class_n, global_step, 5) # 10*34
-                #    loss = loss_eq5(Y, alpha, class_n, global_step, 60) # 10*34
-                # loss = loss * weights
                 loss = tf.reduce_mean(loss)
                 return loss
             return loss

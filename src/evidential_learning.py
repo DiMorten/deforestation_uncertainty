@@ -4,6 +4,7 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 import pdb
+import tensorflow.keras.backend as K
 print(f"Tensorflow ver. {tf.__version__}")
 
 class EvidentialLearning:
@@ -54,10 +55,32 @@ class EvidentialLearning:
         E = y_pred - 1
         alp = tf.add(tf.multiply(E,tf.subtract(1.,y_truth)),1) 
         B = self.KL(alp)
+
         loss = tf.reduce_mean(A) + (self.an_*B)             
         
         return loss
 
+    def weighted_categorical_crossentropy_evidential_learning(self, weights):
+        weights = K.variable(weights)
+        def loss(y_truth,y_pred):
+            S = tf.reduce_sum(y_pred, axis=3,keepdims=True)
+            dgS = tf.math.digamma(S)
+            dgalpha = tf.math.digamma(y_pred)
+
+            term = tf.multiply(y_truth,tf.subtract(dgS,dgalpha))
+            term = term * weights
+            A = tf.reduce_sum(term,axis=3,keepdims=True)
+            E = y_pred - 1
+            alp = tf.add(tf.multiply(E,tf.subtract(1.,y_truth)),1) 
+            B = self.KL(alp)
+            print("K.int_shape(A)", K.int_shape(A))
+            print("K.int_shape(tf.reduce_mean(A))", K.int_shape(tf.reduce_mean(A)))
+            print("K.int_shape(B)", K.int_shape(B))
+
+            loss = tf.reduce_mean(A) + (self.an_*B)             
+            
+            return loss
+        return loss
     def mse_loss(self, y_truth,y_pred):
         S = tf.reduce_sum(y_pred, axis=3,keepdims=True)
         E = y_pred - 1

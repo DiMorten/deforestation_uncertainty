@@ -332,7 +332,7 @@ class ManagerEvidential2(ManagerMultiOutput):
         
         # loss = src.loss.weighted_categorical_crossentropy(self.weights)
         loss = self.el.categorical_crossentropy_envidential_learning
-        
+        # loss = self.el.weighted_categorical_crossentropy_evidential_learning(self.weights)
         input_shape = (rows, cols, self.channels)
         self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n)
         
