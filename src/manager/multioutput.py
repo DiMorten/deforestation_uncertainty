@@ -25,8 +25,10 @@ import src.uncertainty as uncertainty
 import pathlib
 import pdb
 from src.evidential_learning import EvidentialLearning
+import src.evidential_learning as evidential
 import src.network as network
 from tensorflow.keras.models import Model, load_model, Sequential
+from src.evidential_learning import DirichletLayer
 
 class ManagerMultiOutput(Manager):
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
@@ -148,7 +150,8 @@ class ManagerEvidential2(ManagerMultiOutput):
         num_patches_y = int(self.w/patch_size_cols)
 
         ic(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5')
-        model = load_model(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', compile=False)
+        model = load_model(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', 
+            compile=False, custom_objects={"DirichletLayer": DirichletLayer })
         class_n = 3
         
         if self.config["loadInference"] == False:
@@ -156,11 +159,11 @@ class ManagerEvidential2(ManagerMultiOutput):
                 if self.classes_mode == False:
                     self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
                 else:
-                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n - 1, self.config["inference_times"]), dtype = np.float32)
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n), dtype = np.float32)
 
                 # self.prob_rec = np.zeros((image1_pad.shape[0],image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
             print("Dropout training mode: {}".format(self.config['dropout_training']))
-            new_model = network.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
+            new_model = self.network_architecture(input_shape=(patch_size_rows,patch_size_cols, self.c), 
                 nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training=self.config['dropout_training'])
 
             for l in range(1, len(model.layers)):
@@ -168,43 +171,147 @@ class ManagerEvidential2(ManagerMultiOutput):
             
             self.patchesHandler.class_n = class_n
 
-            metrics_all =[]
             with tf.device('/cpu:0'):
-                for tm in range(0,self.config["inference_times"]):
+                tm = 0
+                print('time: ', tm)
 
-                    print('time: ', tm)
 
-                    
-                    # Recinstructing predicted map
-                    start_test = time.time()
-                    '''
-                    args_network = {'patch_size_rows': patch_size_rows,
-                        'patch_size_cols': patch_size_cols,
-                        'c': c,
-                        'nb_filters': nb_filters,
-                        'class_n': class_n,
-                        'dropout_seed': inference_times}
-                    '''
-                    self.alpha_reconstructed = self.patchesHandler.infer(
-                            new_model, self.image1_pad, self.h, self.w, 
-                            num_patches_x, num_patches_y, patch_size_rows, 
-                            patch_size_cols, classes_mode = self.classes_mode)
-                    prob_reconstructed, self.u_reconstructed = self.el.alpha_to_probability_and_uncertainty(
-                        self.alpha_reconstructed)
+                # Recinstructing predicted map
+                start_test = time.time()
+                '''
+                args_network = {'patch_size_rows': patch_size_rows,
+                    'patch_size_cols': patch_size_cols,
+                    'c': c,
+                    'nb_filters': nb_filters,
+                    'class_n': class_n,
+                    'dropout_seed': inference_times}
+                '''
+                self.alpha_reconstructed = self.patchesHandler.infer(
+                        new_model, self.image1_pad, self.h, self.w, 
+                        num_patches_x, num_patches_y, patch_size_rows, 
+                        patch_size_cols, classes_mode = True)
+                prob_reconstructed, self.u_reconstructed = evidential.alpha_to_probability_and_uncertainty(
+                    self.alpha_reconstructed)
+                prob_reconstructed = prob_reconstructed[...,1]
+                ts_time =  time.time() - start_test
 
-                    ts_time =  time.time() - start_test
+                if self.config["save_probabilities"] == True:
+                    np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
+                else:
+                    self.prob_rec = prob_reconstructed
+                
 
-                    if self.config["save_probabilities"] == True:
-                        np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
-                    else:
-                        self.prob_rec[...,tm] = prob_reconstructed
-                    
-                    metrics_all.append(ts_time)
-                    del prob_reconstructed
-                metrics_ = np.asarray(metrics_all)
-                # Saving test time
-                np.save(self.path_exp+'/metrics_ts.npy', metrics_)
-        del self.image1_pad        
+                del prob_reconstructed
+        del self.image1_pad
+
+
+    def applyProbabilityThreshold(self):
+        print(self.mean_prob.shape)
+        self.predicted = np.zeros_like(self.mean_prob)
+        self.threshold = 0.5
+
+        self.predicted[self.mean_prob>=self.threshold] = 1
+        self.predicted[self.mean_prob<self.threshold] = 0
+
+        print(np.unique(self.predicted, return_counts=True))
+
+        self.predicted_unpad = self.predicted.copy()
+        self.predicted_unpad[self.label_mask == 2] = 0
+        ic(self.predicted_unpad.shape, self.predicted.shape)
+        del self.predicted
+
+    # to-do: pass to predictor. to do that, pass data to dataset class (dataset.image_stack, dataset.label, etc)
+
+
+    def setUncertainty(self):
+        self.uncertainty_map = self.u_reconstructed
+
+
+
+    def getUncertaintyMetrics(self):
+        predicted_thresholded = np.zeros_like(self.uncertainty).astype(np.int8)
+        predicted_thresholded[self.uncertainty >= np.max(self.predicted_test,axis=-1)] = 1
+        print(np.unique(predicted_thresholded, return_counts=True))
+
+        predicted_test_classified_correct = self.predicted_test[
+                predicted_thresholded == 0]
+        label_current_deforestation_test_classified_correct = self.label_mask_current_deforestation_test[
+                predicted_thresholded == 0]
+
+
+        predicted_test_classified_incorrect = self.predicted_test[
+                predicted_thresholded == 1]
+        label_current_deforestation_test_classified_incorrect = self.label_mask_current_deforestation_test[
+                predicted_thresholded == 1]
+
+        uncertainty_classified_correct = self.uncertainty[
+                predicted_thresholded == 0]
+        uncertainty_classified_incorrect = self.uncertainty[
+                predicted_thresholded == 1]
+        print(np.min(uncertainty_classified_correct), np.mean(uncertainty_classified_correct), np.max(uncertainty_classified_correct))
+        print(np.min(uncertainty_classified_incorrect), np.mean(uncertainty_classified_incorrect), np.max(uncertainty_classified_incorrect))
+
+        print(label_current_deforestation_test_classified_correct.shape,
+                predicted_test_classified_correct.shape)
+        cm_correct = metrics.confusion_matrix(
+                label_current_deforestation_test_classified_correct,
+                predicted_test_classified_correct)
+        print("cm_correct", cm_correct)
+
+        TN_L = cm_correct[0,0]
+        FN_L = cm_correct[1,0]
+        TP_L = cm_correct[1,1]
+        FP_L = cm_correct[0,1]
+
+        ic(label_current_deforestation_test_classified_incorrect.shape,
+                predicted_test_classified_incorrect.shape)
+
+        cm_incorrect = metrics.confusion_matrix(
+                label_current_deforestation_test_classified_incorrect,
+                predicted_test_classified_incorrect)
+
+        print("cm_incorrect", cm_incorrect)
+
+        if cm_incorrect.shape[0] != 2: 
+                ic(np.all(label_current_deforestation_test_classified_incorrect) == 0) 
+                ic(np.all(predicted_test_classified_incorrect) == 0) 
+                
+                precision_L = np.nan 
+                recall_L = np.nan 
+                recall_Ltotal = np.nan 
+                AA = len(label_current_deforestation_test_classified_incorrect) / len(self.label_mask_current_deforestation_test) 
+                precision_H = np.nan 
+                recall_H = np.nan 
+        else:
+                        
+                TN_H = cm_incorrect[0,0]
+                FN_H = cm_incorrect[1,0]
+                TP_H = cm_incorrect[1,1]
+                FP_H = cm_incorrect[0,1]
+                
+                precision_L = TP_L / (TP_L + FP_L)
+                recall_L = TP_L / (TP_L + FN_L)
+                
+                precision_H = TP_H / (TP_H + FP_H)
+                recall_H = TP_H / (TP_H + FN_H)
+                
+                recall_Ltotal = TP_L / (TP_L + FN_L + TP_H + FN_H)
+                ic((TP_H + FN_H + FP_H + TN_H), len(self.label_mask_current_deforestation_test))
+                AA = (TP_H + FN_H + FP_H + TN_H) / len(self.label_mask_current_deforestation_test)
+                ic((TP_H + FN_H + FP_H + TN_H), len(self.label_mask_current_deforestation_test))
+
+
+        self.m = {'precision_L': precision_L,
+                'recall_L': recall_L,
+                'recall_Ltotal': recall_Ltotal,
+                'AA': AA,
+                'precision_H': precision_H,
+                'recall_H': recall_H}
+
+        self.m['f1_L'] = 2*self.m['precision_L']*self.m['recall_L']/(self.m['precision_L']+self.m['recall_L'])
+        self.m['f1_H'] = 2*self.m['precision_H']*self.m['recall_H']/(self.m['precision_H']+self.m['recall_H'])
+
+
     def train(self):
 
         metrics_all = []
