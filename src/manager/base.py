@@ -778,15 +778,17 @@ class Manager():
         self.threshold_optimal = minimum.x
         ic(self.threshold_optimal)
     
-    def getUncertaintyMetricsFromOptimalThreshold(self, get_f1=True):
-
+    def getUncertaintyMetricsFromOptimalThreshold(self, threshold=None, get_f1=True):
+        if threshold == None:
+            threshold = self.threshold_optimal
+        print("threshold: ", threshold)
         self.metric_values_optimal = _metrics.getAA_Recall(self.uncertainty, 
                                 self.label_mask_current_deforestation_test, 
-                                self.predicted_test, [self.threshold_optimal])
+                                self.predicted_test, [threshold])
 
         self.metric_values_audited_optimal = _metrics.getUncertaintyMetricsAudited(self.uncertainty, 
                 self.label_mask_current_deforestation_test, 
-                self.predicted_test, [self.threshold_optimal])
+                self.predicted_test, [threshold])
 
         self.m_optimal = {'precision_L': self.metric_values_optimal[:,0],
                 'recall_L': self.metric_values_optimal[:,1],
