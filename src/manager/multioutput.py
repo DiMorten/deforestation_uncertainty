@@ -152,7 +152,7 @@ class ManagerEvidential2(ManagerMultiOutput):
         ic(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5')
         model = load_model(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', 
             compile=False, custom_objects={"DirichletLayer": DirichletLayer })
-        class_n = 3
+        class_n = 2
         
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:
@@ -164,7 +164,7 @@ class ManagerEvidential2(ManagerMultiOutput):
                 # self.prob_rec = np.zeros((image1_pad.shape[0],image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
             print("Dropout training mode: {}".format(self.config['dropout_training']))
             new_model = self.network_architecture(input_shape=(patch_size_rows,patch_size_cols, self.c), 
-                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training=self.config['dropout_training'])
+                nb_filters = self.nb_filters, n_classes = class_n + 1, dropout_seed = None, training=self.config['dropout_training'])
 
             for l in range(1, len(model.layers)):
                 new_model.layers[l].set_weights(model.layers[l].get_weights())
@@ -237,8 +237,9 @@ class ManagerEvidential2(ManagerMultiOutput):
 
 
     def getUncertaintyMetrics(self):
+
         predicted_thresholded = np.zeros_like(self.uncertainty).astype(np.int8)
-        predicted_thresholded[self.uncertainty >= np.max(self.predicted_test,axis=-1)] = 1
+        predicted_thresholded[self.uncertainty >= np.max(self.max_prob_test,axis=-1)] = 1
         print(np.unique(predicted_thresholded, return_counts=True))
 
         predicted_test_classified_correct = self.predicted_test[
@@ -318,7 +319,7 @@ class ManagerEvidential2(ManagerMultiOutput):
 
         self.m['f1_L'] = 2*self.m['precision_L']*self.m['recall_L']/(self.m['precision_L']+self.m['recall_L'])
         self.m['f1_H'] = 2*self.m['precision_H']*self.m['recall_H']/(self.m['precision_H']+self.m['recall_H'])
-
+        return self.m
 
     def train(self):
 

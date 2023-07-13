@@ -239,18 +239,18 @@ def getAA_Recall(uncertainty, label_mask_current_deforestation_test,
     for threshold in threshold_list:
         print("threshold", threshold)
 
-        predicted_thresholded = np.zeros_like(uncertainty).astype(np.int8)
-        predicted_thresholded[uncertainty >= threshold] = 1
+        uncertainty_thresholded = np.zeros_like(uncertainty).astype(np.int8)
+        uncertainty_thresholded[uncertainty >= threshold] = 1
 
         predicted_test_classified_correct = predicted_test[
-            predicted_thresholded == 0]
+            uncertainty_thresholded == 0]
         label_current_deforestation_test_classified_correct = label_mask_current_deforestation_test[
-            predicted_thresholded == 0]
+            uncertainty_thresholded == 0]
 
         predicted_test_classified_incorrect = predicted_test[
-            predicted_thresholded == 1]
+            uncertainty_thresholded == 1]
         label_current_deforestation_test_classified_incorrect = label_mask_current_deforestation_test[
-            predicted_thresholded == 1]
+            uncertainty_thresholded == 1]
 
         ## print(label_current_deforestation_test_classified_correct.shape,
         ##     predicted_test_classified_correct.shape)
@@ -300,7 +300,7 @@ def getAA_Recall(uncertainty, label_mask_current_deforestation_test,
             ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
             AA = (TP_H + FN_H + FP_H + TN_H) / len(label_mask_current_deforestation_test)
             ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
-            UEO = getUEO(predicted_test, label_mask_current_deforestation_test, predicted_thresholded)
+            UEO = getUEO(predicted_test, label_mask_current_deforestation_test, uncertainty_thresholded)
 
         mm = np.hstack((precision_L, recall_L, recall_Ltotal, AA,
                 precision_H, recall_H, UEO))
@@ -310,6 +310,86 @@ def getAA_Recall(uncertainty, label_mask_current_deforestation_test,
         # pdb.set_trace()
     metrics_list = np.asarray(metrics_list)
     return metrics_list       
+
+
+
+def getAA_Recall_evidential(uncertainty_thresholded, label_mask_current_deforestation_test, 
+        predicted_test, threshold_list):
+    metrics_list = []
+    for threshold in threshold_list:
+        print("threshold", threshold)
+
+        uncertainty_thresholded = np.zeros_like(uncertainty).astype(np.int8)
+        uncertainty_thresholded[uncertainty >= np.argmax(predicted_probability_test, axis=-1)] = 1
+
+        predicted_test_classified_correct = predicted_test[
+            uncertainty_thresholded == 0]
+        label_current_deforestation_test_classified_correct = label_mask_current_deforestation_test[
+            uncertainty_thresholded == 0]
+
+        predicted_test_classified_incorrect = predicted_test[
+            uncertainty_thresholded == 1]
+        label_current_deforestation_test_classified_incorrect = label_mask_current_deforestation_test[
+            uncertainty_thresholded == 1]
+
+        ## print(label_current_deforestation_test_classified_correct.shape,
+        ##     predicted_test_classified_correct.shape)
+        cm_correct = metrics.confusion_matrix(
+            label_current_deforestation_test_classified_correct,
+            predicted_test_classified_correct)
+        ## print("cm_correct", cm_correct)
+
+        TN_L = cm_correct[0,0]
+        FN_L = cm_correct[1,0]
+        TP_L = cm_correct[1,1]
+        FP_L = cm_correct[0,1]
+
+        ic(label_current_deforestation_test_classified_incorrect.shape,
+            predicted_test_classified_incorrect.shape)
+
+        cm_incorrect = metrics.confusion_matrix(
+            label_current_deforestation_test_classified_incorrect,
+            predicted_test_classified_incorrect)
+
+        ## print("cm_incorrect", cm_incorrect)
+
+        if cm_incorrect.shape[0] != 2: 
+            ic(np.all(label_current_deforestation_test_classified_incorrect) == 0) 
+            ic(np.all(predicted_test_classified_incorrect) == 0) 
+             
+            precision_L = np.nan 
+            recall_L = np.nan 
+            recall_Ltotal = np.nan 
+            AA = len(label_current_deforestation_test_classified_incorrect) / len(label_mask_current_deforestation_test) 
+            precision_H = np.nan 
+            recall_H = np.nan 
+        else:
+                        
+            TN_H = cm_incorrect[0,0]
+            FN_H = cm_incorrect[1,0]
+            TP_H = cm_incorrect[1,1]
+            FP_H = cm_incorrect[0,1]
+            
+            precision_L = TP_L / (TP_L + FP_L)
+            recall_L = TP_L / (TP_L + FN_L)
+            
+            precision_H = TP_H / (TP_H + FP_H)
+            recall_H = TP_H / (TP_H + FN_H)
+            
+            recall_Ltotal = TP_L / (TP_L + FN_L + TP_H + FN_H)
+            ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+            AA = (TP_H + FN_H + FP_H + TN_H) / len(label_mask_current_deforestation_test)
+            ic((TP_H + FN_H + FP_H + TN_H), len(label_mask_current_deforestation_test))
+            UEO = getUEO(predicted_test, label_mask_current_deforestation_test, uncertainty_thresholded)
+
+        mm = np.hstack((precision_L, recall_L, recall_Ltotal, AA,
+                precision_H, recall_H, UEO))
+        print(mm)
+        metrics_list.append(mm)
+
+        # pdb.set_trace()
+    metrics_list = np.asarray(metrics_list)
+    return metrics_list   
 
 def getUncertaintyMetricsAudited(uncertainty, label_mask_current_deforestation_test, 
         predicted_test, threshold_list):
