@@ -139,7 +139,8 @@ class EvidentialLearning:
             mse = A + B
             print("K.int_shape(mse)", K.int_shape(mse))
             mse = mse * weights
-
+            # mse = mse * mask
+            
             #annealing_coef = tf.minimum(1.0,tf.cast(global_step/annealing_step,tf.float32))
             print("K.int_shape(E)", K.int_shape(E))
             print("K.int_shape(y_truth)", K.int_shape(y_truth))

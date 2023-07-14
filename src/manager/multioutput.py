@@ -179,7 +179,7 @@ class ManagerEvidential2(ManagerMultiOutput):
             print("Dropout training mode: {}".format(self.config['dropout_training']))
             new_model = self.network_architecture(input_shape=(patch_size_rows,patch_size_cols, self.c), 
                 nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None,
-                training=self.config['dropout_training'], last_activation='relu')
+                training=self.config['dropout_training'], last_activation='relu') # , last_activation='relu'
 
             for l in range(1, len(model.layers)):
                 new_model.layers[l].set_weights(model.layers[l].get_weights())
@@ -351,8 +351,9 @@ class ManagerEvidential2(ManagerMultiOutput):
         loss = self.el.weighted_mse_loss(self.weights)
 
         input_shape = (rows, cols, self.channels)
-        self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n)
-        
+        self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n, last_activation='relu')
+        # ,
+        #                                        last_activation='relu'
         self.model.compile(optimizer=adam, loss=loss, metrics=['accuracy'])
         self.model.summary()
 
