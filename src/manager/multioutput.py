@@ -29,7 +29,21 @@ import src.evidential_learning as evidential
 import src.network as network
 from tensorflow.keras.models import Model, load_model, Sequential
 from src.evidential_learning import DirichletLayer
-
+from numpy.core.numeric import Inf
+class _EarlyStopping():
+    def __init__(self, patience):
+        self.patience = patience
+        self.restartCounter()
+    def restartCounter(self):
+        self.counter = 0
+    def increaseCounter(self):
+        self.counter += 1
+    def checkStopping(self):
+        if self.counter >= self.patience:
+            return True
+        else:
+            return False
+        
 class ManagerMultiOutput(Manager):
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0):
         super().__init__(config, dataset, patchesHandler, logger, grid_idx=grid_idx)
@@ -164,7 +178,8 @@ class ManagerEvidential2(ManagerMultiOutput):
                 # self.prob_rec = np.zeros((image1_pad.shape[0],image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
             print("Dropout training mode: {}".format(self.config['dropout_training']))
             new_model = self.network_architecture(input_shape=(patch_size_rows,patch_size_cols, self.c), 
-                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training=self.config['dropout_training'])
+                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None,
+                training=self.config['dropout_training'], last_activation='relu')
 
             for l in range(1, len(model.layers)):
                 new_model.layers[l].set_weights(model.layers[l].get_weights())
@@ -342,29 +357,46 @@ class ManagerEvidential2(ManagerMultiOutput):
         self.model.summary()
 
         earlystop = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=1, mode='min')
-        checkpoint = ModelCheckpoint(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+        checkpoint_filename = self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5'
+        checkpoint = ModelCheckpoint(checkpoint_filename, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
         lr_reduce = ReduceLROnPlateau(factor=0.9, min_delta=0.0001, patience=5, verbose=1)
         callbacks_list = [earlystop, checkpoint]
         # train the model
         start_training = time.time()
 
-        epochs = 30
-        history = []
+        epochs = 500
+        history_list = []
+
+        val_loss = Inf
+        es = _EarlyStopping(10)
+
         for epoch in range(1,epochs+1):
             print('Epoch:',epoch)
             print('Anneling Coeficient', self.el.an_)
             self.el.updateAnnealingCoeficient(epoch)
-            history.append(self.model.fit(
+            history = self.model.fit(
                 self.train_gen_batch, 
                 epochs=1, 
                 steps_per_epoch=self.len_X_train*3//self.train_gen.batch_size, # quitar el 3?
                 validation_data=self.valid_gen_batch,
                 validation_steps=self.len_X_valid*3//self.valid_gen.batch_size,
-                callbacks=callbacks_list)) 
-            
-            #model.evaluate(data_gen(x_test_paths, y_test_paths, batch_size=1))
-            if epoch%50 == 0:
-                self.model.save('saved_model_cc_an' + str(i) + '/my_model')
+                callbacks=callbacks_list)
+            history_list.append(history.history)
+            new_val_loss = round(history.history['val_loss'][-1], 5)
+            if new_val_loss < val_loss:
+                # self.model.save(checkpoint_filename)
+                val_loss = new_val_loss
+                es.restartCounter()
+                print("New best val loss. Val loss: {}. Early stop count: {}".format(
+                    new_val_loss, es.counter))
+            else:
+                es.increaseCounter()
+                print("Early stop count: {}".format(es.counter))
+            if es.checkStopping() == True:
+                print("Early stopping")
+                print(es.counter, es.patience)
+                print('Finished Training')
+                break
 
         end_training = time.time() - start_training
         print('Training time: ', end_training)	

@@ -11,7 +11,7 @@ class EvidentialLearning:
     def __init__(self):
         self.an_ = 0
         self.im_len = 128
-        self.num_classes = 3
+        self.num_classes = 2
         
     def KL(self, alpha):
         beta=tf.constant(np.ones((self.im_len,self.im_len,self.num_classes)),dtype=tf.float32,shape=(self.im_len,self.im_len,self.num_classes))
@@ -103,8 +103,9 @@ class EvidentialLearning:
             print("K.int_shape(tf.reduce_mean(A))", K.int_shape(tf.reduce_mean(A)))
             print("K.int_shape(B)", K.int_shape(B))
 
-            loss = tf.reduce_mean(A) + (self.an_*B)             
-            
+            loss = tf.reduce_mean(A) + (self.an_*B)    
+                     
+            print(self.an_)
             return loss
         return loss
     def mse_loss(self, y_truth,y_pred):
@@ -124,6 +125,10 @@ class EvidentialLearning:
     def weighted_mse_loss(self, weights):
         weights = K.variable(weights)
         def loss(y_truth,y_pred):
+            mask = tf.cast(tf.not_equal(tf.argmax(y_truth, axis=3), self.num_classes), dtype=tf.float32)
+
+            y_truth = y_truth[:,:,:,0:2]
+
             S = tf.reduce_sum(y_pred, axis=3,keepdims=True)
             E = y_pred - 1
             prob = tf.math.divide_no_nan(y_pred,S)
@@ -132,12 +137,17 @@ class EvidentialLearning:
             B = tf.reduce_sum(y_pred*(S-y_pred)/(S*S*(S+1)), axis=3, keepdims=True) 
             
             mse = A + B
+            print("K.int_shape(mse)", K.int_shape(mse))
             mse = mse * weights
+
             #annealing_coef = tf.minimum(1.0,tf.cast(global_step/annealing_step,tf.float32))
-            
+            print("K.int_shape(E)", K.int_shape(E))
+            print("K.int_shape(y_truth)", K.int_shape(y_truth))
             alp = tf.add(tf.multiply(E,tf.subtract(1.,y_truth)),1) 
             C =  self.KL(alp)
-            return mse + (0.3*C)
+            #return mse + (0.3*C)
+            return mse + (1*C)
+        
         return loss
 
     def evidential_accuracy(self, y_truth,y_pred):
@@ -148,8 +158,8 @@ class EvidentialLearning:
         return acc   
     
     def updateAnnealingCoeficient(self, epoch):
-        self.an_ = np.minimum([1.0],[(float(epoch)/75.0)])
-        # self.an_ = np.minimum([1.0],[(float(epoch)/10.0)])
+        # self.an_ = np.minimum([1.0],[(float(epoch)/75.0)])
+        self.an_ = np.minimum([1.0],[(float(epoch)/10.0)])
     
 class DirichletLayer(tf.keras.layers.Layer):
   def __init__(self, num_outputs, **kwargs):
