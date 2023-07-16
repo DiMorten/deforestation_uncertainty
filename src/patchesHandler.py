@@ -365,3 +365,35 @@ class PatchesHandlerEvidential(PatchesHandlerMultipleDates):
 		del patch, predicted
 		return img_reconstructed, u_reconstructed, alpha_reconstructed
 
+class PatchesHandlerEvidential2(PatchesHandler):
+
+	def infer(self, new_model, image1_pad,
+		h, w, num_patches_x, num_patches_y, 
+		patch_size_x, patch_size_y, classes_mode=False):
+		# patch_size_x, patch_size_y, a):
+		
+		if classes_mode == False:
+			img_reconstructed = np.zeros((h, w, 3), dtype=np.float32)
+		else:
+			img_reconstructed = np.zeros((h, w, 2), dtype=np.float32)
+
+		for i in range(0,num_patches_y):
+			for j in range(0,num_patches_x):
+				'''
+				new_model = utils_v1.build_resunet_dropout_spatial(input_shape=(a['patch_size_rows'],a['patch_size_cols'], a['c']), 
+                	nb_filters = a['nb_filters'], n_classes = a['class_n'], dropout_seed = a['dropout_seed'])
+
+				for l in range(1, len(model.layers)):
+					new_model.layers[l].set_weights(model.layers[l].get_weights())
+				'''
+				patch = image1_pad[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)]
+				if classes_mode == False:
+					predicted = new_model.predict(np.expand_dims(patch, axis=0)).astype(np.float32)
+				else:
+					predicted = new_model.predict(np.expand_dims(patch, axis=0)).astype(np.float32)
+					# predicted[...,0] += predicted[...,-1] # add past deforestation prob. to "not current deforestation"
+					# predicted[...,0] = 1 - predicted[...,1]
+					# predicted = predicted[...,0:-1]
+				img_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = predicted
+		del patch, predicted
+		return img_reconstructed

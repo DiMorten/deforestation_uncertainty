@@ -166,7 +166,10 @@ class ManagerEvidential2(ManagerMultiOutput):
         ic(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5')
         model = load_model(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', 
             compile=False, custom_objects={"DirichletLayer": DirichletLayer })
-        class_n = 3
+        if self.classes_mode == False:
+            class_n = 3
+        else:
+            class_n = 2
         
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:
@@ -207,6 +210,8 @@ class ManagerEvidential2(ManagerMultiOutput):
                         patch_size_cols, classes_mode = True)
                 prob_reconstructed, self.u_reconstructed = evidential.alpha_to_probability_and_uncertainty(
                     self.alpha_reconstructed)
+                if self.classes_mode == False:
+                    prob_reconstructed = prob_reconstructed[:,:,:,0:2]
                 ts_time =  time.time() - start_test
 
                 if self.config["save_probabilities"] == True:
