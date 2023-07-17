@@ -635,6 +635,9 @@ class Manager():
                 # self.threshold_list = [x*1.0/0.36 for x in self.threshold_list] + [np.max(uncertainty)-0.006, np.max(uncertainty)-0.003]
                         
                 # self.threshold_list = np.linspace(np.min(uncertainty) + 0.0015, np.max(uncertainty) - 0.0015, 19)
+        elif self.config['uncertainty_method'] == "evidential2":
+                self.threshold_list = list(np.linspace(np.min(self.uncertainty)+0.0000001, np.max(self.uncertainty)-0.005, 11))[1:]
+
         print(self.threshold_list)
         self.loadThresholdMetrics = False
         if self.loadThresholdMetrics == False:

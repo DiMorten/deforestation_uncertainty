@@ -373,7 +373,7 @@ class PatchesHandlerEvidential2(PatchesHandler):
 		# patch_size_x, patch_size_y, a):
 		
 		if classes_mode == False:
-			img_reconstructed = np.zeros((h, w, 3), dtype=np.float32)
+			img_reconstructed = np.zeros((h, w, 2), dtype=np.float32)
 		else:
 			img_reconstructed = np.zeros((h, w, 2), dtype=np.float32)
 
@@ -388,7 +388,7 @@ class PatchesHandlerEvidential2(PatchesHandler):
 				'''
 				patch = image1_pad[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)]
 				if classes_mode == False:
-					predicted = new_model.predict(np.expand_dims(patch, axis=0)).astype(np.float32)
+					predicted = new_model.predict(np.expand_dims(patch, axis=0))[...,0:-1].astype(np.float32)
 				else:
 					predicted = new_model.predict(np.expand_dims(patch, axis=0)).astype(np.float32)
 					# predicted[...,0] += predicted[...,-1] # add past deforestation prob. to "not current deforestation"

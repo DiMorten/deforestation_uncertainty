@@ -8,10 +8,10 @@ import tensorflow.keras.backend as K
 print(f"Tensorflow ver. {tf.__version__}")
 
 class EvidentialLearning:
-    def __init__(self):
+    def __init__(self, num_classes = 2):
         self.an_ = 0
         self.im_len = 128
-        self.num_classes = 2
+        self.num_classes = num_classes
         
     def KL(self, alpha):
         beta=tf.constant(np.ones((self.im_len,self.im_len,self.num_classes)),dtype=tf.float32,shape=(self.im_len,self.im_len,self.num_classes))
@@ -126,8 +126,8 @@ class EvidentialLearning:
         weights = K.variable(weights)
         def loss(y_truth,y_pred):
             mask = tf.cast(tf.not_equal(tf.argmax(y_truth, axis=3), self.num_classes), dtype=tf.float32)
-
-            y_truth = y_truth[:,:,:,0:2]
+            if self.num_classes == 2:
+                y_truth = y_truth[:,:,:,0:2]
 
             S = tf.reduce_sum(y_pred, axis=3,keepdims=True)
             E = y_pred - 1

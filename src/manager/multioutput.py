@@ -152,7 +152,11 @@ class ManagerEvidential2(ManagerMultiOutput):
         self.network_architecture = network.build_evidential_resunet
 
         self.default_log_name = 'output/log/log_evidential.pkl'
-        self.el = EvidentialLearning()
+        if self.config['classes_mode'] == False:
+            self.model_class_n = self.reference_class_n
+        else:
+            self.model_class_n = self.class_n
+        self.el = EvidentialLearning(self.model_class_n)
 
     def infer(self):
 
@@ -167,21 +171,21 @@ class ManagerEvidential2(ManagerMultiOutput):
         model = load_model(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', 
             compile=False, custom_objects={"DirichletLayer": DirichletLayer })
         if self.classes_mode == False:
-            class_n = 3
+            class_n = 2
         else:
             class_n = 2
         
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:
                 if self.classes_mode == False:
-                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n), dtype = np.float32)
                 else:
                     self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n), dtype = np.float32)
 
                 # self.prob_rec = np.zeros((image1_pad.shape[0],image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
             print("Dropout training mode: {}".format(self.config['dropout_training']))
             new_model = self.network_architecture(input_shape=(patch_size_rows,patch_size_cols, self.c), 
-                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None,
+                nb_filters = self.nb_filters, n_classes = self.model_class_n, dropout_seed = None,
                 training=self.config['dropout_training'], last_activation='relu') # , last_activation='relu'
 
             for l in range(1, len(model.layers)):
@@ -207,11 +211,11 @@ class ManagerEvidential2(ManagerMultiOutput):
                 self.alpha_reconstructed = self.patchesHandler.infer(
                         new_model, self.image1_pad, self.h, self.w, 
                         num_patches_x, num_patches_y, patch_size_rows, 
-                        patch_size_cols, classes_mode = True)
+                        patch_size_cols, classes_mode = self.config['classes_mode'])
                 prob_reconstructed, self.u_reconstructed = evidential.alpha_to_probability_and_uncertainty(
                     self.alpha_reconstructed)
-                if self.classes_mode == False:
-                    prob_reconstructed = prob_reconstructed[:,:,:,0:2]
+                # if self.classes_mode == False:
+                #    prob_reconstructed = prob_reconstructed[:,:,:,0:2]
                 ts_time =  time.time() - start_test
 
                 if self.config["save_probabilities"] == True:
@@ -356,7 +360,8 @@ class ManagerEvidential2(ManagerMultiOutput):
         loss = self.el.weighted_mse_loss(self.weights)
 
         input_shape = (rows, cols, self.channels)
-        self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n, last_activation='relu')
+
+        self.model = self.network_architecture(input_shape, self.nb_filters, self.model_class_n, last_activation='relu')
         # ,
         #                                        last_activation='relu'
         self.model.compile(optimizer=adam, loss=loss, metrics=['accuracy'])
