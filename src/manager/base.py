@@ -178,9 +178,11 @@ class Manager():
         self.retrieveSamplesOfInterest()
         self.getGenerators()
         self.fixChannelNumber()
-        self.train()
-        self.plotHistory()
-        self.plotLossTerms()
+        for tm in range(self.config['training_times']):
+            self.repetition_id = tm
+            self.train()
+        # self.plotHistory()
+        # self.plotLossTerms()
         
     def snipDataset(self, idx=0):
         self.logger.snipDataset(self.dataset, idx, self.coords_train, self.patchesHandler, 
