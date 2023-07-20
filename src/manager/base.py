@@ -31,8 +31,6 @@ class Manager():
         self.patch_size = 128
         self.overlap = 0.7
         self.batch_size = 32
-        self.class_n = 2
-        self.reference_class_n = 3
         self.logger = logger
         self.patchesHandler = patchesHandler
 
@@ -40,7 +38,16 @@ class Manager():
         self.training_times = training_times
         self.method = 'resunet'
         self.nb_filters = [16, 32, 64, 128, 256]
-        self.weights = [0.1, 0.9]
+        if self.classes_mode == True:
+            self.weights = [0.1, 0.9]
+            self.class_n = 2
+            self.reference_class_n = 3
+
+        else:
+            self.weights = [0.1, 0.9, 0]
+            self.class_n = 3
+            self.reference_class_n = 3
+
         # self.weights = [0.0025, 0.9975, 0]
         self.title_name = 'ResUnet'
 
@@ -153,9 +160,9 @@ class Manager():
 
         
         self.train_gen_batch = self.patchesHandler.batch_generator(self.train_gen,
-                self.image_stack, self.label_mask, self.patch_size, self.class_n + 1)
+                self.image_stack, self.label_mask, self.patch_size, self.reference_class_n)
         self.valid_gen_batch = self.patchesHandler.batch_generator(self.valid_gen,
-                self.image_stack, self.label_mask, self.patch_size, self.class_n + 1)
+                self.image_stack, self.label_mask, self.patch_size, self.reference_class_n)
 
     def fixChannelNumber(self):
         if type(self.patchesHandler) == PatchesHandlerMultipleDates:
@@ -272,14 +279,19 @@ class Manager():
 
         ic(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5')
         model = load_model(self.path_models+ '/' + self.method +'_'+str(self.repetition_id)+'.h5', compile=False)
-        class_n = 3
         
+        if self.classes_mode == False:
+            class_n = 3
+            self.patchesHandler.class_n = class_n
+        else:
+            class_n = 2    
+            self.patchesHandler.class_n = class_n + 1
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:
                 if self.classes_mode == False:
                     self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
                 else:
-                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n - 1, self.config["inference_times"]), dtype = np.float32)
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
 
                 # self.prob_rec = np.zeros((image1_pad.shape[0],image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
             print("Dropout training mode: {}".format(self.config['dropout_training']))
@@ -289,7 +301,7 @@ class Manager():
             for l in range(1, len(model.layers)):
                 new_model.layers[l].set_weights(model.layers[l].get_weights())
             
-            self.patchesHandler.class_n = class_n
+            
 
             metrics_all =[]
             with tf.device('/cpu:0'):
@@ -765,7 +777,7 @@ class Manager():
         plt.ylim([0, 0.4])
         plt.savefig('output/figures/ueo.png', dpi=150, bbox_inches='tight')
 
-    def getOptimalUncertaintyThreshold(self, AA = 0.03, bound = 0.0015):
+    def getOptimalUncertaintyThreshold(self, AA = 0.03, bounds = None):
 
         def getAAFromUncertaintyThreshold(threshold): 
             print(threshold)
@@ -773,8 +785,9 @@ class Manager():
                             self.label_mask_current_deforestation_test, 
                             self.predicted_test, [threshold])
             return np.abs(AA - metrics_values2[:,3].squeeze())
-
-        bounds = (bound, np.max(self.uncertainty)-0.0015)
+        if bounds is None:
+            bounds = (np.min(self.uncertainty) + 0.0015, np.max(self.uncertainty)-0.0015)
+        
         ic(bounds)
         minimum = optimize.minimize_scalar(getAAFromUncertaintyThreshold, 
             method='bounded', bounds=bounds, tol=0.0001)

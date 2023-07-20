@@ -135,7 +135,7 @@ def resnet_block_spatial_dropout(x, n_filter, dropout_seed, ind, training=True):
     x = Add()([x, s])
     return x
 
-# Residual U-Net model
+# Dropout Residual U-Net model
 def build_resunet_dropout_spatial(input_shape, nb_filters, n_classes, dropout_seed = None, last_activation='softmax', training=True):
     '''Base network to be shared (eq. to feature extraction)'''
 

@@ -109,11 +109,13 @@ def weighted_categorical_crossentropy(weights):
 
 
 def weighted_cross_entropy_loss(loss_weights):
-    loss_object = tf.keras.losses.CategoricalCrossentropy(from_logits=True, reduction=tf.keras.losses.Reduction.NONE)
+# def weighted_categorical_crossentropy(loss_weights):
+    loss_object = tf.keras.losses.CategoricalCrossentropy(from_logits=False, reduction=tf.keras.losses.Reduction.NONE)
+    loss_weights = K.variable(loss_weights)
 
     def loss_fn(y_true, y_pred):
         # Adjust the number of classes in y_pred
-        adjusted_num_classes = y_true.shape[-1] - 1
+        adjusted_num_classes = 2
         adjusted_y_true = y_true[:, :, :, :-1]
         
         # Apply loss weights

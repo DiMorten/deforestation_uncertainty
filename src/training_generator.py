@@ -16,7 +16,7 @@ def batch_generator(batches, image, reference, target_size, number_class):
         batch_img = np.zeros((batch_x.shape[0], target_size, target_size, image.shape[-1]))
         batch_ref = np.zeros((batch_x.shape[0], target_size, target_size, number_class))
 
-        new_augmentations = True
+        new_augmentations = False
         for i in range(batch_x.shape[0]):
             if new_augmentations == False:
 

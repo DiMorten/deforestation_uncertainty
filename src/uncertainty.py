@@ -52,7 +52,8 @@ def single_experiment_entropy(pred_prob, classes_mode = False):
     for k in range(K):
         pred_entropy = pred_entropy + pred_prob[..., k] * np.log(pred_prob[..., k] + epsilon) 
     if classes_mode == True:
-        pred_entropy = - pred_entropy / np.log(K)
+        pred_entropy = - pred_entropy / K
+        # pred_entropy = - pred_entropy / np.log(K)
 
     else:
         pred_entropy = - pred_entropy / K

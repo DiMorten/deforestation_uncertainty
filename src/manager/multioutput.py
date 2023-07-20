@@ -150,9 +150,10 @@ class ManagerEvidential2(ManagerMultiOutput):
         config['dropout_training'] = False
         super().__init__(config, dataset, patchesHandler, logger, grid_idx)
         self.network_architecture = network.build_evidential_resunet
-
+        self.weights = [0.1, 0.9]
         self.default_log_name = 'output/log/log_evidential.pkl'
         self.el = EvidentialLearning()
+
 
     def infer(self):
 
@@ -181,8 +182,8 @@ class ManagerEvidential2(ManagerMultiOutput):
                 # self.prob_rec = np.zeros((image1_pad.shape[0],image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
             print("Dropout training mode: {}".format(self.config['dropout_training']))
             new_model = self.network_architecture(input_shape=(patch_size_rows,patch_size_cols, self.c), 
-                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None,
-                training=self.config['dropout_training'], last_activation='relu') # , last_activation='relu'
+                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, 
+                training=self.config['dropout_training'], last_activation='relu')
 
             for l in range(1, len(model.layers)):
                 new_model.layers[l].set_weights(model.layers[l].get_weights())
@@ -207,7 +208,7 @@ class ManagerEvidential2(ManagerMultiOutput):
                 self.alpha_reconstructed = self.patchesHandler.infer(
                         new_model, self.image1_pad, self.h, self.w, 
                         num_patches_x, num_patches_y, patch_size_rows, 
-                        patch_size_cols, classes_mode = True)
+                        patch_size_cols, classes_mode = self.classes_mode)
                 prob_reconstructed, self.u_reconstructed = evidential.alpha_to_probability_and_uncertainty(
                     self.alpha_reconstructed)
                 if self.classes_mode == False:
@@ -222,7 +223,6 @@ class ManagerEvidential2(ManagerMultiOutput):
 
                 del prob_reconstructed
         del self.image1_pad
-
 
     def getMeanProb(self):
         self.mean_prob = self.prob_rec
@@ -407,7 +407,8 @@ class ManagerEvidential2(ManagerMultiOutput):
         end_training = time.time() - start_training
         print('Training time: ', end_training)	
 
-    def getOptimalUncertaintyThreshold(self, AA = 0.03, bound = 0.0015):
+
+    def getOptimalUncertaintyThreshold(self, AA = 0.03, bounds = None):
 
         def getAAFromUncertaintyThreshold(threshold): 
             print(threshold)
@@ -415,8 +416,9 @@ class ManagerEvidential2(ManagerMultiOutput):
                             self.label_mask_current_deforestation_test, 
                             self.predicted_test, [threshold])
             return np.abs(AA - metrics_values2[:,3].squeeze())
-
-        bounds = (np.min(self.uncertainty) + 0.0015, np.max(self.uncertainty)-0.0015)
+        if bounds is None:
+            bounds = (np.min(self.uncertainty) + 0.0015, np.max(self.uncertainty)-0.0015)
+        
         ic(bounds)
         minimum = optimize.minimize_scalar(getAAFromUncertaintyThreshold, 
             method='bounded', bounds=bounds, tol=0.0001)
