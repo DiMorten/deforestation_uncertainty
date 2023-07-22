@@ -90,7 +90,7 @@ Edit the `config` dictionary for configuration.
    - `dataset`: Options: "PA": Para site. "MT": Mato Grosso site.
    - `year`: year from the latest image in the image pair. Example: 2019
      
-The script will generate a NPY with the cloud mask which is used during training.
+The script will generate a NPY with the temporal distance to past deforestation map which is used during training and inference.
 
 Example: to train in PA site for [2018, 2019] dates, execute the script only for the latest year (2019)
 
