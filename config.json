@@ -1,0 +1,18 @@
+{
+    "training": false,
+	"inferring": true,
+	"site": "PA", 
+	"training_date": "earlier", 
+	"mode": "ensemble", 
+	"uncertainty_method": "pred_entropy", 
+	"loadInference": false,
+	"removePolygons": true,
+	"plotLandsat": false,
+	"plotPOI": false,
+
+	"save_probabilities": false,
+	"addPastDeforestationInput": true,
+	"classes_mode": false,
+	"learning_rate": 1e-4,
+    "use_cloud_mask": true,
+}

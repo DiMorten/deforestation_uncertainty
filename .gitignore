@@ -126,7 +126,8 @@ dmypy.json
 *.png
 *.tif
 *.pkl
-*.json
+*.pkl.json
+# *.json
 *.csv
 *.h5
 logs/*
