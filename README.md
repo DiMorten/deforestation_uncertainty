@@ -74,8 +74,8 @@ The function `exportBands` exports the selected bands to a TIF file. To reduce c
 
 Use the `cloud_mask.py` script.
 Edit the `config` dictionary for configuration.
-   - "dataset": Options: "PA": Para site. "MT": Mato Grosso site.
-   - "year": year from the cloud mask to be calculated. Example: 2019
+   - `dataset`: Options: "PA": Para site. "MT": Mato Grosso site.
+   - `year`: year from the cloud mask to be calculated. Example: 2019
      
 The script will generate a NPY with the cloud mask which is used during training.
 
@@ -87,8 +87,8 @@ Example: to train in PA site for [2018, 2019] dates, execute the script two time
 To calculate it, use the script `preprocess_deforestation_time.py`
 
 Edit the `config` dictionary for configuration.
-   - "dataset": Options: "PA": Para site. "MT": Mato Grosso site.
-   - "year": year from the latest image in the image pair. Example: 2019
+   - `dataset`: Options: "PA": Para site. "MT": Mato Grosso site.
+   - `year`: year from the latest image in the image pair. Example: 2019
      
 The script will generate a NPY with the cloud mask which is used during training.
 
@@ -99,8 +99,8 @@ Example: to train in PA site for [2018, 2019] dates, execute the script only for
 Normalized input is pre-calculated. Use `preprocess_dataset.py` to normalize the input image.
 
 Edit the `config` dictionary for configuration.
-   - "dataset": Options: "PA": Para site. "MT": Mato Grosso site.
-   - "year": year from the latest image in the image pair. Example: 2019
+   - `dataset`: Options: "PA": Para site. "MT": Mato Grosso site.
+   - `year`: year from the latest image in the image pair. Example: 2019
      
 The script will generate a NPY with the normalized input image which is used during training.
 
