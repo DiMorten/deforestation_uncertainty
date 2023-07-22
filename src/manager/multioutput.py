@@ -440,20 +440,22 @@ class ManagerEnsemble(ManagerMultiOutput):
         num_patches_x = int(self.h/patch_size_rows)
         num_patches_y = int(self.w/patch_size_cols)
 
-
-        class_n = 3
-        
+        if self.classes_mode == False:
+            class_n = 3
+            self.patchesHandler.class_n = class_n
+        else:
+            class_n = 2    
+            self.patchesHandler.class_n = class_n + 1        
         if self.config["loadInference"] == False:
             if self.config["save_probabilities"] == False:
                 if self.classes_mode == False:
                     self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
                 else:
-                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n - 1, self.config["inference_times"]), dtype = np.float32)
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
 
             new_model = network.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
                 nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training = False)
 
-            self.patchesHandler.class_n = class_n
             # pathlib.Path(self.path_maps).mkdir(parents=True, exist_ok=True)
             with tf.device('/cpu:0'):
                 for tm in range(0,self.config["inference_times"]):
@@ -465,7 +467,9 @@ class ManagerEnsemble(ManagerMultiOutput):
                     path_exp = self.dataset.paths.experiment + 'exp' + str(self.exp) # exp_ids[tm]
                     path_models = path_exp + '/models'
                     # ic(path_models+ '/' + method +'_'+str(0)+'.h5')
-                    model = load_model(path_models+ '/' + self.method +'_'+str(tm)+'.h5', compile=False)
+                    path_repetition = path_models+ '/' + self.method +'_'+str(tm)+'.h5'
+                    print("Loading model in:", path_repetition)
+                    model = load_model(path_repetition, compile=False)
                     for l in range(1, len(model.layers)): #WHY 1?
                         new_model.layers[l].set_weights(model.layers[l].get_weights())
                     
