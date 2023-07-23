@@ -87,7 +87,7 @@ def weighted_categorical_crossentropy(weights):
 		# y_true is of shape (N, H, W, C) with C the number of classes = 3. Ignore last index (ignore_index=2)
 		# y_pred is of shape (N, H, W, C) with C the number of classes = 2			
 		# scale predictions so that the class probas of each sample sum to 1
-		y_true = y_true[:,:,:,0:2]
+		# y_true = y_true[:,:,:,0:2]
 		y_pred /= K.sum(y_pred, axis=-1, keepdims=True)
 		# clip to prevent NaN's and Inf's
 		y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())

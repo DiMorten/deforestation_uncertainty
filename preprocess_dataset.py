@@ -12,10 +12,8 @@ from src.dataset import PA, PAMultipleDates, MTMultipleDates, MT, MA, MS, PI
 
 # ======= INPUT PARAMETERS ============ # 
 config = {
-    'dataset': 'PI',
-    'year': 2020, # latest year
-    'maskOutClouds': False,
-    'exclude60mBandsFlag': False
+    'dataset': 'PA',
+    'year': 2019, # latest year
 }
 # ======= END INPUT PARAMETERS ============ # 
 
@@ -23,10 +21,14 @@ scale_list = None
 
 if config['dataset'] == 'PA':
     dataset = PA()
+    config['maskOutClouds'] = True
+    config['exclude60mBandsFlag'] = True
+
 elif config['dataset'] == 'MT':
     dataset = MT()
-elif config['dataset'] == 'MA':
-    dataset = MA()
+    config['maskOutClouds'] = True
+    config['exclude60mBandsFlag'] = True
+
 elif config['dataset'] == 'MS':
     dataset = MS()
     config['maskOutClouds'] = False
@@ -35,6 +37,8 @@ elif config['dataset'] == 'PI':
     dataset = PI()
     config['maskOutClouds'] = False
     config['exclude60mBandsFlag'] = False
+elif config['dataset'] == 'MA':
+    dataset = MA()
 
 
 

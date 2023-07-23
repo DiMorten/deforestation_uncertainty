@@ -15,8 +15,8 @@ from src.dataset import (
 ic.configureOutput(includeContext=True)
 # ======= INPUT PARAMETERS ============ #
 config = {
-    'dataset': 'PI',
-    'year': 2020, # latest year
+    'dataset': 'PA',
+    'year': 2019, # latest year
 }
 mask_input = 'deforestation_time'
 loadDeforestationBefore2008Flag = True
