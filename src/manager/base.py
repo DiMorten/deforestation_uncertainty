@@ -225,7 +225,7 @@ class Manager():
         calculateMAPWithoutSmallPolygons = False
         if calculateMAPWithoutSmallPolygons == True:
             self.calculateMAPWithoutSmallPolygons()
-        self.get_label_no_buffer()
+        # self.get_label_no_buffer()
         self.getErrorMask()
         self.getErrorMaskToShowRGB()
         self.setUncertainty()
@@ -233,11 +233,11 @@ class Manager():
         self.getTestValues2() 
         
         self.getUncertaintyToShow()
-        self.logger.plotCropSample(self)
+        # self.logger.plotCropSample(self)
 
         
-        sUEO, ece_score = self.getOtherUncertaintyMetrics()
-        out['other_uncertainty_metrics'] = {'sUEO': sUEO, 'ece_score': ece_score}
+        ## sUEO, ece_score = self.getOtherUncertaintyMetrics()
+        ## out['other_uncertainty_metrics'] = {'sUEO': sUEO, 'ece_score': ece_score}
         # optional
         # self.getPOIValues()
         # out['snippet_poi_results'] = self.snippet_poi_results
@@ -523,7 +523,7 @@ class Manager():
     def getErrorMaskToShowRGB(self):
         predicted_unpad_to_show = self.predicted_unpad.copy()
 
-        predicted_unpad_to_show[self.label_no_buffer == 2] = 0
+        predicted_unpad_to_show[self.label_mask == 2] = 0
         
         print(np.unique(predicted_unpad_to_show))
         error_mask_to_show = _metrics.getRgbErrorMask(predicted_unpad_to_show, 

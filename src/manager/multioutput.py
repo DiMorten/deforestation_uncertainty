@@ -94,6 +94,7 @@ class ManagerMultiOutput(Manager):
             self.prob_rec = np.transpose(self.prob_rec, (2, 0, 1))
             self.prob_rec = np.expand_dims(self.prob_rec, axis = -1)
         else:
+            print(self.prob_rec.shape)
             self.prob_rec = np.transpose(self.prob_rec, (3, 0, 1, 2))
 
     def setUncertainty(self):
@@ -250,6 +251,8 @@ class ManagerEvidential2(ManagerMultiOutput):
         self.predicted_val = self.predicted_val[self.label_mask_val != 2]
     # to-do: pass to predictor. to do that, pass data to dataset class (dataset.image_stack, dataset.label, etc)
 
+    def preprocessProbRec(self):
+        pass
 
     def setUncertainty(self):
         self.uncertainty_map = self.u_reconstructed

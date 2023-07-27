@@ -125,10 +125,11 @@ class EvidentialLearning:
     def weighted_mse_loss(self, weights):
         weights = K.variable(weights)
         def loss(y_truth,y_pred):
-            mask = tf.cast(tf.not_equal(tf.argmax(y_truth, axis=3), self.num_classes), dtype=tf.float32)
+            # mask = tf.cast(tf.not_equal(tf.argmax(y_truth, axis=3), self.num_classes), dtype=tf.float32)
 
+            mask = tf.expand_dims(1 - y_truth[:,:,:,-1], axis=-1)
             y_truth = y_truth[:,:,:,0:2]
-
+            
             S = tf.reduce_sum(y_pred, axis=3,keepdims=True)
             E = y_pred - 1
             prob = tf.math.divide_no_nan(y_pred,S)
@@ -138,16 +139,20 @@ class EvidentialLearning:
             
             mse = A + B
             print("K.int_shape(mse)", K.int_shape(mse))
+            print("K.int_shape(mask)", K.int_shape(mask))
+
             mse = mse * weights
-            # mse = mse * mask
+            mse = mse * mask
             
             #annealing_coef = tf.minimum(1.0,tf.cast(global_step/annealing_step,tf.float32))
             print("K.int_shape(E)", K.int_shape(E))
             print("K.int_shape(y_truth)", K.int_shape(y_truth))
             alp = tf.add(tf.multiply(E,tf.subtract(1.,y_truth)),1) 
             C =  self.KL(alp)
-            #return mse + (0.3*C)
+            # return mse + (0.3*C)
             return mse + (1*C)
+            # return mse + (self.an_*C)
+            # print(self.an_)
         
         return loss
 
