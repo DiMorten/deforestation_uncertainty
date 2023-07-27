@@ -1,9 +1,10 @@
 {
-    "training": false,
+    "training": true,
 	"inferring": true,
 	"site": "PA", 
-	"training_date": "earlier", 
-	"mode": "ensemble", 
+	"training_date": "current", 
+	"mode": "evidential2", 
+	"training_times": 1,
 	"uncertainty_method": "pred_entropy", 
 	"loadInference": false,
 	"removePolygons": true,
@@ -12,7 +13,7 @@
 
 	"save_probabilities": false,
 	"addPastDeforestationInput": true,
-	"classes_mode": false,
+	"classes_mode": true,
 	"learning_rate": 1e-4,
     "use_cloud_mask": true
 }
