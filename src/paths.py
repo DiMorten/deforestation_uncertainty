@@ -227,6 +227,7 @@ class PathsPI(Paths):
             2020: ['merged_2020_crop.tif']
         }
 
+        self.biome_limits = os.path.join(self.optical_im_folder, 'biome_limits.tif')
 class PathsMA(Paths): 
     def __init__(self): 
         self.reference_folder = 'D:/Jorge/datasets/deforestation/MA/'

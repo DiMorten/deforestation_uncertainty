@@ -12,12 +12,14 @@ class Logger():
         # pathlib.Path(figures_path).mkdir(parents=True, exist_ok=True)
         pathlib.Path("output/figures/").mkdir(parents=True, exist_ok=True)
         self.title_name = 'ResUnet'
-    def plotFigure(self, figure, name='output/figure', cmap = plt.cm.gray, savefig=False, figsize=(10,10), dpi=200):
+    def plotFigure(self, figure, name='output/figure', cmap = plt.cm.gray, 
+                   savefig=False, figsize=(10,10), dpi=200, axis_off = True):
         plt.figure(figsize=figsize)
         plt.imshow(figure, cmap=cmap)
 
         # title_name = 'ResUnet'
-        plt.axis('off')
+        if axis_off == True:
+            plt.axis('off')
         if savefig == True:
             plt.savefig('output/figures/' + name, dpi=150, bbox_inches='tight')
 

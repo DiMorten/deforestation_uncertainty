@@ -849,7 +849,7 @@ class Manager():
     def plotAnnealingCoef(self):
         pass
 
-    def run_predictor_repetition(self, uncertainty_methods=['pred_entropy', 'pred_var', 'MI', 'KL']):
+    def run_predictor_multiple_metrics(self, uncertainty_methods=['pred_entropy', 'pred_var', 'MI', 'KL']):
         # self.setExperimentPath()
         # self.createLogFolders()
         self.setPadding()

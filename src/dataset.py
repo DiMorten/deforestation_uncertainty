@@ -310,7 +310,11 @@ class PI(Dataset):
 		self.bands = 4
 
 		self.min_polygon_area = 400 # 4.0ha
-
+	def maskOutNonBiome(self, label):
+		biome_limits = utils_v1.load_tiff_image(
+			self.paths.biome_limits).astype(np.uint8)[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]]
+		label[biome_limits == 0] = 2 
+		return label		
 class MA(Dataset):
 	def __init__(self):
 		self.paths = PathsMA()
@@ -421,20 +425,12 @@ class MultipleDates():
 		return label_past_deforestation_before_2008
 
 	def loadInputImage(self):
-		# self.addPastDeforestationInput = False
-		# image_stack = super().loadInputImage()
-		# self.addPastDeforestationInput = True
+
 		image_stack = []
 		for date in self.dates:
 			im = np.load(os.path.join(self.paths.optical_im_past_dates[date], 'optical_im.npy')).astype('float32')[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]]
 			image_stack.append(im)
 		image_stack = np.concatenate(image_stack, axis = -1)
-		'''
-		image_stack = np.concatenate((
-			np.load(self.paths.optical_im_past_dates[2017] + 'optical_im.npy').astype('float32'),
-			image_stack),
-			axis = -1)
-		'''
 
 		if self.addPastDeforestationInput == True:
 			image_stack = self.addDeforestationTime(image_stack)        
@@ -442,11 +438,7 @@ class MultipleDates():
 		return image_stack
 
 	def addDeforestationTime(self, image_stack):
-		'''
-		image_stack = super().addDeforestationTime(image_stack)
-		print("2")
-		ic(image_stack.shape)
-		'''
+
 		deforestation_times = []
 		for date in self.dates[:-1]:
 			deforestation_times.append(
@@ -467,7 +459,8 @@ class MultipleDates():
 			if self.config['use_cloud_mask'] == True:
 				label = self.addCloudMaskToLabel(label, date)
 				label = self.addCloudMaskToLabel(label, date - 1)
-			
+			if self.config['mask_out_non_biome'] == True:
+				label = self.maskOutNonBiome(label)
 			if self.borderBuffer > 0:
 				label = self.removeBorderBufferFromLabel(label, self.borderBuffer)
 				print("Removing bufer................")
