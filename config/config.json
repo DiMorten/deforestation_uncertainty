@@ -1,23 +1,24 @@
 {
     "training": false,
 	"inferring": true,
-	"site": "PI", 
+	"site": "MS", 
 	"training_date": "earlier", 
-	"mode": "evidential2", 
+	"mode": "mcd", 
 	"training_times": 10,
 	"uncertainty_method": "pred_entropy", 
 	"loadInference": false,
 	"removePolygons": true,
 	"plotLandsat": false,
 	"plotPOI": false,
-	"training_experiment_id": 15,
+	"training_experiment_id": 19,
 	"get_multiple_metrics": false,
 
 	"save_probabilities": false,
 	"addPastDeforestationInput": true,
-	"classes_mode": true,
+	"classes_mode": false,
 	"learning_rate": 1e-4,
     "use_cloud_mask": false,
+	"mask_out_non_biome": false,
 
-	"log_filename": "log_mcd_pi_earlier.pkl"
+	"log_filename": "log_mcd_ms_earlier.pkl"
 }

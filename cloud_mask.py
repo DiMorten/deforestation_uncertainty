@@ -8,12 +8,13 @@ import rasterio
 from osgeo import gdal 
 import cv2 
 import src.rasterTools as rasterTools
-
+import os
 from src.dataset import (
-    PA, PADistanceMap, PAMultipleDates, MTMultipleDates,
+    PA, PAMultipleDates, MTMultipleDates,
     MT, 
     MS,
-    MA
+    MA,
+    PI
 )
 # naming conventions: 
 # ['QA60', 'B1','B2',    'B3',    'B4',   'B5','B6','B7', 'B8','  B8A', 'B9',          'B10', 'B11','B12'] 
@@ -115,8 +116,8 @@ if __name__ == '__main__':
     # ======= INPUT PARAMETERS ============ # 
 
     config = {
-        'dataset': 'MT',
-        'year': 2020, # latest year # MA: 2021
+        'dataset': 'PI',
+        'year': 2019, # latest year # MA: 2021
     }
     if config['dataset'] == 'PA':
         dataset = PA()
@@ -126,6 +127,8 @@ if __name__ == '__main__':
         dataset = MS()
     elif config['dataset'] == 'MA':            
         dataset = MA()
+    elif config['dataset'] == 'PI':            
+        dataset = PI()
 
     addThinCloudMask = False
     apply_shadow_mask = False
@@ -141,6 +144,16 @@ if __name__ == '__main__':
         cirrus_band_id = 1
 
     elif type(dataset) == MT: 
+
+        path_cirrus_band = dataset.paths.im_filenames[config['year']][5]
+        cirrus_band_id = 0
+
+    elif type(dataset) == MS: 
+
+        path_cirrus_band = dataset.paths.im_filenames[config['year']][5]
+        cirrus_band_id = 0
+
+    elif type(dataset) == PI: 
 
         path_cirrus_band = dataset.paths.im_filenames[config['year']][5]
         cirrus_band_id = 0
@@ -176,7 +189,8 @@ if __name__ == '__main__':
 
     # === GET CIRRUS THIN CLOUD MASK === #
     ic(path_optical_im + path_cirrus_band)
-    cirrus = rasterTools.load_tiff_image(path_optical_im + path_cirrus_band)[cirrus_band_id]
+    cirrus = rasterTools.load_tiff_image(
+        os.path.join(path_optical_im, path_cirrus_band))[cirrus_band_id]
     if scale_list != None:
         cirrus = rasterTools.scaleIm(cirrus, 6.0)
     ic(np.min(cirrus), np.average(cirrus), np.max(cirrus))
@@ -201,9 +215,10 @@ if __name__ == '__main__':
     plt.figure() 
     plt.imshow(cloud_mask) 
     plt.axis('off') 
-    plt.savefig(path_optical_im + 'cloudmask_' + filename + '.png', dpi = 500)
+    plt.savefig(
+        os.path.join(path_optical_im, 'cloudmask_' + filename + '.png'), dpi = 500)
     
 
-    print("saving in... " + path_optical_im + "cloudmask_" + filename)
-    np.save(path_optical_im + "cloudmask_" + filename, cloud_mask) 
+    print("saving in... " + os.path.join(path_optical_im, "cloudmask_" + filename))
+    np.save(os.path.join(path_optical_im, "cloudmask_" + filename), cloud_mask) 
 

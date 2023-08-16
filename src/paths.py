@@ -185,9 +185,27 @@ class PathsMS(Paths):
         }
         
         self.im_filenames = {
-            2018: ['merged_2018_crop.tif'],
-            2019: ['merged_2019_crop.tif'],
-            2020: ['merged_2020_crop.tif']
+            2018: ['S2_MS_B1_B2_2018_crop.tif',
+                   'S2_MS_B3_B4_2018_crop.tif',
+                   'S2_MS_B5_B6_2018_crop.tif',
+                   'S2_MS_B7_B8_2018_crop.tif',
+                   'S2_MS_B8A_B9_2018_crop.tif',
+                   'S2_MS_B10_B11_2018_crop.tif',
+                   'S2_MS_B12_2018_crop.tif'],
+            2019: ['S2_MS_B1_B2_2019_crop.tif',
+                   'S2_MS_B3_B4_2019_crop.tif',
+                   'S2_MS_B5_B6_2019_crop.tif',
+                   'S2_MS_B7_B8_2019_crop.tif',
+                   'S2_MS_B8A_B9_2019_crop.tif',
+                   'S2_MS_B10_B11_2019_crop.tif',
+                   'S2_MS_B12_2019_crop.tif'],
+            2020: ['S2_MS_B1_B2_2020_crop.tif',
+                   'S2_MS_B3_B4_2020_crop.tif',
+                   'S2_MS_B5_B6_2020_crop.tif',
+                   'S2_MS_B7_B8_2020_crop.tif',
+                   'S2_MS_B8A_B9_2020_crop.tif',
+                   'S2_MS_B10_B11_2020_crop.tif',
+                   'S2_MS_B12_2020_crop.tif']
         }
 
 class PathsPI(Paths):
@@ -207,6 +225,62 @@ class PathsPI(Paths):
             2020: os.path.join(self.reference_folder, 'deforestation_time_normalized_2020.npy'),
             2019: os.path.join(self.reference_folder, 'deforestation_time_normalized_2019.npy'),
             2018: os.path.join(self.reference_folder, 'deforestation_time_normalized_2018.npy'),
+            2017: os.path.join(self.reference_folder, 'deforestation_time_normalized_2017.npy'),
+
+        } 
+
+        self.optical_im_past_dates = { 
+            2020: os.path.join(self.optical_im_folder,  '2020'), 
+            2019: os.path.join(self.optical_im_folder,  '2019'),
+            2018: os.path.join(self.optical_im_folder,  '2018'),
+            2017: os.path.join(self.optical_im_folder,  '2017'),
+        }
+
+        self.cloud_mask = {
+            2020: os.path.join(self.optical_im_folder,  '2020', 'cloudmask_PI_2020.npy'), 
+            2019: os.path.join(self.optical_im_folder,  '2019', 'cloudmask_PI_2019.npy'),
+            2018: os.path.join(self.optical_im_folder,  '2018', 'cloudmask_PI_2018.npy'),
+            2017: os.path.join(self.optical_im_folder,  '2018', 'cloudmask_PI_2017.npy')
+        }
+
+        self.im_filenames = {
+            2017: ['S2_PI_B4_B3_2017_crop.tif',
+                   'S2_PI_B2_B8_2017_crop.tif'],
+            2018: ['merged_2018_crop.tif'],
+            2019: ['merged_2019_crop.tif'],
+            2020: ['merged_2020_crop.tif']
+        }
+        '''
+        self.im_filenames = {
+            2018: ['merged_2018_crop.tif'],
+            2019: ['S2_PI_B1_B2_2019_crop.tif',
+                   'S2_PI_B3_B4_2019_crop.tif',
+                   'S2_PI_B5_B6_2019_crop.tif',
+                   'S2_PI_B7_B8_2019_crop.tif',
+                   'S2_PI_B8A_B9_2019_crop.tif',
+                   'S2_PI_B10_B11_2019_crop.tif',
+                   'S2_PI_B12_2019_crop.tif'],
+            2020: ['merged_2020_crop.tif']
+        }
+        '''
+        self.biome_limits = os.path.join(self.optical_im_folder, 'biome_limits.tif')
+class PathsMO(Paths):
+    def __init__(self): 
+
+        self.reference_folder = 'D:/Jorge/datasets/deforestation/MO/'
+        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/MO/'
+
+        self.experiment = 'D:/Jorge/datasets/deforestation/experiments/MO/' 
+
+        self.deforestation_before_2008 = os.path.join(self.reference_folder, 'deforestation_before_2000_MO.tif') 
+
+        self.hydrography = os.path.join(self.reference_folder, 'hydgrography.tif')
+        self.deforestation_past_years = os.path.join(self.reference_folder, 'deforestation_past_years.tif')
+ 
+        self.deforestation_time = {
+            2020: os.path.join(self.reference_folder, 'deforestation_time_normalized_2020.npy'),
+            2019: os.path.join(self.reference_folder, 'deforestation_time_normalized_2019.npy'),
+            2018: os.path.join(self.reference_folder, 'deforestation_time_normalized_2018.npy'),
         } 
 
         self.optical_im_past_dates = { 
@@ -216,18 +290,21 @@ class PathsPI(Paths):
         }
 
         self.cloud_mask = {
-            2020: os.path.join(self.optical_im_folder,  '2020', 'cloudmask_PI_2020.npy'), 
-            2019: os.path.join(self.optical_im_folder,  '2019', 'cloudmask_PI_2019.npy'),
-            2018: os.path.join(self.optical_im_folder,  '2018', 'cloudmask_PI_2018.npy'),
+            2020: os.path.join(self.optical_im_folder,  '2020', 'cloudmask_MO_2020.npy'), 
+            2019: os.path.join(self.optical_im_folder,  '2019', 'cloudmask_MO_2019.npy'),
+            2018: os.path.join(self.optical_im_folder,  '2018', 'cloudmask_MO_2018.npy'),
         }
 
         self.im_filenames = {
-            2018: ['merged_2018_crop.tif'],
-            2019: ['merged_2019_crop.tif'],
-            2020: ['merged_2020_crop.tif']
+            2018: ['S2_MO_B4_B3_2018_crop.tif',
+                   'S2_MO_B2_B8_2018_crop.tif'],
+            2019: ['S2_MO_B4_B3_2019_crop.tif',
+                   'S2_MO_B2_B8_2019_crop.tif'],
+            2020: ['S2_MO_B4_B3_2020_crop.tif',
+                   'S2_MO_B2_B8_2020_crop.tif']
         }
-
         self.biome_limits = os.path.join(self.optical_im_folder, 'biome_limits.tif')
+
 class PathsMA(Paths): 
     def __init__(self): 
         self.reference_folder = 'D:/Jorge/datasets/deforestation/MA/'

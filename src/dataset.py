@@ -4,7 +4,7 @@ from icecream import ic
 import pdb
 import scipy
 sys.path.append("..")
-from src.paths import PathsPA, PathsMT, PathsMA, PathsMS, PathsPI
+from src.paths import PathsPA, PathsMT, PathsMA, PathsMS, PathsPI, PathsMO
 import utils_v1
 import skimage
 import matplotlib.pyplot as plt
@@ -240,8 +240,10 @@ class MS(Dataset):
 						{"coords": [670, 550], "text": "K"}]]
 		
 		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
-		self.prodes_dates = [2019, 2020, 2021]
+		self.prodes_dates = [2018, 2019, 2020]
 		self.hspace = [-0.1, -0.1]				# 0,    1,2,3,4,5,6,7,8,9,10,    11,12,13,14,15,16,17,18,19,20  
+		# self.previewBandsSnip = [[1,2,3],[11,12,13]]
+		# self.bands = 10
 		self.previewBandsSnip = [[1,2,3],[5,6,7]]   # 0,      1,2,3,4,      5,6,7,8
 		self.bands = 4
 
@@ -259,7 +261,7 @@ class PI(Dataset):
 		
 		# self.previewLims2 = np.array([5000, 6000, 9420, 10420])
 
-		self.site = 'MS' 
+		self.site = 'PI' 
 		 
 		self.lims = np.array([None, None, None, None])
  
@@ -304,17 +306,82 @@ class PI(Dataset):
 						{"coords": [670, 550], "text": "K"}]]
 		
 		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
-		self.prodes_dates = [2019, 2020, 2021]
+		self.prodes_dates = [2018, 2019, 2020]
 		self.hspace = [-0.1, -0.1]				# 0,    1,2,3,4,5,6,7,8,9,10,    11,12,13,14,15,16,17,18,19,20  
 		self.previewBandsSnip = [[1,2,3],[5,6,7]]   # 0,      1,2,3,4,      5,6,7,8
 		self.bands = 4
 
 		self.min_polygon_area = 400 # 4.0ha
+
 	def maskOutNonBiome(self, label):
 		biome_limits = utils_v1.load_tiff_image(
 			self.paths.biome_limits).astype(np.uint8)[self.lims[0]:self.lims[1], self.lims[2]:self.lims[3]]
 		label[biome_limits == 0] = 2 
 		return label		
+
+class MO(Dataset):
+	def __init__(self): 
+		self.paths = PathsMO() 
+		# self.previewLims1 = np.array([2200, 3200, 6900, 7900])
+		# self.previewLims2 = np.array([500, 1500, 3500, 4500])
+		self.previewLims1 = np.array([5500, 8500, 10000, 12500])
+
+		self.previewLims2 = np.array([16000, 18000, 3000, 6000])
+		# self.previewLims2 = np.array([5080, 6000, 9500, 10500])
+		
+		# self.previewLims2 = np.array([5000, 6000, 9420, 10420])
+
+		self.site = 'MO' 
+		 
+		self.lims = np.array([None, None, None, None])
+ 
+		self.grid_x, self.grid_y = 5,5 
+ 
+
+
+		self.tiles_tr = [2,4,5,6,7,12,14,15,18,21,23,25]  
+		# self.tiles_val = [9,11,25] 
+		# self.tiles_val = [8,11,25] 
+		self.tiles_val = [9,11,24] 
+		'''
+		self.tiles_tr = [2,4,5,6,7,12,14,15,18,21,23,24]  
+		# self.tiles_val = [9,11,25] 
+		# self.tiles_val = [8,11,25] 
+		self.tiles_val = [9,11,25] 
+		'''
+		self.patch_deforestation_percentage = 0.2
+
+		self.snippet_coords = {
+			"snippet_id0": [
+				[550, 550], # 10,1 alpha
+				[210, 610], #harder 1,1 alpha
+				[207, 617], # easy 1,1 alpha
+				[800, 200] # easy 1,10 alpha
+			],
+			"snippet_id1": [
+				[550, 115], # 10,1 alpha # I think will diverge from ensemble
+				[430, 950] # Will diverge from ensemble
+			]
+		}
+
+		self.polygons = [[{"coords": [460, 720], "text": "L"},
+                        {"coords": [600, 950], "text": "M"},
+                        {"coords": [800, 100], "text": "N"}],
+
+						[{"coords": [200, 740], "text": "F"},
+                        {"coords": [770, 730], "text": "G"},
+						{"coords": [410, 470], "text": "H"},
+						{"coords": [500, 850], "text": "I"},
+						{"coords": [200, 650], "text": "J"},
+						{"coords": [670, 550], "text": "K"}]]
+		
+		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
+		self.prodes_dates = [2018, 2019, 2020]
+		self.hspace = [-0.1, -0.1]				# 0,    1,2,3,4,5,6,7,8,9,10,    11,12,13,14,15,16,17,18,19,20  
+		self.previewBandsSnip = [[1,2,3],[5,6,7]]   # 0,      1,2,3,4,      5,6,7,8
+		self.bands = 4
+
+		self.min_polygon_area = 400 # 4.0ha	
 class MA(Dataset):
 	def __init__(self):
 		self.paths = PathsMA()
@@ -536,4 +603,7 @@ class MSMultipleDates(MultipleDates, DeforestationTime, MS):
 	pass
 
 class PIMultipleDates(MultipleDates, DeforestationTime, PI):
+	pass
+
+class MOMultipleDates(MultipleDates, DeforestationTime, MO):
 	pass
