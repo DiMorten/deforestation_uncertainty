@@ -307,6 +307,8 @@ class PI(Dataset):
 		
 		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
 		self.prodes_dates = [2018, 2019, 2020]
+		self.prodes_dates = [2017, 2018, 2019]
+		
 		self.hspace = [-0.1, -0.1]				# 0,    1,2,3,4,5,6,7,8,9,10,    11,12,13,14,15,16,17,18,19,20  
 		self.previewBandsSnip = [[1,2,3],[5,6,7]]   # 0,      1,2,3,4,      5,6,7,8
 		self.bands = 4

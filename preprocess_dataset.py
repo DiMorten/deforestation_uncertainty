@@ -12,8 +12,8 @@ from src.dataset import PA, PAMultipleDates, MTMultipleDates, MT, MA, MS, PI, MO
 
 # ======= INPUT PARAMETERS ============ # 
 config = {
-    'dataset': 'PI',
-    'year': 2017, # latest year
+    'dataset': 'MS',
+    'year': 2021, # latest year
 }
 # ======= END INPUT PARAMETERS ============ # 
 

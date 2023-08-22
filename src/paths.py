@@ -167,18 +167,21 @@ class PathsMS(Paths):
         self.deforestation_past_years = os.path.join(self.reference_folder, 'deforestation_past_years.tif')
  
         self.deforestation_time = {
+            2021: os.path.join(self.reference_folder, 'deforestation_time_normalized_2021.npy'),
             2020: os.path.join(self.reference_folder, 'deforestation_time_normalized_2020.npy'),
             2019: os.path.join(self.reference_folder, 'deforestation_time_normalized_2019.npy'),
             2018: os.path.join(self.reference_folder, 'deforestation_time_normalized_2018.npy'),
         } 
 
         self.optical_im_past_dates = { 
+            2021: os.path.join(self.optical_im_folder,  '2021'), 
             2020: os.path.join(self.optical_im_folder,  '2020'), 
             2019: os.path.join(self.optical_im_folder,  '2019'), 
             2018: os.path.join(self.optical_im_folder,  '2018'), 
         }
 
         self.cloud_mask = {
+            2021: os.path.join(self.optical_im_folder,  '2021', 'cloudmask_MS_2021.npy'), 
             2020: os.path.join(self.optical_im_folder,  '2020', 'cloudmask_MS_2020.npy'), 
             2019: os.path.join(self.optical_im_folder,  '2019', 'cloudmask_MS_2019.npy'),
             2018: os.path.join(self.optical_im_folder,  '2018', 'cloudmask_MS_2018.npy'),
@@ -207,7 +210,22 @@ class PathsMS(Paths):
                    'S2_MS_B10_B11_2020_crop.tif',
                    'S2_MS_B12_2020_crop.tif']
         }
-
+ 
+        self.im_filenames = {
+            2018: ['S2_MS_B4_B3_2018_crop.tif',
+                   'S2_MS_B2_B8_2018_crop.tif'],
+            2019: ['S2_MS_B4_B3_2019_crop.tif',
+                   'S2_MS_B2_B8_2019_crop.tif'],
+            2020: ['S2_MS_B4_B3_2020_crop.tif',
+                   'S2_MS_B2_B8_2020_crop.tif']                   
+        }   
+        self.im_filenames = {
+            2018: ['merged_2018_crop.tif'],
+            2019: ['merged_2019_crop.tif'],
+            2020: ['merged_2020_crop.tif'],
+            2021: ['S2_MS_B4_B3_2021_crop.tif',
+                   'S2_MS_B2_B8_2021_crop.tif']
+        }    
 class PathsPI(Paths):
     def __init__(self): 
 
@@ -240,7 +258,7 @@ class PathsPI(Paths):
             2020: os.path.join(self.optical_im_folder,  '2020', 'cloudmask_PI_2020.npy'), 
             2019: os.path.join(self.optical_im_folder,  '2019', 'cloudmask_PI_2019.npy'),
             2018: os.path.join(self.optical_im_folder,  '2018', 'cloudmask_PI_2018.npy'),
-            2017: os.path.join(self.optical_im_folder,  '2018', 'cloudmask_PI_2017.npy')
+            2017: os.path.join(self.optical_im_folder,  '2017', 'cloudmask_PI_2017.npy')
         }
 
         self.im_filenames = {

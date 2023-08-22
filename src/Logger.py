@@ -266,7 +266,7 @@ class Logger():
                     hspace = manager.dataset.hspace[1])
             plt.savefig('output/figures/' + manager.dataset.__class__.__name__ + 'PredictSampleUncertaintyLandsatColorbar.png', dpi=150, bbox_inches='tight')
 
-    def plotCropSampleT0T1(self, manager):
+    def plotCropSampleT0T1(self, manager, previewLims, colorbar = False, save_name = '1'):
         previewBandsT0 = manager.dataset.previewBandsSnip[-2]
         previewBandsT1 = manager.dataset.previewBandsSnip[-1]
 
@@ -275,8 +275,7 @@ class Logger():
         self.plotCropSampleFlag = True
         if self.plotCropSampleFlag == True:
 
-            # import matplotlib
-            # customCmap = matplotlib.colors.ListedColormap(['black', 'red'])
+
             '''
             ic(manager.dataset.previewLims1, manager.dataset.previewLims2)
             lims = manager.dataset.previewLims1
@@ -286,29 +285,11 @@ class Logger():
             '''
             _plt.plotCropSample5(manager.image_stack[...,previewBandsT0], manager.image_stack[...,previewBandsT1], manager.mean_prob, 
                     manager.error_mask_to_show_rgb[...,::-1], manager.uncertainty_to_show, 
-                    lims = manager.dataset.previewLims1, 
+                    lims = previewLims, 
                     titles = ['Snippet $\mathregular{T_{-1}}$', 'Snippet $\mathregular{T_0}$', 'Predicted Probability', 'Predicted', 'Uncertainty'],
                     cmaps = [plt.cm.gray, plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
                     maskBackground = [False, False, True, False, True],
-                    invertMask = [False, False, False, False, False], uncertainty_vlims = uncertainty_vlims)
-            plt.savefig('output/figures/' + manager.dataset.__class__.__name__ + 'PredictSampleUncertainty1_.png', dpi=150, bbox_inches='tight')
-
-            _plt.plotCropSample5(manager.image_stack[...,previewBandsT0], manager.image_stack[...,previewBandsT1], manager.mean_prob, 
-                    manager.error_mask_to_show_rgb[...,::-1], manager.uncertainty_to_show, 
-                    lims = manager.dataset.previewLims2, 
-                    titles = ['Snippet $\mathregular{T_{-1}}$', 'Snippet $\mathregular{T_0}$', 'Predicted Probability', 'Predicted', 'Uncertainty'],
-                    cmaps = [plt.cm.gray, plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
-                    maskBackground = [False, False, True, False, True],
-                    invertMask = [False, False, False, False, False], uncertainty_vlims = uncertainty_vlims)
-            plt.savefig('output/figures/' + manager.dataset.__class__.__name__ + 'PredictSampleUncertainty2_.png', dpi=150, bbox_inches='tight')
-
-            _plt.plotCropSample5(manager.image_stack[...,previewBandsT0], manager.image_stack[...,previewBandsT1], manager.mean_prob, 
-                    manager.error_mask_to_show_rgb[...,::-1], manager.uncertainty_to_show, 
-                    lims = manager.dataset.previewLims2, 
-                    titles = ['Snippet $\mathregular{T_{-1}}$', 'Snippet $\mathregular{T_0}$', 'Predicted Probability', 'Predicted', 'Uncertainty'],
-                    cmaps = [plt.cm.gray, plt.cm.gray, 'jet', plt.cm.gray, 'jet'],
-                    maskBackground = [False, False, True, False, True],
-                    invertMask = [False, False, False, False, False], uncertainty_vlims = uncertainty_vlims,
-                    colorbar = True)
-            plt.savefig('output/figures/' + manager.dataset.__class__.__name__ + 'PredictSampleUncertaintyColorbar_.png', dpi=150, bbox_inches='tight')
+                    invertMask = [False, False, False, False, False], uncertainty_vlims = uncertainty_vlims, 
+                    colorbar = colorbar)
+            plt.savefig('output/figures/' + manager.dataset.__class__.__name__ + 'PredictSampleUncertainty{}_.png'.format(save_name), dpi=150, bbox_inches='tight')
 
