@@ -281,6 +281,15 @@ class PathsPI(Paths):
             2020: ['merged_2020_crop.tif']
         }
         '''
+        self.im_filenames = {
+            2017: ['S2_PI_B4_B3_2017_crop.tif',
+                   'S2_PI_B2_B8_2017_crop.tif'],
+            2018: ['merged_2018_crop.tif'],
+            2019: ['S2_PI_B4_B3_2019_crop.tif',
+                   'S2_PI_B2_B8_2019_crop.tif'],
+            2020: ['S2_PI_B4_B3_2020_crop.tif',
+                   'S2_PI_B2_B8_2020_crop.tif']
+        }
         self.biome_limits = os.path.join(self.optical_im_folder, 'biome_limits.tif')
 class PathsMO(Paths):
     def __init__(self): 
