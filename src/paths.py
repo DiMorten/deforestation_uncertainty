@@ -219,6 +219,7 @@ class PathsMS(Paths):
             2020: ['S2_MS_B4_B3_2020_crop.tif',
                    'S2_MS_B2_B8_2020_crop.tif']                   
         }   
+        '''
         self.im_filenames = {
             2018: ['merged_2018_crop.tif'],
             2019: ['merged_2019_crop.tif'],
@@ -226,6 +227,7 @@ class PathsMS(Paths):
             2021: ['S2_MS_B4_B3_2021_crop.tif',
                    'S2_MS_B2_B8_2021_crop.tif']
         }    
+        '''
 class PathsPI(Paths):
     def __init__(self): 
 
