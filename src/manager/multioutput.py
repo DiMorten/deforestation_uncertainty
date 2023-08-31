@@ -458,6 +458,7 @@ class ManagerEnsemble(ManagerMultiOutput):
 
             new_model = network.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
                 nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training = False)
+            t0 = time.time()
 
             # pathlib.Path(self.path_maps).mkdir(parents=True, exist_ok=True)
             with tf.device('/cpu:0'):
@@ -465,7 +466,7 @@ class ManagerEnsemble(ManagerMultiOutput):
                     print('time: ', tm)
                     
                     # Recinstructing predicted map
-                    start_test = time.time()
+                    runtime_repetition_t0 = time.time()
 
                     path_exp = self.dataset.paths.experiment + 'exp' + str(self.exp) # exp_ids[tm]
                     path_models = path_exp + '/models'
@@ -489,8 +490,8 @@ class ManagerEnsemble(ManagerMultiOutput):
                             num_patches_x, num_patches_y, patch_size_rows, 
                             patch_size_cols, classes_mode = self.classes_mode)
                             
-                    ts_time =  time.time() - start_test
-
+                    runtime_repetition =  time.time() - runtime_repetition_t0
+                    print("runtime_repetition", round(runtime_repetition,2))
                     if self.config["save_probabilities"] == True:
                         
                         np.save(os.path.join(self.path_maps, 'prob_'+str(tm)+'.npy'),prob_reconstructed) 
@@ -498,6 +499,11 @@ class ManagerEnsemble(ManagerMultiOutput):
                         self.prob_rec[...,tm] = prob_reconstructed
 
                     del prob_reconstructed
+            runtime = time.time() - t0
+            print("Inference runtime", round(runtime,2))
+            # print round time.time()
+
+
         del self.image1_pad
 
     def run_predictor_repetition_single_entropy(self):

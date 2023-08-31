@@ -481,6 +481,7 @@ class ManagerEvidential(Manager):
         self.class_n = 3
 
         if self.config["loadInference"] == False:
+            t0 = time.time()
             if self.config["save_probabilities"] == False:
                 # self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.class_n, inference_times), dtype = np.float32)
                 self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.class_n), dtype = np.float32)
@@ -511,18 +512,20 @@ class ManagerEvidential(Manager):
                             self.patch_size_cols)
                             # patch_size_cols, a = args_network)
                             
-                    ts_time =  time.time() - start_test
+                    # ts_time =  time.time() - start_test
 
                     if self.config["save_probabilities"] == True:
                         np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
                     else:
                         self.prob_rec = prob_reconstructed.copy()
                     
-                    metrics_all.append(ts_time)
+                    # metrics_all.append(ts_time)
                     del prob_reconstructed
-                metrics_ = np.asarray(metrics_all)
+                # metrics_ = np.asarray(metrics_all)
                 # Saving test time
-                np.save(self.path_exp+'/metrics_ts.npy', metrics_)
+                # np.save(self.path_exp+'/metrics_ts.npy', metrics_)
+            runtime = time.time() - t0
+            print("Inference runtime", round(runtime,2))
         del self.image1_pad
         
         self.alpha_unpad = self.alpha_reconstructed[:self.label_mask.shape[0], :self.label_mask.shape[1]]

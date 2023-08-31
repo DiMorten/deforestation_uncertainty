@@ -1,7 +1,7 @@
 {
     "training": false,
 	"inferring": true,
-	"site": "MS", 
+	"site": "PI", 
 	"training_date": "earlier", 
 	"mode": "mcd", 
 	"training_times": 10,
@@ -10,15 +10,16 @@
 	"removePolygons": true,
 	"plotLandsat": false,
 	"plotPOI": false,
-	"training_experiment_id": 19,
+	"training_experiment_id": 27,
 	"get_multiple_metrics": false,
+	"start_repetition_id": 0,
 
 	"save_probabilities": false,
 	"addPastDeforestationInput": true,
 	"classes_mode": false,
 	"learning_rate": 1e-4,
     "use_cloud_mask": false,
-	"mask_out_non_biome": false,
+	"mask_out_non_biome": true,
 
-	"log_filename": "log_mcd_ms_earlier.pkl"
+	"log_filename": "log.pkl"
 }

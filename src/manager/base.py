@@ -880,6 +880,7 @@ class Manager():
         results = {}
         for uncertainty_method in uncertainty_methods:
             self.config['uncertainty_method'] = uncertainty_method
+            print("uncertainty_method", uncertainty_method)
             self.setUncertainty()
             self.getValidationValues2()
             self.getTestValues2()

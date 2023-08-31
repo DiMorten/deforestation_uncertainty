@@ -275,6 +275,10 @@ class Logger():
         self.plotCropSampleFlag = True
         if self.plotCropSampleFlag == True:
 
+            lims = manager.dataset.previewLims1
+            ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]]))
+            lims = manager.dataset.previewLims2
+            ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
 
             '''
             ic(manager.dataset.previewLims1, manager.dataset.previewLims2)

@@ -213,6 +213,11 @@ class MS(Dataset):
 		 
 		self.tiles_val = [9,11,25] 
 		
+		'''
+		self.tiles_tr = [2,4,5,6,7,12,14,15,18,19,21,23]  
+		 
+		self.tiles_val = [9,11,25] 
+		'''
 		self.patch_deforestation_percentage = 0.2
 
 		self.snippet_coords = {

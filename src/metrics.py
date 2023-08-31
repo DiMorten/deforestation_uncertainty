@@ -283,6 +283,7 @@ def getAA_Recall(uncertainty, label_mask_current_deforestation_test,
             AA = len(label_current_deforestation_test_classified_incorrect) / len(label_mask_current_deforestation_test) 
             precision_H = np.nan 
             recall_H = np.nan 
+            UEO = np.nan
         else:
                         
             TN_H = cm_incorrect[0,0]
