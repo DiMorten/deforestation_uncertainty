@@ -8,7 +8,7 @@ from sklearn.preprocessing._data import _handle_zeros_in_scale
 import cv2
 import src.rasterTools as rasterTools
 
-from src.dataset import PA, PAMultipleDates, MTMultipleDates, MT, MA, MS, PI, MO
+from src.dataset import PA, PAMultipleDates, MTMultipleDates, MT, MA, MS, PI, MO, L8MT
 
 # ======= INPUT PARAMETERS ============ # 
 config = {
@@ -39,6 +39,11 @@ elif config['dataset'] == 'PI':
     config['exclude60mBandsFlag'] = False
 elif config['dataset'] == 'MO':
     dataset = MO()
+    config['maskOutClouds'] = False
+    config['exclude60mBandsFlag'] = False
+
+elif config['dataset'] == 'L8MT':
+    dataset = L8MT()
     config['maskOutClouds'] = False
     config['exclude60mBandsFlag'] = False
 

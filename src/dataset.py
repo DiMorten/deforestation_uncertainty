@@ -4,7 +4,7 @@ from icecream import ic
 import pdb
 import scipy
 sys.path.append("..")
-from src.paths import PathsPA, PathsMT, PathsMA, PathsMS, PathsPI, PathsMO, PathsL8_1
+from src.paths import PathsPA, PathsMT, PathsMA, PathsMS, PathsPI, PathsMO, PathsL8MT
 import utils_v1
 import skimage
 import matplotlib.pyplot as plt
@@ -257,9 +257,9 @@ class MS(Dataset):
 
 
 
-class L8_1(Dataset): 
+class L8MT(Dataset): 
 	def __init__(self): 
-		self.paths = PathsL8_1() 
+		self.paths = PathsL8MT() 
 		# self.previewLims1 = np.array([2200, 3200, 6900, 7900])
 		# self.previewLims2 = np.array([500, 1500, 3500, 4500])
 		self.previewLims1 = np.array([11500, 12500, 9000, 10000])
@@ -269,7 +269,7 @@ class L8_1(Dataset):
 		
 		# self.previewLims2 = np.array([5000, 6000, 9420, 10420])
 
-		self.site = 'MS' 
+		self.site = 'L8MT' 
 		 
 		self.lims = np.array([None, None, None, None])
  
@@ -315,14 +315,14 @@ class L8_1(Dataset):
 						{"coords": [670, 550], "text": "K"}]]
 		
 		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
-		self.prodes_dates = [2018, 2019, 2020]
+		self.prodes_dates = [2021, 2022, 2023]
 		self.hspace = [-0.1, -0.1]				# 0,    1,2,3,4,5,6,7,8,9,10,    11,12,13,14,15,16,17,18,19,20  
 		# self.previewBandsSnip = [[1,2,3],[11,12,13]]
 		# self.bands = 10
-		self.previewBandsSnip = [[1,2,3],[5,6,7]]   # 0,      1,2,3,4,      5,6,7,8
-		self.bands = 4
+		self.previewBandsSnip = [[3,2,1],[10,9,8]]   # 0,      1,2,3,4,      5,6,7,8
+		self.bands = 7
 
-		self.min_polygon_area = 400 # 4.0ha
+		self.min_polygon_area = 70 # 6.25ha # 62500m2/(30*30)m2=62500m2/900m2=69.44px=70px  
 
 class PI(Dataset):
 	def __init__(self): 
