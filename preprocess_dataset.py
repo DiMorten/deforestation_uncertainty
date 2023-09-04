@@ -13,7 +13,7 @@ from src.dataset import PA, PAMultipleDates, MTMultipleDates, MT, MA, MS, PI, MO
 # ======= INPUT PARAMETERS ============ # 
 config = {
     'dataset': 'MS',
-    'year': 2018, # latest year
+    'year': 2019, # latest year
 }
 # ======= END INPUT PARAMETERS ============ # 
 

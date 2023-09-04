@@ -7,6 +7,7 @@ from osgeo import gdal
 import pdb
 from sklearn.preprocessing._data import _handle_zeros_in_scale
 import cv2
+from matplotlib import pyplot as plt
 
 def load_tiff_image(path):
     # Read tiff Image
@@ -80,3 +81,26 @@ def padForGeorreferencingChannels(im):
     im_pad = np.pad(im_pad, ((0,4000), (3000,0), (0,0)), constant_values = pad_value)
     print(im_pad.shape)
     return im_pad
+def save_georreferenced(im, original_im_path, produced_im_path, bands = 1, plot = False):
+    if len(im.shape) == 2:
+        pad_values = ((0, 0), (0, 1))
+    else:
+        pad_values = ((0, 0), (0, 1), (0, 0))
+    im_pad = np.pad(im, pad_values)
+    print("im_pad.shape", im_pad.shape)
+    if plot == True:
+        fig, ax = plt.subplots(figsize=(10,10))
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.imshow(im_pad, cmap='jet')
+        plt.axis('off')
+
+    if len(im_pad.shape) == 2:
+        im_pad = np.expand_dims(im_pad, axis=0)
+    else:
+        im_pad = np.transpose(im_pad, (2, 0, 1))
+    print("im_pad.shape", im_pad.shape)
+    GeoReference_Raster_from_Source_data(original_im_path, 
+                    im_pad.astype(np.float32), produced_im_path, bands = bands,
+                    nodata=-1)
+    del im_pad
