@@ -4,7 +4,7 @@ from icecream import ic
 import pdb
 import scipy
 sys.path.append("..")
-from src.paths import PathsPA, PathsMT, PathsMA, PathsMS, PathsPI, PathsMO, PathsL8MT
+from src.paths import PathsPA, PathsMT, PathsMA, PathsMS, PathsPI, PathsMO, PathsL8MT, PathsL8AM
 import utils_v1
 import skimage
 import matplotlib.pyplot as plt
@@ -28,18 +28,18 @@ class Dataset():
 		print('Test tiles: ', tiles_ts)
 
 		# Training and validation mask
-		mask_tr_val = np.zeros((mask_tiles.shape)).astype('uint8')
+		mask_train_val = np.zeros((mask_tiles.shape)).astype('uint8')
 
 		for tr_ in tiles_tr:
-			mask_tr_val[mask_tiles == tr_] = 1
+			mask_train_val[mask_tiles == tr_] = 1
 
 		for val_ in tiles_val:
-			mask_tr_val[mask_tiles == val_] = 2
+			mask_train_val[mask_tiles == val_] = 2
 
-		mask_amazon_ts = np.zeros((mask_tiles.shape)).astype('uint8')
+		mask_test = np.zeros((mask_tiles.shape)).astype('uint8')
 		for ts_ in tiles_ts:
-			mask_amazon_ts[mask_tiles == ts_] = 1
-		return mask_tr_val, mask_amazon_ts        
+			mask_test[mask_tiles == ts_] = 1
+		return mask_train_val, mask_test        
 	def getLabelCurrentDeforestation(self, label_mask, selected_class = 1):
 		label_mask_current_deforestation = label_mask.copy()
 		label_mask_current_deforestation[label_mask_current_deforestation == selected_class] = 10
@@ -270,6 +270,74 @@ class L8MT(Dataset):
 		# self.previewLims2 = np.array([5000, 6000, 9420, 10420])
 
 		self.site = 'L8MT' 
+		 
+		self.lims = np.array([None, None, None, None])
+ 
+		self.grid_x, self.grid_y = 5,5 
+ 
+
+
+		 
+		
+		self.tiles_tr = [2,4,5,6,7,12,14,15,18,21,23,24]  
+		 
+		self.tiles_val = [9,11,25] 
+		
+		'''
+		self.tiles_tr = [2,4,5,6,7,12,14,15,18,19,21,23]  
+		 
+		self.tiles_val = [9,11,25] 
+		'''
+		self.patch_deforestation_percentage = 0.2
+
+		self.snippet_coords = {
+			"snippet_id0": [
+				[550, 550], # 10,1 alpha
+				[210, 610], #harder 1,1 alpha
+				[207, 617], # easy 1,1 alpha
+				[800, 200] # easy 1,10 alpha
+			],
+			"snippet_id1": [
+				[550, 115], # 10,1 alpha # I think will diverge from ensemble
+				[430, 950] # Will diverge from ensemble
+			]
+		}
+
+		self.polygons = [[{"coords": [460, 720], "text": "L"},
+                        {"coords": [600, 950], "text": "M"},
+                        {"coords": [800, 100], "text": "N"}],
+
+						[{"coords": [200, 740], "text": "F"},
+                        {"coords": [770, 730], "text": "G"},
+						{"coords": [410, 470], "text": "H"},
+						{"coords": [500, 850], "text": "I"},
+						{"coords": [200, 650], "text": "J"},
+						{"coords": [670, 550], "text": "K"}]]
+		
+		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
+		self.prodes_dates = [2021, 2022, 2023]
+		self.hspace = [-0.1, -0.1]				# 0,    1,2,3,4,5,6,7,8,9,10,    11,12,13,14,15,16,17,18,19,20  
+		# self.previewBandsSnip = [[1,2,3],[11,12,13]]
+		# self.bands = 10
+		self.previewBandsSnip = [[3,2,1],[10,9,8]]   # 0,      1,2,3,4,      5,6,7,8
+		self.bands = 7
+
+		self.min_polygon_area = 70 # 6.25ha # 62500m2/(30*30)m2=62500m2/900m2=69.44px=70px  
+
+
+class L8AM(Dataset): 
+	def __init__(self): 
+		self.paths = PathsL8AM() 
+		# self.previewLims1 = np.array([2200, 3200, 6900, 7900])
+		# self.previewLims2 = np.array([500, 1500, 3500, 4500])
+		self.previewLims1 = np.array([11500, 12500, 9000, 10000])
+
+		self.previewLims2 = np.array([5000, 6000, 9500, 10500])
+		# self.previewLims2 = np.array([5080, 6000, 9500, 10500])
+		
+		# self.previewLims2 = np.array([5000, 6000, 9420, 10420])
+
+		self.site = 'L8AM' 
 		 
 		self.lims = np.array([None, None, None, None])
  
@@ -683,4 +751,10 @@ class PIMultipleDates(MultipleDates, DeforestationTime, PI):
 	pass
 
 class MOMultipleDates(MultipleDates, DeforestationTime, MO):
+	pass
+
+class L8MTMultipleDates(MultipleDates, DeforestationTime, L8MT):
+	pass
+
+class L8AMMultipleDates(MultipleDates, DeforestationTime, L8AM):
 	pass

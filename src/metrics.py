@@ -503,7 +503,7 @@ def getAA_Recall(uncertainty, label_mask_current_deforestation_test,
     return metrics_list, metrics_list_audited    
 '''
 '''
-def matrics_AA_recall(thresholds_, prob_map, ref_reconstructed, mask_amazon_ts_, px_area):
+def matrics_AA_recall(thresholds_, prob_map, ref_reconstructed, mask_test_, px_area):
     thresholds = thresholds_    
     metrics_all = []
     
@@ -528,8 +528,8 @@ def matrics_AA_recall(thresholds_, prob_map, ref_reconstructed, mask_amazon_ts_,
         ref_consider = mask_no_consider * ref_reconstructed
         pred_consider = mask_no_consider*img_reconstructed
         
-        ref_final = ref_consider[mask_amazon_ts_==1]
-        pre_final = pred_consider[mask_amazon_ts_==1]
+        ref_final = ref_consider[mask_test_==1]
+        pre_final = pred_consider[mask_test_==1]
         
         # Metrics
         cm = confusion_matrix(ref_final, pre_final)

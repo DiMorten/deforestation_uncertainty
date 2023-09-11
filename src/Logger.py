@@ -129,9 +129,9 @@ class Logger():
                 # customCmap = matplotlib.colors.ListedColormap(['black', 'red'])
                 ic(manager.dataset.previewLims1, manager.dataset.previewLims2)
                 lims = manager.dataset.previewLims1
-                ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]]))
+                ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]]))
                 lims = manager.dataset.previewLims2
-                ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
+                ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
 
                 _plt.plotCropSample4(manager.image_stack[...,manager.dataset.previewBands], manager.mean_prob, 
                         manager.error_mask_to_show_rgb[...,::-1], manager.uncertainty_to_show, 
@@ -164,9 +164,9 @@ class Logger():
         if self.plotCropSampleFlag == True:
             ic(manager.dataset.previewLims1, manager.dataset.previewLims2)
             lims = manager.dataset.previewLims1
-            ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]]))
+            ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]]))
             lims = manager.dataset.previewLims2
-            ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
+            ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
 
             _plt.plotCropSample4(manager.image_stack[...,manager.dataset.previewBandsSnip[-1]], manager.mean_prob, 
                     manager.error_mask_to_show_rgb[...,::-1], manager.uncertainty_to_show, 
@@ -209,9 +209,9 @@ class Logger():
         if self.plotCropSampleFlag == True:
             ic(manager.dataset.previewLims1, manager.dataset.previewLims2)
             lims = manager.dataset.previewLims1
-            ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]]))
+            ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]]))
             lims = manager.dataset.previewLims2
-            ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
+            ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
 
             ims = [landsat_ims[0], landsat_ims[1], landsat_ims[2],
                     manager.mean_prob, 
@@ -276,16 +276,16 @@ class Logger():
         if self.plotCropSampleFlag == True:
 
             lims = manager.dataset.previewLims1
-            ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]]))
+            ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]]))
             lims = manager.dataset.previewLims2
-            ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
+            ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
 
             '''
             ic(manager.dataset.previewLims1, manager.dataset.previewLims2)
             lims = manager.dataset.previewLims1
-            ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]]))
+            ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]]))
             lims = manager.dataset.previewLims2
-            ic(np.unique(manager.mask_amazon_ts[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
+            ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
             '''
             _plt.plotCropSample5(manager.image_stack[...,previewBandsT0], manager.image_stack[...,previewBandsT1], manager.mean_prob, 
                     manager.error_mask_to_show_rgb[...,::-1], manager.uncertainty_to_show, 

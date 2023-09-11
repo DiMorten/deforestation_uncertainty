@@ -187,7 +187,7 @@ def mask_no_considered(image_ref, past_ref, buffer):
     return image_ref_
 
 
-def matrics_AA_recall(thresholds_, prob_map, ref_reconstructed, mask_amazon_ts_, px_area):
+def matrics_AA_recall(thresholds_, prob_map, ref_reconstructed, mask_test_, px_area):
     thresholds = thresholds_    
     metrics_all = []
     
@@ -212,8 +212,8 @@ def matrics_AA_recall(thresholds_, prob_map, ref_reconstructed, mask_amazon_ts_,
         ref_consider = mask_no_consider * ref_reconstructed
         pred_consider = mask_no_consider*img_reconstructed
         
-        ref_final = ref_consider[mask_amazon_ts_==1]
-        pre_final = pred_consider[mask_amazon_ts_==1]
+        ref_final = ref_consider[mask_test_==1]
+        pre_final = pred_consider[mask_test_==1]
         
         # Metrics
         cm = confusion_matrix(ref_final, pre_final)
@@ -236,7 +236,10 @@ def getTestVectorFromIm(im, mask, mask_return_value = 1):
     return im[mask == mask_return_value]
 
 def unpadIm(im, npad):
-    return im[:-npad[0][1], :-npad[1][1]]
+    lims = [npad[0][1], npad[1][1]]
+    lims = [-lim if lim != 0 else None for lim in lims]
+
+    return im[:lims[0], :lims[1]]
 
 import tracemalloc
 from collections import Counter

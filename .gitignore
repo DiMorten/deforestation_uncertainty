@@ -131,3 +131,4 @@ dmypy.json
 *.csv
 *.h5
 logs/*
+*.rar

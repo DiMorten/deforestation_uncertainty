@@ -48,10 +48,10 @@ class PatchesHandler():
 		ic(coords.shape, coords.dtype)
 		return coords.astype(np.uint16)
 	
-	def trainTestSplit(self, coords, mask_tr_val, patch_size):
+	def trainTestSplit(self, coords, mask_train_val, patch_size):
 		coords_train, coords_val = [], []
 		for idx in range(coords.shape[0]):
-			mask_patch = mask_tr_val[coords[idx, 0]:coords[idx, 0] + patch_size[0], 
+			mask_patch = mask_train_val[coords[idx, 0]:coords[idx, 0] + patch_size[0], 
 				coords[idx, 1]:coords[idx, 1] + patch_size[1]]
 			# ic(mask_patch.shape)
 			# pdb.set_trace()
@@ -166,27 +166,27 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 		ic(self.input_image_shape)
 		ic(self.dataset.image_channels)
 
-	def trainTestSplit(self, coords, mask_tr_val, patch_size):
+	def trainTestSplit(self, coords, mask_train_val, patch_size):
 		coords_current_date_train, coords_current_date_val = super().trainTestSplit(
-			coords, mask_tr_val, patch_size)
+			coords, mask_train_val, patch_size)
 
-		mask_past_date_tr_val = np.ones_like(mask_tr_val)
+		mask_past_date_tr_val = np.ones_like(mask_train_val)
 		coords_train = []
 		coords_val = []
 		
 		for date_id in self.dataset.date_ids:
-			mask = mask_past_date_tr_val if date_id != self.dataset.date_ids[-1] else mask_tr_val
+			mask = mask_past_date_tr_val if date_id != self.dataset.date_ids[-1] else mask_train_val
 			coords_train_date, _ = super().trainTestSplit(coords, mask, patch_size)
 			coords_train_date = self.addDateToCoords(
 				coords_train_date, date_id)
 			coords_train.append(coords_train_date)
 		coords_train = np.concatenate(coords_train, axis = 0)
-		_, coords_val = super().trainTestSplit(coords, mask_tr_val, patch_size)
+		_, coords_val = super().trainTestSplit(coords, mask_train_val, patch_size)
 		coords_val = self.addDateToCoords(
 			coords_val, self.dataset.date_ids[-1])
 
 		return coords_train, coords_val
-		# mask_past_date_tr_val = mask_tr_val.copy()
+		# mask_past_date_tr_val = mask_train_val.copy()
 		# mask_past_date_tr_val[mask_past_date_tr_val == 0] = 1
 		
 		coords_past_date_train, _ = super().trainTestSplit(

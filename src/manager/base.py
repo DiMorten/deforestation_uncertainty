@@ -22,6 +22,7 @@ from scipy import optimize
 import glob
 from tensorflow.keras.models import Model, load_model, Sequential
 import src.network as network
+import cv2
 
 class Manager():
     def __init__(self, config, dataset, patchesHandler, logger, grid_idx=0, training_times=1):
@@ -80,10 +81,47 @@ class Manager():
     def loadLabel(self):
         self.label_mask = self.dataset.loadLabel()
         print('Mask label shape: ', '\n', self.label_mask.shape, '\n', 'Unique values: ', '\n', np.unique(self.label_mask))
+    '''
     def maskNoDataAsNotConsideredClass(self):
         print("self.image_stack.shape", self.image_stack.shape)
         condition = np.sum(self.image_stack[..., self.dataset.previewBandsSnip[0] + self.dataset.previewBandsSnip[1]], axis=-1)
+        
+        kernel = np.ones((7,7),np.uint8)
+        condition = cv2.morphologyEx(condition, cv2.MORPH_CLOSE, kernel)
+        # condition = cv2.dilate(condition,kernel,iterations = 1)
+        condition_to_show = np.zeros_like(condition)
+        condition_to_show[condition == 0] = 1
+        plt.figure(figsize=(15,15))
+        plt.imshow(condition_to_show, cmap='gray')
+        del condition_to_show
         self.label_mask[condition == 0] = 2
+    '''
+    def maskNoDataAsNotConsideredClass(self):
+        print("self.image_stack.shape", self.image_stack.shape)
+        condition_t0 = np.sum(self.image_stack[..., self.dataset.previewBandsSnip[0]], axis=-1)
+        condition_t1 = np.sum(self.image_stack[..., self.dataset.previewBandsSnip[1]], axis=-1)
+        
+        kernel = np.ones((30,30),np.uint8)
+        condition_t0 = cv2.morphologyEx(condition_t0, cv2.MORPH_CLOSE, kernel)
+
+        kernel = np.ones((30,30),np.uint8)
+        condition_t1 = cv2.morphologyEx(condition_t1, cv2.MORPH_CLOSE, kernel)
+
+        # condition = cv2.dilate(condition,kernel,iterations = 1)
+        condition_to_show_t0 = np.zeros_like(condition_t0)
+        condition_to_show_t0[condition_t0 == 0] = 1
+        plt.figure(figsize=(15,15))
+        plt.imshow(condition_to_show_t0, cmap='gray')
+
+
+        condition_to_show_t1 = np.zeros_like(condition_t1)
+        condition_to_show_t1[condition_t1 == 0] = 1
+        plt.figure(figsize=(15,15))
+        plt.imshow(condition_to_show_t1, cmap='gray')
+
+        del condition_to_show_t0, condition_to_show_t1
+        self.label_mask[condition_t0 == 0] = 2
+        self.label_mask[condition_t1 == 0] = 2
 
 
     def createTrainValTestTiles(self):
@@ -113,7 +151,7 @@ class Manager():
         ic(self.channels)
 
     def getTrainValTestMasks(self):
-        self.mask_tr_val, self.mask_amazon_ts = self.dataset.getTrainValTestMasks(self.mask_tiles)
+        self.mask_train_val, self.mask_test = self.dataset.getTrainValTestMasks(self.mask_tiles)
 
     def createIdxImage(self):
         self.im_idx = self.patchesHandler.create_idx_image(self.label_mask)
@@ -125,7 +163,7 @@ class Manager():
             
     def trainTestSplit(self):
         self.coords_train, self.coords_val = self.patchesHandler.trainTestSplit(self.coords,
-		    self.mask_tr_val, patch_size=(self.patch_size, self.patch_size, 2))        
+		    self.mask_train_val, patch_size=(self.patch_size, self.patch_size, 2))        
         ic(self.coords_train.shape, self.coords_val.shape)            
 
     def retrieveSamplesOfInterest(self, percentage = 0.2):
@@ -245,8 +283,17 @@ class Manager():
 
         # self.getUncertaintyAAValues()
         # manager.getUncertaintyAAAuditedValues()
-        self.getOptimalUncertaintyThreshold()
-        result = self.getUncertaintyMetricsFromOptimalThreshold()
+        # self.getOptimalUncertaintyThreshold()
+        try:
+            bounds = (np.min(self.uncertainty) + 0.000015, 
+                np.max(self.uncertainty) - 0.0015)
+            print(bounds)
+
+            self.getOptimalUncertaintyThreshold(bounds=bounds)
+            result = self.getUncertaintyMetricsFromOptimalThreshold()
+        except:
+            print("Results error. Setting to None")
+            results = None
         out['uncertainty_result'] = result
         return out
     
@@ -301,9 +348,9 @@ class Manager():
             for l in range(1, len(model.layers)):
                 new_model.layers[l].set_weights(model.layers[l].get_weights())
             
-            
+            t0 = time.time()            
 
-            metrics_all =[]
+            # metrics_all =[]
             with tf.device('/cpu:0'):
                 for tm in range(0,self.config["inference_times"]):
 
@@ -311,7 +358,8 @@ class Manager():
 
                     
                     # Recinstructing predicted map
-                    start_test = time.time()
+                    runtime_repetition_t0 = time.time()
+
                     '''
                     args_network = {'patch_size_rows': patch_size_rows,
                         'patch_size_cols': patch_size_cols,
@@ -325,18 +373,20 @@ class Manager():
                             num_patches_x, num_patches_y, patch_size_rows, 
                             patch_size_cols, classes_mode = self.classes_mode)
                             
-                    ts_time =  time.time() - start_test
 
+                    runtime_repetition =  time.time() - runtime_repetition_t0
+                    print("runtime_repetition", round(runtime_repetition,2))
                     if self.config["save_probabilities"] == True:
                         np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
                     else:
                         self.prob_rec[...,tm] = prob_reconstructed
                     
-                    metrics_all.append(ts_time)
+                    # metrics_all.append(ts_time)
                     del prob_reconstructed
-                metrics_ = np.asarray(metrics_all)
-                # Saving test time
-                np.save(self.path_exp+'/metrics_ts.npy', metrics_)
+            runtime = time.time() - t0
+            print("Inference runtime", round(runtime,2))
+            # Saving test time
+            # np.save(self.path_exp+'/metrics_ts.npy', metrics_)
         del self.image1_pad
     def loadPredictedProbabilities(self):
         if self.config["save_probabilities"] == True:
@@ -359,8 +409,8 @@ class Manager():
         self.mean_prob[self.label_mask == 2] = 0
 
     def getLabelTest(self):
-        self.label_test = self.label_mask[self.mask_amazon_ts == 1]
-        self.mean_prob_test = self.mean_prob[self.mask_amazon_ts == 1]
+        self.label_test = self.label_mask[self.mask_test == 1]
+        self.mean_prob_test = self.mean_prob[self.mask_test == 1]
         self.mean_prob_test = self.mean_prob_test[self.label_test != 2]
         self.label_test = self.label_test[self.label_test != 2]
 
@@ -414,24 +464,24 @@ class Manager():
         del self.predicted
 
     def getValidationValuesForMetrics(self):
-        self.label_mask_val = self.label_mask[self.mask_tr_val == 2]
+        self.label_mask_val = self.label_mask[self.mask_train_val == 2]
         ic(self.label_mask_val.shape)
 
-        self.mean_prob_val = self.mean_prob[self.mask_tr_val == 2]
+        self.mean_prob_val = self.mean_prob[self.mask_train_val == 2]
 
         self.mean_prob_val = self.mean_prob_val[self.label_mask_val != 2]
         self.label_mask_val_valid = self.label_mask_val[self.label_mask_val != 2]
         ic(self.label_mask_val_valid.shape)
 
-        self.predicted_val = self.predicted_unpad[self.mask_tr_val == 2]
+        self.predicted_val = self.predicted_unpad[self.mask_train_val == 2]
         self.predicted_val = self.predicted_val[self.label_mask_val != 2]
 
     def getTestValues(self):
         # test metrics
-        predicted_test = self.predicted_unpad[self.mask_amazon_ts == 1]
-        label_mask_current_deforestation_test = self.label_mask_current_deforestation[self.mask_amazon_ts == 1]
-        label_mask_test = self.label_mask[self.mask_amazon_ts == 1]
-        mean_prob_test = self.mean_prob[self.mask_amazon_ts == 1]
+        predicted_test = self.predicted_unpad[self.mask_test == 1]
+        label_mask_current_deforestation_test = self.label_mask_current_deforestation[self.mask_test == 1]
+        label_mask_test = self.label_mask[self.mask_test == 1]
+        mean_prob_test = self.mean_prob[self.mask_test == 1]
 
         ic(predicted_test.shape)
 
@@ -452,7 +502,7 @@ class Manager():
 
             self.predicted_unpad, self.label_mask = _metrics.removeSmallPolygonsForMetrics(self.predicted_unpad, self.label_mask,
                 min_polygon_area)
-            predicted_masked, label_masked = _metrics.getTest(self.predicted_unpad, self.label_mask, self.mask_amazon_ts)
+            predicted_masked, label_masked = _metrics.getTest(self.predicted_unpad, self.label_mask, self.mask_test)
 
             self.predicted_test = predicted_masked
             self.label_mask_current_deforestation_test = label_masked
@@ -473,7 +523,7 @@ class Manager():
                         ref1 = np.ones_like(label_mask).astype(np.float32)
 
                         ref1 [label_mask == 2] = 0
-                        TileMask = mask_amazon_ts * ref1
+                        TileMask = mask_test * ref1
                         GTTruePositives = label_mask==1
 
                         # Metrics for th=0.5    
@@ -482,7 +532,7 @@ class Manager():
                         Pmax = np.max(mean_prob[GTTruePositives * TileMask ==1])
                         ProbList = np.linspace(Pmax,0,Npoints)
 
-                        metrics_ = matrics_AA_recall(ProbList, mean_prob, label_mask, mask_amazon_ts, 625)
+                        metrics_ = matrics_AA_recall(ProbList, mean_prob, label_mask, mask_test, 625)
                         print('Metrics th = 0.5: ', metrics_*100)
                         '''
                         pass
@@ -506,14 +556,14 @@ class Manager():
         ref1 = np.ones_like(self.label_mask).astype(np.uint8)
 
         ref1 [self.label_mask == 2] = 0
-        TileMask = self.mask_amazon_ts * ref1
+        TileMask = self.mask_test * ref1
         GTTruePositives = self.label_mask==1
 
         # Metrics for th=0.5    
 
         ProbList_05 = [0.5]
 
-        metrics_05 = utils_v1.matrics_AA_recall(ProbList_05, self.mean_prob, self.label_mask, self.mask_amazon_ts, 625)
+        metrics_05 = utils_v1.matrics_AA_recall(ProbList_05, self.mean_prob, self.label_mask, self.mask_test, 625)
         print('Metrics th = 0.5: ', metrics_05*100)
 
     def getErrorMask(self):
@@ -538,15 +588,15 @@ class Manager():
     def getTestValues2(self):
 
         ic(self.label_mask.shape)
-        ic(self.mask_amazon_ts.shape)
+        ic(self.mask_test.shape)
         
         self.label_mask_test = utils_v1.getTestVectorFromIm(
-                self.label_mask, self.mask_amazon_ts)        
+                self.label_mask, self.mask_test)        
         ic(self.label_mask_test.shape)
 
         self.error_mask_test = utils_v1.excludeBackgroundAreasFromTest(
                 utils_v1.getTestVectorFromIm(
-                self.error_mask, self.mask_amazon_ts),
+                self.error_mask, self.mask_test),
                 self.label_mask_test) 
 
         
@@ -555,32 +605,32 @@ class Manager():
 
         self.uncertainty = utils_v1.excludeBackgroundAreasFromTest(
                 utils_v1.getTestVectorFromIm(
-                        utils_v1.unpadIm(self.uncertainty_map, self.npad), self.mask_amazon_ts),
+                        utils_v1.unpadIm(self.uncertainty_map, self.npad), self.mask_test),
                 self.label_mask_test)
 
 
 
         self.label_mask_current_deforestation_test = utils_v1.excludeBackgroundAreasFromTest(
                 utils_v1.getTestVectorFromIm(
-                        self.label_mask_current_deforestation, self.mask_amazon_ts),
+                        self.label_mask_current_deforestation, self.mask_test),
                 self.label_mask_test)
 
         self.predicted_test = utils_v1.excludeBackgroundAreasFromTest(
                 utils_v1.getTestVectorFromIm(
-                        self.predicted_unpad, self.mask_amazon_ts),
+                        self.predicted_unpad, self.mask_test),
                 self.label_mask_test)
                 
 
     def getValidationValues2(self):
         self.error_mask_val = utils_v1.excludeBackgroundAreasFromTest(
                 utils_v1.getTestVectorFromIm(
-                self.error_mask, self.mask_tr_val, mask_return_value = 2),
+                self.error_mask, self.mask_train_val, mask_return_value = 2),
                 self.label_mask_val) 
 
 
         self.uncertainty_val = utils_v1.excludeBackgroundAreasFromTest(
                 utils_v1.getTestVectorFromIm(
-                        utils_v1.unpadIm(self.uncertainty_map, self.npad), self.mask_tr_val, mask_return_value = 2),
+                        utils_v1.unpadIm(self.uncertainty_map, self.npad), self.mask_train_val, mask_return_value = 2),
                 self.label_mask_val)
 
     def getOtherUncertaintyMetrics(self):

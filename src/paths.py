@@ -336,13 +336,13 @@ class PathsL8MT(Paths):
         }
 
         self.im_filenames = {
-            2021: ['LC08_L1TP_228067_20210720_20210729_02_T1_B1.TIF',
-                   'LC08_L1TP_228067_20210720_20210729_02_T1_B2.TIF',
-                   'LC08_L1TP_228067_20210720_20210729_02_T1_B3.TIF',
-                   'LC08_L1TP_228067_20210720_20210729_02_T1_B4.TIF',
-                   'LC08_L1TP_228067_20210720_20210729_02_T1_B5.TIF',
-                   'LC08_L1TP_228067_20210720_20210729_02_T1_B6.TIF',
-                   'LC08_L1TP_228067_20210720_20210729_02_T1_B7.TIF'],
+            2021: ['LC08_L1TP_228067_20210720_20210729_02_T1_B1_crop.TIF',
+                   'LC08_L1TP_228067_20210720_20210729_02_T1_B2_crop.TIF',
+                   'LC08_L1TP_228067_20210720_20210729_02_T1_B3_crop.TIF',
+                   'LC08_L1TP_228067_20210720_20210729_02_T1_B4_crop.TIF',
+                   'LC08_L1TP_228067_20210720_20210729_02_T1_B5_crop.TIF',
+                   'LC08_L1TP_228067_20210720_20210729_02_T1_B6_crop.TIF',
+                   'LC08_L1TP_228067_20210720_20210729_02_T1_B7_crop.TIF'],
             2022: ['LC09_L1TP_228067_20220731_20230405_02_T1_B1.TIF',
                    'LC09_L1TP_228067_20220731_20230405_02_T1_B2.TIF',
                    'LC09_L1TP_228067_20220731_20230405_02_T1_B3.TIF',
@@ -350,14 +350,69 @@ class PathsL8MT(Paths):
                    'LC09_L1TP_228067_20220731_20230405_02_T1_B5.TIF',
                    'LC09_L1TP_228067_20220731_20230405_02_T1_B6.TIF',
                    'LC09_L1TP_228067_20220731_20230405_02_T1_B7.TIF'],
-            2023: ['LC09_L1TP_228067_20230803_20230804_02_T1_B1.TIF',
-                   'LC09_L1TP_228067_20230803_20230804_02_T1_B2.TIF',
-                   'LC09_L1TP_228067_20230803_20230804_02_T1_B3.TIF',
-                   'LC09_L1TP_228067_20230803_20230804_02_T1_B4.TIF',
-                   'LC09_L1TP_228067_20230803_20230804_02_T1_B5.TIF',
-                   'LC09_L1TP_228067_20230803_20230804_02_T1_B6.TIF',
-                   'LC09_L1TP_228067_20230803_20230804_02_T1_B7.TIF']
+            2023: ['LC09_L1TP_228067_20230803_20230804_02_T1_B1_crop.TIF',
+                'LC09_L1TP_228067_20230803_20230804_02_T1_B2_crop.TIF',
+                'LC09_L1TP_228067_20230803_20230804_02_T1_B3_crop.TIF',
+                'LC09_L1TP_228067_20230803_20230804_02_T1_B4_crop.TIF',
+                'LC09_L1TP_228067_20230803_20230804_02_T1_B5_crop.TIF',
+                'LC09_L1TP_228067_20230803_20230804_02_T1_B6_crop.TIF',
+                'LC09_L1TP_228067_20230803_20230804_02_T1_B7_crop.TIF']
         }
+
+class PathsL8AM(Paths):
+    def __init__(self): 
+        self.reference_folder = 'D:/Jorge/datasets/deforestation/L8AM/'
+        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/L8AM/'
+
+        self.experiment = 'D:/Jorge/datasets/deforestation/experiments/L8AM/' 
+
+        self.deforestation_before_2008 = os.path.join(self.reference_folder, 'deforestation_before_2008_L8AM.tif') 
+
+        self.hydrography = os.path.join(self.reference_folder, 'hydgrography.tif')
+        self.deforestation_past_years = os.path.join(self.reference_folder, 'deforestation_past_years.tif')
+ 
+        self.deforestation_time = {
+            2022: os.path.join(self.reference_folder, 'deforestation_time_normalized_2022.npy'),
+            2021: os.path.join(self.reference_folder, 'deforestation_time_normalized_2021.npy'),
+
+        } 
+
+        self.optical_im_past_dates = { 
+            2023: os.path.join(self.optical_im_folder,  '2023'), 
+            2022: os.path.join(self.optical_im_folder,  '2022'),
+            2021: os.path.join(self.optical_im_folder,  '2021'),
+        }
+
+        self.cloud_mask = {
+            2023: os.path.join(self.optical_im_folder,  '2023', 'cloudmask_L8AM_2023.npy'), 
+            2022: os.path.join(self.optical_im_folder,  '2022', 'cloudmask_L8AM_2022.npy'),
+            2021: os.path.join(self.optical_im_folder,  '2021', 'cloudmask_L8AM_2021.npy'),
+        }
+
+        self.im_filenames = {
+            2021: ['LC08_L1TP_232066_20210817_20210827_02_T1_B1_crop.TIF',
+                   'LC08_L1TP_232066_20210817_20210827_02_T1_B2_crop.TIF',
+                   'LC08_L1TP_232066_20210817_20210827_02_T1_B3_crop.TIF',
+                   'LC08_L1TP_232066_20210817_20210827_02_T1_B4_crop.TIF',
+                   'LC08_L1TP_232066_20210817_20210827_02_T1_B5_crop.TIF',
+                   'LC08_L1TP_232066_20210817_20210827_02_T1_B6_crop.TIF',
+                   'LC08_L1TP_232066_20210817_20210827_02_T1_B7_crop.TIF'],
+            2022: ['LC09_L1TP_232066_20220727_20230406_02_T1_B1.TIF',
+                   'LC09_L1TP_232066_20220727_20230406_02_T1_B2.TIF',
+                   'LC09_L1TP_232066_20220727_20230406_02_T1_B3.TIF',
+                   'LC09_L1TP_232066_20220727_20230406_02_T1_B4.TIF',
+                   'LC09_L1TP_232066_20220727_20230406_02_T1_B5.TIF',
+                   'LC09_L1TP_232066_20220727_20230406_02_T1_B6.TIF',
+                   'LC09_L1TP_232066_20220727_20230406_02_T1_B7.TIF'],
+            2023: ['LC08_L1TP_232066_20230722_20230803_02_T1_B1_crop.TIF',
+                'LC08_L1TP_232066_20230722_20230803_02_T1_B2_crop.TIF',
+                'LC08_L1TP_232066_20230722_20230803_02_T1_B3_crop.TIF',
+                'LC08_L1TP_232066_20230722_20230803_02_T1_B4_crop.TIF',
+                'LC08_L1TP_232066_20230722_20230803_02_T1_B5_crop.TIF',
+                'LC08_L1TP_232066_20230722_20230803_02_T1_B6_crop.TIF',
+                'LC08_L1TP_232066_20230722_20230803_02_T1_B7_crop.TIF']
+        }
+
 
 class PathsMO(Paths):
     def __init__(self): 

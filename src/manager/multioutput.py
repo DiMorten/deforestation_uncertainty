@@ -191,13 +191,13 @@ class ManagerEvidential2(ManagerMultiOutput):
             
             self.patchesHandler.class_n = class_n
 
+            t0 = time.time()
             with tf.device('/cpu:0'):
                 tm = 0
                 print('time: ', tm)
 
 
                 # Recinstructing predicted map
-                start_test = time.time()
                 '''
                 args_network = {'patch_size_rows': patch_size_rows,
                     'patch_size_cols': patch_size_cols,
@@ -214,7 +214,7 @@ class ManagerEvidential2(ManagerMultiOutput):
                     self.alpha_reconstructed)
                 if self.classes_mode == False:
                     prob_reconstructed = prob_reconstructed[:,:,:,0:2]
-                ts_time =  time.time() - start_test
+                # ts_time =  time.time() - start_test
 
                 if self.config["save_probabilities"] == True:
                     np.save(self.path_maps+'/'+'prob_'+str(tm)+'.npy',prob_reconstructed) 
@@ -223,6 +223,8 @@ class ManagerEvidential2(ManagerMultiOutput):
                 
 
                 del prob_reconstructed
+            runtime = time.time() - t0
+            print("Inference runtime", round(runtime,2))                
         del self.image1_pad
 
     def getMeanProb(self):
@@ -238,16 +240,16 @@ class ManagerEvidential2(ManagerMultiOutput):
 
         
     def getValidationValuesForMetrics(self):
-        self.label_mask_val = self.label_mask[self.mask_tr_val == 2]
+        self.label_mask_val = self.label_mask[self.mask_train_val == 2]
         ic(self.label_mask_val.shape)
 
-        self.mean_prob_val = self.mean_prob[...,1][self.mask_tr_val == 2]
+        self.mean_prob_val = self.mean_prob[...,1][self.mask_train_val == 2]
 
         self.mean_prob_val = self.mean_prob_val[self.label_mask_val != 2]
         self.label_mask_val_valid = self.label_mask_val[self.label_mask_val != 2]
         ic(self.label_mask_val_valid.shape)
 
-        self.predicted_val = self.predicted_unpad[self.mask_tr_val == 2]
+        self.predicted_val = self.predicted_unpad[self.mask_train_val == 2]
         self.predicted_val = self.predicted_val[self.label_mask_val != 2]
     # to-do: pass to predictor. to do that, pass data to dataset class (dataset.image_stack, dataset.label, etc)
 
@@ -465,6 +467,7 @@ class ManagerEnsemble(ManagerMultiOutput):
                 for tm in range(0,self.config["inference_times"]):
                     print('time: ', tm)
                     
+
                     # Recinstructing predicted map
                     runtime_repetition_t0 = time.time()
 
