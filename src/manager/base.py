@@ -223,7 +223,8 @@ class Manager():
         self.retrieveSamplesOfInterest()
         self.getGenerators()
         self.fixChannelNumber()
-        for tm in range(self.config['training_times']):
+        # for tm in range(self.config['training_times']):
+        for tm in range(self.config['start_repetition_id'], self.config['end_repetition_id']):
             self.repetition_id = tm
             self.train()
         # self.plotHistory()
