@@ -72,9 +72,9 @@ class PathsPA(Paths):
         ]
 class PathsMT(Paths): 
     def __init__(self): 
-        self.reference_folder = 'D:/Jorge/datasets/deforestation/MT/'
-        self.optical_im_folder = 'D:/Jorge/datasets/sentinel2/MT/'
-        self.experiment = 'D:/Jorge/datasets/deforestation/experiments/MT/' 
+        self.reference_folder = 'C:/Users/jchamorro/Documents/jorge/datasets/deforestation/MT/'
+        self.optical_im_folder = 'C:/Users/jchamorro/Documents/jorge/datasets/sentinel2/MT/'
+        self.experiment = 'C:/Users/jchamorro/Documents/jorge/datasets/deforestation/experiments/MT/' 
 
         self.optical_im = os.path.join(self.optical_im_folder,  '2020')
 
