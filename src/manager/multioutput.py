@@ -30,6 +30,8 @@ import src.network as network
 from tensorflow.keras.models import Model, load_model, Sequential
 from src.evidential_learning import DirichletLayer
 from numpy.core.numeric import Inf
+import gc, tracemalloc
+
 class _EarlyStopping():
     def __init__(self, patience):
         self.patience = patience
@@ -223,6 +225,8 @@ class ManagerEvidential2(ManagerMultiOutput):
                 
 
                 del prob_reconstructed
+                gc.collect() 
+
             runtime = time.time() - t0
             print("Inference runtime", round(runtime,2))                
         del self.image1_pad
@@ -502,6 +506,9 @@ class ManagerEnsemble(ManagerMultiOutput):
                         self.prob_rec[...,tm] = prob_reconstructed
 
                     del prob_reconstructed
+                    gc.collect() 
+                    # snapshot = tracemalloc.take_snapshot() 
+                    # utils_v1.display_top(snapshot, limit=20)                     
             runtime = time.time() - t0
             print("Inference runtime", round(runtime,2))
             # print round time.time()
