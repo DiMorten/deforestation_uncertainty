@@ -6,6 +6,8 @@ importlib.reload(_plt)
 import numpy as np
 from icecream import ic
 import pdb
+import gc
+
 class Logger():
     def createLogFolders(self, dataset):
         # figures_path = 'output/figures' + dataset.__class__.__name__ + '/'
@@ -297,3 +299,4 @@ class Logger():
                     colorbar = colorbar)
             plt.savefig('output/figures/' + manager.dataset.__class__.__name__ + 'PredictSampleUncertainty{}_.png'.format(save_name), dpi=150, bbox_inches='tight')
 
+            gc.collect()

@@ -190,14 +190,11 @@ class MT(Dataset):
 class MS(Dataset): 
 	def __init__(self): 
 		self.paths = PathsMS() 
-		# self.previewLims1 = np.array([2200, 3200, 6900, 7900])
-		# self.previewLims2 = np.array([500, 1500, 3500, 4500])
-		self.previewLims1 = np.array([11500, 12500, 9000, 10000])
 
-		self.previewLims2 = np.array([5000, 6000, 9500, 10500])
-		# self.previewLims2 = np.array([5080, 6000, 9500, 10500])
-		
-		# self.previewLims2 = np.array([5000, 6000, 9420, 10420])
+		self.previewLims0 = np.array([6000, 7000, 15600, 16600])
+		self.previewLims1 = np.array([13250, 14250, 4000, 5000])
+		self.previewLims2 = np.array([13500, 14500, 16250, 17250])
+
 
 		self.site = 'MS' 
 		 
@@ -395,14 +392,12 @@ class L8AM(Dataset):
 class PI(Dataset):
 	def __init__(self): 
 		self.paths = PathsPI() 
-		# self.previewLims1 = np.array([2200, 3200, 6900, 7900])
-		# self.previewLims2 = np.array([500, 1500, 3500, 4500])
-		self.previewLims1 = np.array([5500, 8500, 10000, 12500])
+		self.previewLims0 = np.array([6000, 7000, 14500, 15500])   
+		self.previewLims1 = np.array([18355, 19355, 10600, 11600])
+		self.previewLims2 = np.array([100, 1100, 7700, 8700])
+		self.previewLims3 = np.array([12000, 13000, 13000, 14000])    
+		self.previewLims4 = np.array([4300, 5300, 2600, 3600])  
 
-		self.previewLims2 = np.array([16000, 18000, 3000, 6000])
-		# self.previewLims2 = np.array([5080, 6000, 9500, 10500])
-		
-		# self.previewLims2 = np.array([5000, 6000, 9420, 10420])
 
 		self.site = 'PI' 
 		 
