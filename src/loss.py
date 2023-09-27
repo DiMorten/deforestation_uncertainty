@@ -67,7 +67,7 @@ def weighted_categorical_crossentropy(weights):
 			return loss
 		return loss
 
-
+'''
 def weighted_categorical_crossentropy(weights):
 	"""
 	A weighted version of keras.objectives.categorical_crossentropy
@@ -107,7 +107,7 @@ def weighted_categorical_crossentropy(weights):
 	return loss
 
 
-
+'''
 def weighted_cross_entropy_loss(loss_weights):
 # def weighted_categorical_crossentropy(loss_weights):
     loss_object = tf.keras.losses.CategoricalCrossentropy(from_logits=False, reduction=tf.keras.losses.Reduction.NONE)
