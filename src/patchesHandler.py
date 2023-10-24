@@ -5,6 +5,9 @@ import pdb
 import tensorflow as tf
 # import sys
 import utils_v1
+import cv2
+import pdb
+import matplotlib.pyplot as plt
 class PatchesHandler():
 
 	def create_idx_image(self, ref_mask):
@@ -134,6 +137,12 @@ class PatchesHandler():
 					new_model.layers[l].set_weights(model.layers[l].get_weights())
 				'''
 				patch = image1_pad[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)]
+				if self.test_time_augmentation == True:
+					print("1 patch.shape", patch.shape)
+					patch, augmentation_type = random_augmentation(patch)
+					print("augmentation_type", augmentation_type)
+					print("2 patch.shape", patch.shape)
+
 				if classes_mode == False:
 					predicted = new_model.predict(np.expand_dims(patch, axis=0))[:,:,:,1].astype(np.float32)
 				else:
@@ -141,6 +150,20 @@ class PatchesHandler():
 					# predicted[...,0] += predicted[...,-1] # add past deforestation prob. to "not current deforestation"
 					# predicted[...,0] = 1 - predicted[...,1]
 					# predicted = predicted[...,0:-1]
+				if self.test_time_augmentation == True:
+					print("1 predicted.shape", predicted.shape)
+					predicted = undo_augmentation(predicted, augmentation_type)
+					print("2 predicted.shape", predicted.shape)
+				'''
+
+				plt.imshow(patch)
+				plt.savefig("input_patch.png", dpi=300)
+				plt.imshow(predicted)
+				plt.savefig("predicted_patch.png", dpi=300)
+
+				pdb.set_trace()
+				'''
+
 				img_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = predicted
 		del patch, predicted
 		return img_reconstructed
@@ -165,7 +188,7 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 		self.input_image_shape = len(self.dataset.image_channels[0])
 		ic(self.input_image_shape)
 		ic(self.dataset.image_channels)
-
+		self.test_time_augmentation = False
 	def trainTestSplit(self, coords, mask_train_val, patch_size):
 		coords_current_date_train, coords_current_date_val = super().trainTestSplit(
 			coords, mask_train_val, patch_size)
@@ -268,6 +291,15 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 					batch_img[i] = batch_img[i]
 					batch_ref_int = batch_ref_int
 				batch_ref[i] = tf.keras.utils.to_categorical(batch_ref_int, number_class)
+			'''
+			plt.imshow(np.squeeze(batch_img[0][...,[0,1,2]]))
+			plt.savefig("input_patch.png", dpi=300)
+			plt.imshow(np.squeeze(np.argmax(batch_ref[0], axis=-1)), cmap="gray")
+			plt.savefig("predicted_patch.png", dpi=300)
+
+			pdb.set_trace()
+			'''
+
 			yield (batch_img, batch_ref)
 
 	def getPatch(self, image, reference, coord, patch_size=128, idx=0):
@@ -281,6 +313,78 @@ class PatchesHandlerMultipleDates(PatchesHandler):
 				coord[idx,1] : coord[idx,1] + patch_size, self.dataset.image_channels[coord[idx,2]]] 
 
 		return image_patch, reference_patch
+
+class PatchesHandlerTTA(PatchesHandlerMultipleDates):
+	def infer(self, new_model, image1_pad,
+		h, w, num_patches_x, num_patches_y, 
+		patch_size_x, patch_size_y, classes_mode=False):
+		# patch_size_x, patch_size_y, a):
+		
+		if classes_mode == False:
+			img_reconstructed = np.zeros((h, w), dtype=np.float32)
+		else:
+			img_reconstructed = np.zeros((h, w, 2), dtype=np.float32)
+
+		for i in range(0,num_patches_y):
+			for j in range(0,num_patches_x):
+				'''
+				new_model = utils_v1.build_resunet_dropout_spatial(input_shape=(a['patch_size_rows'],a['patch_size_cols'], a['c']), 
+                	nb_filters = a['nb_filters'], n_classes = a['class_n'], dropout_seed = a['dropout_seed'])
+
+				for l in range(1, len(model.layers)):
+					new_model.layers[l].set_weights(model.layers[l].get_weights())
+				'''
+				patch = image1_pad[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)]
+				patch, augmentation_type = random_augmentation(patch)
+				if classes_mode == False:
+					predicted = new_model.predict(np.expand_dims(patch, axis=0))[:,:,:,1].astype(np.float32)
+				else:
+					predicted = new_model.predict(np.expand_dims(patch, axis=0)).astype(np.float32)
+
+				patch = undo_augmentation(patch, augmentation_type)
+				img_reconstructed[patch_size_x*j:patch_size_x*(j+1),patch_size_y*i:patch_size_y*(i+1)] = predicted
+		del patch, predicted
+		return img_reconstructed
+
+def random_augmentation(patch):
+	augmentation_type = np.random.choice(6)
+	if augmentation_type == 0:
+		patch = np.rot90(patch, 1)
+
+	if augmentation_type == 1:
+		patch = np.rot90(patch, 2)
+
+	if augmentation_type == 2:
+		patch = np.rot90(patch, 3)
+
+	if augmentation_type == 3:
+		patch = np.flip(patch, 0)
+
+	if augmentation_type == 4:
+		patch = np.flip(patch, 1)
+		
+	if augmentation_type == 5:
+		patch = patch
+	return patch, augmentation_type
+def undo_augmentation(patch, augmentation_type):
+	if augmentation_type == 0:
+		patch = np.rot90(patch, 3, axes=(1, 2))
+
+	if augmentation_type == 1:
+		patch = np.rot90(patch, 2, axes=(1, 2))
+
+	if augmentation_type == 2:
+		patch = np.rot90(patch, 1, axes=(1, 2))
+
+	if augmentation_type == 3:
+		patch = np.flip(patch, 1)
+
+	if augmentation_type == 4:
+		patch = np.flip(patch, 2)
+		
+	if augmentation_type == 5:
+		patch = patch
+	return patch
 '''
 def create_idx_image(ref_mask):
 	im_idx = np.arange(ref_mask.shape[0] * ref_mask.shape[1]).reshape(ref_mask.shape[0] , ref_mask.shape[1])

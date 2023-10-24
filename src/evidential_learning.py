@@ -180,7 +180,8 @@ class DirichletLayer(tf.keras.layers.Layer):
         return dict(list(base_config.items()) + list(config.items()))
   
   def call(self, inputs):
-    evidence = tf.exp(tf.clip_by_value(inputs,-10,10)) #Remover a divisao por 10
+    # evidence = tf.exp(tf.clip_by_value(inputs,-10,10)) #Remover a divisao por 10
+    evidence = tf.clip_by_value(inputs,-10,10)
     alpha = evidence + 1
     #S = tf.reduce_sum(alpha, axis=3, keepdims=True)
     #m = tf.math.divide_no_nan(evidence,S) # m = bk

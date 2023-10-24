@@ -46,6 +46,7 @@ class Manager():
 
         else:
             self.weights = [0.1, 0.9, 0]
+            # self.weights = [1, 1, 0] # was for focal loss experiment
             self.class_n = 3
             self.reference_class_n = 3
 

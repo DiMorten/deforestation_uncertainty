@@ -184,7 +184,7 @@ def plotCropSample6(ims, lims = None,
         maskBackground = [False, False, False, False, False],
         invertMask = [False, False, False, False, False],
         uncertainty_vlims = [0, 1], polygons = [], colorbar = False,
-        hspace=0.):
+        hspace=0., show_polygon_text = True):
     # fig, axes = plt.subplots(2, 3, figsize=(8,6))
     fig, axes = plt.subplots(2, 3, figsize=(12,9))
     
@@ -221,17 +221,20 @@ def plotCropSample6(ims, lims = None,
     if invertMask[4] == True:
         im5 = invertMaskFromIm(im5)
     '''
-    font = {'family': "Times New Roman",
-        'color':  'white',
-        'weight': 'bold',
-        'size': 14,
-        }
+
+    if show_polygon_text == True:
+        font = {'family': "Times New Roman",
+            'color':  'white',
+            'weight': 'bold',
+            'size': 14,
+            }
     
     
     for idx in range(3):
         axes[idx].imshow(ims[idx], cmap=cmaps[idx])
-        for polygon in polygons:
-            axes[idx].text(polygon['coords'][0], polygon['coords'][1], polygon['text'], fontdict=font)
+        if show_polygon_text == True:
+            for polygon in polygons:
+                axes[idx].text(polygon['coords'][0], polygon['coords'][1], polygon['text'], fontdict=font)
     
     plot = axes[3].imshow(ims[3], cmap=cmaps[3], vmin=0, vmax=1)
     if colorbar == True:

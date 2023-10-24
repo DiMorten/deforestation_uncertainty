@@ -63,6 +63,7 @@ class ManagerMultiOutput(Manager):
         adam = Adam(lr = self.config['learning_rate'] , beta_1=0.9) # 1e-3
         
         loss = src.loss.weighted_categorical_crossentropy(self.weights)
+        # loss = src.loss.weighted_focal(self.weights)
         
         input_shape = (rows, cols, self.channels)
         self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n)
@@ -462,7 +463,7 @@ class ManagerEnsemble(ManagerMultiOutput):
                 else:
                     self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
 
-            new_model = network.build_resunet_dropout_spatial(input_shape=(patch_size_rows,patch_size_cols, self.c), 
+            new_model = network.build_resunet_dropout_spatial(input_shape=(None,None, self.c), 
                 nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training = False)
             t0 = time.time()
 
@@ -595,3 +596,82 @@ class ManagerEnsemble(ManagerMultiOutput):
                 self.snippet_poi_results.append(dict_)
 
         return self.snippet_poi_results
+    
+
+class ManagerTTA(ManagerEnsemble):
+
+    def infer(self):
+        self.h, self.w, self.c = self.image1_pad.shape
+        self.c = self.channels
+        patch_size_rows = self.h//self.n_rows
+        patch_size_cols = self.w//self.n_cols
+        num_patches_x = int(self.h/patch_size_rows)
+        num_patches_y = int(self.w/patch_size_cols)
+
+        if self.classes_mode == False:
+            class_n = 3
+            self.patchesHandler.class_n = class_n
+        else:
+            class_n = 2    
+            self.patchesHandler.class_n = class_n + 1        
+        if self.config["loadInference"] == False:
+            if self.config["save_probabilities"] == False:
+                if self.classes_mode == False:
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], self.config["inference_times"]), dtype = np.float32)
+                else:
+                    self.prob_rec = np.zeros((self.image1_pad.shape[0],self.image1_pad.shape[1], class_n, self.config["inference_times"]), dtype = np.float32)
+
+            new_model = network.build_resunet_dropout_spatial(input_shape=(None,None, self.c), 
+                nb_filters = self.nb_filters, n_classes = class_n, dropout_seed = None, training = False)
+            t0 = time.time()
+
+            # pathlib.Path(self.path_maps).mkdir(parents=True, exist_ok=True)
+            with tf.device('/cpu:0'):
+                for tm in range(0,self.config["inference_times"]):
+                    tm = 0
+                    print('time: ', tm)
+                    
+
+                    # Recinstructing predicted map
+                    runtime_repetition_t0 = time.time()
+
+                    path_exp = self.dataset.paths.experiment + 'exp' + str(self.exp) # exp_ids[tm]
+                    path_models = path_exp + '/models'
+                    # ic(path_models+ '/' + method +'_'+str(0)+'.h5')
+                    path_repetition = path_models+ '/' + self.method +'_'+str(tm)+'.h5'
+                    print("Loading model in:", path_repetition)
+                    model = load_model(path_repetition, compile=False)
+                    for l in range(1, len(model.layers)): #WHY 1?
+                        new_model.layers[l].set_weights(model.layers[l].get_weights())
+                    
+                    '''
+                    args_network = {'patch_size_rows': patch_size_rows,
+                        'patch_size_cols': patch_size_cols,
+                        'c': c,
+                        'nb_filters': nb_filters,
+                        'class_n': class_n,
+                        'dropout_seed': inference_times}
+                    '''
+                    prob_reconstructed = self.patchesHandler.infer(
+                            new_model, self.image1_pad, self.h, self.w, 
+                            num_patches_x, num_patches_y, patch_size_rows, 
+                            patch_size_cols, classes_mode = self.classes_mode)
+                            
+                    runtime_repetition =  time.time() - runtime_repetition_t0
+                    print("runtime_repetition", round(runtime_repetition,2))
+                    if self.config["save_probabilities"] == True:
+                        
+                        np.save(os.path.join(self.path_maps, 'prob_'+str(tm)+'.npy'),prob_reconstructed) 
+                    else:
+                        self.prob_rec[...,tm] = prob_reconstructed
+
+                    del prob_reconstructed
+                    gc.collect() 
+                    # snapshot = tracemalloc.take_snapshot() 
+                    # utils_v1.display_top(snapshot, limit=20)                     
+            runtime = time.time() - t0
+            print("Inference runtime", round(runtime,2))
+            # print round time.time()
+
+
+        del self.image1_pad

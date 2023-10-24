@@ -194,6 +194,8 @@ class MS(Dataset):
 		self.previewLims0 = np.array([6000, 7000, 15600, 16600])
 		self.previewLims1 = np.array([13250, 14250, 4000, 5000])
 		self.previewLims2 = np.array([13500, 14500, 16250, 17250])
+		self.previewLims3 = np.array([2200, 3200, 16300, 17300])
+		self.previewLims4 = np.array([12500, 13500, 7000, 8000]) 
 
 
 		self.site = 'MS' 
@@ -241,8 +243,8 @@ class MS(Dataset):
 						{"coords": [200, 650], "text": "J"},
 						{"coords": [670, 550], "text": "K"}]]
 		
-		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
-		self.prodes_dates = [2018, 2019, 2020]
+		self.prodes_dates_to_print = ['19/07/2019', '21/07/2020', '24/07/2021']
+		self.prodes_dates = [2019, 2020, 2021]
 		self.hspace = [-0.1, -0.1]				# 0,    1,2,3,4,5,6,7,8,9,10,    11,12,13,14,15,16,17,18,19,20  
 		# self.previewBandsSnip = [[1,2,3],[11,12,13]]
 		# self.bands = 10
@@ -443,9 +445,8 @@ class PI(Dataset):
 						{"coords": [200, 650], "text": "J"},
 						{"coords": [670, 550], "text": "K"}]]
 		
-		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
-		self.prodes_dates = [2018, 2019, 2020]
-		self.prodes_dates = [2017, 2018, 2019]
+		self.prodes_dates_to_print = ['03/08/2019', '25/07/2020', '28/07/2021']
+		self.prodes_dates = [2019, 2020, 2021]
 		
 		self.hspace = [-0.1, -0.1]				# 0,    1,2,3,4,5,6,7,8,9,10,    11,12,13,14,15,16,17,18,19,20  
 		self.previewBandsSnip = [[1,2,3],[5,6,7]]   # 0,      1,2,3,4,      5,6,7,8
