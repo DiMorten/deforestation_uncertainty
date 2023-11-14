@@ -225,9 +225,12 @@ class Manager():
         self.getGenerators()
         self.fixChannelNumber()
         # for tm in range(self.config['training_times']):
+        self.measured_training_time = []
         for tm in range(self.config['start_repetition_id'], self.config['end_repetition_id']):
+            t = time.time()
             self.repetition_id = tm
             self.train()
+            self.measured_training_time.append(time.time() - t)
         # self.plotHistory()
         # self.plotLossTerms()
         
@@ -661,8 +664,7 @@ class Manager():
                 if self.classes_mode == False:
                         self.threshold_list = [0.0025, 0.005, 0.0075, 0.01, 0.015, 0.025, 0.05, 0.08, 0.1, 0.15, 0.2, 0.225, 
                                 0.25, 0.27, 0.3, 0.34, 0.36, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
-                        # self.threshold_list = [0.0025, 0.025, 0.05, 0.1, 0.2, 0.4, 
-                        #         0.5, 0.6, 0.7, 0.8, 0.9, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]
+
                 else:
                         self.threshold_list = [0.0025, 0.025, 0.05, 0.075, 0.1, 0.2, 0.4, 
                         0.5, 0.6, 0.7, 0.8, 0.9, np.max(self.uncertainty)-0.003, np.max(self.uncertainty)-0.0015]

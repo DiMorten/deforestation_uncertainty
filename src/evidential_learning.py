@@ -150,8 +150,8 @@ class EvidentialLearning:
             alp = tf.add(tf.multiply(E,tf.subtract(1.,y_truth)),1) 
             C =  self.KL(alp)
             # return mse + (0.3*C)
-            return mse + (1*C)
-            # return mse + (self.an_*C)
+            # return mse + (1*C)
+            return mse + (self.an_*C)
             # print(self.an_)
         
         return loss
@@ -181,8 +181,11 @@ class DirichletLayer(tf.keras.layers.Layer):
   
   def call(self, inputs):
     # evidence = tf.exp(tf.clip_by_value(inputs,-10,10)) #Remover a divisao por 10
-    evidence = tf.clip_by_value(inputs,-10,10)
+    # evidence = tf.clip_by_value(inputs,-10,10)
+    evidence = inputs
     alpha = evidence + 1
+    # alpha[:] = 0
+
     #S = tf.reduce_sum(alpha, axis=3, keepdims=True)
     #m = tf.math.divide_no_nan(evidence,S) # m = bk
     

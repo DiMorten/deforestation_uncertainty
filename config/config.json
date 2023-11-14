@@ -1,7 +1,7 @@
 {
     "training": true,
 	"inferring": true,
-	"site": "PA", 
+	"site": "MT", 
 	"training_date": "current", 
 	"mode": "evidential2", 
 	"training_times": 10,
@@ -10,17 +10,17 @@
 	"removePolygons": true,
 	"plotLandsat": false,
 	"plotPOI": false,
-	"training_experiment_id": 48,
+	"training_experiment_id": 60,
 	"get_multiple_metrics": false,
 	"start_repetition_id": 0,
-	"end_repetition_id": 3,
+	"end_repetition_id": 10,
 
 	"save_probabilities": false,
 	"addPastDeforestationInput": true,
 	"classes_mode": true,
 	"learning_rate": 1e-4,
-    "use_cloud_mask": false,
-	"mask_out_non_biome": true,
+    "use_cloud_mask": true,
+	"mask_out_non_biome": false,
 
 	"log_filename": "log.pkl"
 }

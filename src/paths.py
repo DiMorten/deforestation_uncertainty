@@ -232,6 +232,17 @@ class PathsMS(Paths):
 
         }   
 
+
+
+        landsat_base = 'D:/Jorge/datasets/landsat/MS/'
+        self.landsat = [
+            os.path.join(landsat_base, 'L8_MS_2019.tif'),
+            os.path.join(landsat_base, 'L8_MS_2020.tif'),
+            os.path.join(landsat_base, 'L8_MS_2021.tif'),
+
+        ]
+
+        self.landsat_matching = 'D:/Jorge/datasets/landsat/matching/Cerrado_224073_2019/Landsat8_OLI_224073_20190719_8bits_654_contraste.tif'
         '''
         self.im_filenames = {
             2018: ['merged_2018_crop.tif'],
@@ -280,9 +291,9 @@ class PathsPI(Paths):
         self.im_filenames = {
             2017: ['S2_PI_B4_B3_2017_crop.tif',
                    'S2_PI_B2_B8_2017_crop.tif'],
-            2018: ['merged_2018_crop.tif'],
-            2019: ['merged_2019_crop.tif'],
-            2020: ['merged_2020_crop.tif']
+            2018: ['merged_2019_crop.tif'],
+            2019: ['merged_2020_crop.tif'],
+            2020: ['merged_2021_crop.tif']
         }
         '''
         self.im_filenames = {
@@ -310,6 +321,13 @@ class PathsPI(Paths):
         }
         self.biome_limits = os.path.join(self.optical_im_folder, 'biome_limits.tif')
 
+        landsat_base = 'D:/Jorge/datasets/landsat/PI/'
+        self.landsat = [
+            os.path.join(landsat_base, 'L8_PI_2019.tif'),
+            os.path.join(landsat_base, 'L8_PI_2020.tif'),
+            os.path.join(landsat_base, 'L8_PI_2021.tif'),
+
+        ]
 class PathsL8MT(Paths):
     def __init__(self): 
         self.reference_folder = 'D:/Jorge/datasets/deforestation/L8MT/'

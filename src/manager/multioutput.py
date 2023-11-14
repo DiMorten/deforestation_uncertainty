@@ -76,14 +76,14 @@ class ManagerMultiOutput(Manager):
         lr_reduce = ReduceLROnPlateau(factor=0.9, min_delta=0.0001, patience=5, verbose=1)
         callbacks_list = [earlystop, checkpoint]
         # train the model
-        start_training = time.time()
+        # start_training = time.time()
         self.history = self.model.fit_generator(self.train_gen_batch,
                                 steps_per_epoch=self.len_X_train*3//self.train_gen.batch_size,
                                 validation_data=self.valid_gen_batch,
                                 validation_steps=self.len_X_valid*3//self.valid_gen.batch_size,
                                 epochs=100,
                                 callbacks=callbacks_list)
-        end_training = time.time() - start_training
+        # end_training = time.time() - start_training
 
         # del self.train_gen_batch, self.valid_gen_batch
 
