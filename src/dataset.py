@@ -191,12 +191,30 @@ class MS(Dataset):
 	def __init__(self): 
 		self.paths = PathsMS() 
 
+
+		'''
+		self.previewLims0 = np.array([3850, 4150, 11800, 12100])
+		self.previewLims1 = np.array([3500, 4500, 14000, 15000])
+		self.previewLims2 = np.array([13600, 13900, 4450, 4750])
+		self.previewLims3 = np.array([17770, 18070, 14600, 14900])
+		self.previewLims4 = np.array([6000, 7000, 15600, 16600])
+		'''
+
+		self.previewLims0 = np.array([ 3850,  4150, 11800, 12100])
+		self.previewLims1 = np.array([13250, 14250,  4000,  5000])
+		self.previewLims2 = np.array([13500, 14500, 16250, 17250])
+		self.previewLims3 = np.array([17770, 18070, 14600, 14900])
+		self.previewLims4 = np.array([ 6000,  7000, 15600, 16600])
+
+		'''
 		self.previewLims0 = np.array([6000, 7000, 15600, 16600])
 		self.previewLims1 = np.array([13250, 14250, 4000, 5000])
-		self.previewLims2 = np.array([13500, 14500, 16250, 17250])
+		self.previewLims2 = np.array([13250, 14250, 4000, 5000])
 		self.previewLims3 = np.array([2200, 3200, 16300, 17300])
-		self.previewLims4 = np.array([12500, 13500, 7000, 8000]) 
+		self.previewLims4 = np.array([6000, 7000, 15600, 16600])
 
+		self.previewLims4 = np.array([12500, 13500, 7000, 8000]) 
+		'''
 
 		self.site = 'MS' 
 		 
@@ -259,11 +277,13 @@ class MS(Dataset):
 class PI(Dataset):
 	def __init__(self): 
 		self.paths = PathsPI() 
-		self.previewLims0 = np.array([6000, 7000, 14500, 15500])   
-		self.previewLims1 = np.array([18355, 19355, 10600, 11600])
-		self.previewLims2 = np.array([100, 1100, 7700, 8700])
-		self.previewLims3 = np.array([12000, 13000, 13000, 14000])    
-		self.previewLims4 = np.array([4300, 5300, 2600, 3600])  
+		self.previewLims0 = np.array([2600, 3300, 13450, 14150])
+		self.previewLims1 = np.array([1300, 2000, 11000, 11700])
+		self.previewLims2 = np.array([6300, 7300, 12200, 13200])    
+
+		self.previewLims3 = np.array([4300, 5300, 2600, 3600])  
+		self.previewLims4 = np.array([18355, 19355, 10600, 11600]) 
+		self.previewLims5 = np.array([6000, 6500, 14800, 15300])  
 
 
 		self.site = 'PI' 
@@ -299,16 +319,7 @@ class PI(Dataset):
 			]
 		}
 
-		self.polygons = [[{"coords": [460, 720], "text": "L"},
-                        {"coords": [600, 950], "text": "M"},
-                        {"coords": [800, 100], "text": "N"}],
-
-						[{"coords": [200, 740], "text": "F"},
-                        {"coords": [770, 730], "text": "G"},
-						{"coords": [410, 470], "text": "H"},
-						{"coords": [500, 850], "text": "I"},
-						{"coords": [200, 650], "text": "J"},
-						{"coords": [670, 550], "text": "K"}]]
+		self.polygons = [[]]
 		
 		self.prodes_dates_to_print = ['08/08/2019', '25/07/2020', '28/07/2021']
 		self.prodes_dates = [2019, 2020, 2021]

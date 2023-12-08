@@ -3,6 +3,25 @@ import utils_v1
 import cv2
 import skimage
 from skimage.exposure import match_histograms
+from skimage import exposure
+
+def min_max_stretch(image):
+    """
+    Performs a min-max stretch on an image per channel.
+
+    Args:
+        image (numpy.ndarray): The image to stretch.
+
+    Returns:
+        numpy.ndarray: The stretched image.
+    """
+    stretched_image = np.zeros_like(image)
+    for channel in range(3):
+        min_val = np.nanpercentile(image[channel], 2)
+        max_val = np.nanpercentile(image[channel], 98)
+        stretched_image[channel] = (image[channel] - min_val) / (max_val - min_val)
+        stretched_image[channel] = np.clip(stretched_image[channel], 0, 1)
+    return stretched_image
 
 class LandsatLoader():
 	def __init__(self, dataset, im_shape):
@@ -14,10 +33,33 @@ class LandsatLoader():
 		for path in self.dataset.paths.landsat:
 			print("Loading {}".format(path))
 			im = utils_v1.load_tiff_image(path)
+			print("np.nanmin(im), np.nanmean(im), np.nanmax(im)", np.nanmin(im), np.nanmean(im), np.nanmax(im))
+			im = im.astype(np.uint8)
 			# im = (im*0.0001*256).astype(np.uint8)
-			im = ((im*2.75e-05-0.2)*256).astype(np.uint8)
+
+			## im = (im*2.75e-05-0.2)
+			## im = min_max_stretch(im)
+			## print(np.min(im), np.max(im))
+			## im = (im*256).astype(np.uint8)
+
+			# im = ((im*2.75e-05-0.2)*256).astype(np.uint8)
+			mode = 1
+			if mode == 0:
+				for chan in range(im.shape[0]):
+					# im[chan] = exposure.equalize_hist(im[chan])
+					print("im[chan].shape", im[chan].shape)
+					im[chan] = cv2.equalizeHist(im[chan])
+			elif mode == 1:
+				# Contrast stretching
+				p2, p98 = np.percentile(im, (2, 98))
+				im = exposure.rescale_intensity(im, in_range=(p2, p98))
 			
+
 			im = np.transpose(im, (1, 2, 0))[...,0:3]
+			
+
+			# im = np.transpose(im, (1,0,2))
+
 			# im = im[...,0:3]
 			im = im[self.dataset.lims[0]:self.dataset.lims[1], self.dataset.lims[2]:self.dataset.lims[3]] 
 			ims.append(im)
@@ -86,7 +128,20 @@ class LandsatLoaderHistogramMatching(LandsatLoader):
 			im = ((im*2.75e-05-0.2)*256).astype(np.uint8)
 			im = np.transpose(im, (1, 2, 0))[...,0:3]
 			im = im[self.dataset.lims[0]:self.dataset.lims[1], self.dataset.lims[2]:self.dataset.lims[3]] 
+			
+			for chan in range(im.shape[-1]):
+				# im[chan] = exposure.equalize_hist(im[chan])
+				print("im[chan].shape", im[...,chan].shape)
+
+				# Contrast stretching
+				p2, p98 = np.percentile(im[...,chan], (2, 98))
+				im[...,chan] = exposure.rescale_intensity(im[...,chan], in_range=(p2, p98))
+				
+				# im[...,chan] = cv2.equalizeHist(im[...,chan])
+
 			im = match_histograms(im, im_histogram_matching, channel_axis=-1)
 			ims.append(im)
 			# ims.append(im)
+
+
 		return ims

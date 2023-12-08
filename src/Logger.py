@@ -203,7 +203,7 @@ class Logger():
             plt.savefig('output/figures/' + manager.dataset.__class__.__name__ + 'PredictSampleUncertaintyColorbar.png', dpi=150, bbox_inches='tight')
 
 
-    def plotCropSampleLandsat(self, manager, landsat_ims):
+    def plotCropSampleLandsat(self, manager, landsat_ims, show_polygon_text = True):
 
         uncertainty_vlims = [np.min(manager.uncertainty_to_show), np.max(manager.uncertainty_to_show)]
 
@@ -233,13 +233,33 @@ class Logger():
                              'jet', plt.cm.gray, 'jet']
 
             # manager.dataset.hspace = [-0.1, 0.03]
+            print("manager.dataset.previewLims0", manager.dataset.previewLims0)
+            print("manager.dataset.previewLims1", manager.dataset.previewLims1)
+            print("manager.dataset.previewLims2", manager.dataset.previewLims2)
+            print("manager.dataset.previewLims3", manager.dataset.previewLims3)
+            print("manager.dataset.previewLims4", manager.dataset.previewLims4)
+            # print("manager.dataset.previewLims5", manager.dataset.previewLims5)
+            _plt.plotCropSample6(ims[:], 
+                    lims = manager.dataset.previewLims0, 
+                    titles = titles,
+                    cmaps = cmaps,
+                    uncertainty_vlims = uncertainty_vlims,
+                    polygons = manager.dataset.polygons[0],
+                    hspace = manager.dataset.hspace[0],
+                    show_polygon_text = show_polygon_text) # -0.1
+            save_name = 'output/figures/{}PredictSampleUncertaintyLandsat0_exp{}.png'.format(
+                manager.dataset.__class__.__name__, str(manager.exp))
+            plt.savefig(save_name, dpi=150, bbox_inches='tight')
+            
+
             _plt.plotCropSample6(ims[:], 
                     lims = manager.dataset.previewLims1, 
                     titles = titles,
                     cmaps = cmaps,
                     uncertainty_vlims = uncertainty_vlims,
                     polygons = manager.dataset.polygons[0],
-                    hspace = manager.dataset.hspace[0]) # -0.1
+                    hspace = manager.dataset.hspace[0],
+                    show_polygon_text = show_polygon_text) # -0.1
             save_name = 'output/figures/{}PredictSampleUncertaintyLandsat1_exp{}.png'.format(
                 manager.dataset.__class__.__name__, str(manager.exp))
             plt.savefig(save_name, dpi=150, bbox_inches='tight')
@@ -251,11 +271,48 @@ class Logger():
                     cmaps = cmaps,
                     uncertainty_vlims = uncertainty_vlims,
                     polygons = manager.dataset.polygons[1],
-                    hspace = manager.dataset.hspace[1]) # 0.
+                    hspace = manager.dataset.hspace[1],
+                    show_polygon_text = show_polygon_text) # 0.
             save_name = 'output/figures/{}PredictSampleUncertaintyLandsat2_exp{}.png'.format(
                 manager.dataset.__class__.__name__, str(manager.exp))
             plt.savefig(save_name, dpi=150, bbox_inches='tight')
 
+            _plt.plotCropSample6(ims[:], 
+                    lims = manager.dataset.previewLims3, 
+                    titles = titles,
+                    cmaps = cmaps,
+                    uncertainty_vlims = uncertainty_vlims,
+                    polygons = manager.dataset.polygons[1],
+                    hspace = manager.dataset.hspace[1],
+                    show_polygon_text = show_polygon_text) # 0.
+            save_name = 'output/figures/{}PredictSampleUncertaintyLandsat3_exp{}.png'.format(
+                manager.dataset.__class__.__name__, str(manager.exp))
+            plt.savefig(save_name, dpi=150, bbox_inches='tight')
+
+            _plt.plotCropSample6(ims[:], 
+                    lims = manager.dataset.previewLims4, 
+                    titles = titles,
+                    cmaps = cmaps,
+                    uncertainty_vlims = uncertainty_vlims,
+                    polygons = manager.dataset.polygons[1],
+                    hspace = manager.dataset.hspace[1],
+                    show_polygon_text = show_polygon_text) # 0.
+            save_name = 'output/figures/{}PredictSampleUncertaintyLandsat4_exp{}.png'.format(
+                manager.dataset.__class__.__name__, str(manager.exp))
+            plt.savefig(save_name, dpi=150, bbox_inches='tight')
+            '''
+            _plt.plotCropSample6(ims[:], 
+                    lims = manager.dataset.previewLims5, 
+                    titles = titles,
+                    cmaps = cmaps,
+                    uncertainty_vlims = uncertainty_vlims,
+                    polygons = manager.dataset.polygons[1],
+                    hspace = manager.dataset.hspace[1],
+                    show_polygon_text = show_polygon_text) # 0.
+            save_name = 'output/figures/{}PredictSampleUncertaintyLandsat5_exp{}.png'.format(
+                manager.dataset.__class__.__name__, str(manager.exp))
+            plt.savefig(save_name, dpi=150, bbox_inches='tight')
+            '''
             _plt.plotCropSample6(ims[:], 
                     lims = manager.dataset.previewLims2, 
                     titles = titles,
@@ -265,7 +322,9 @@ class Logger():
                     uncertainty_vlims = uncertainty_vlims,
                     polygons = manager.dataset.polygons[1],
                     colorbar = True,
-                    hspace = manager.dataset.hspace[1])
+                    hspace = manager.dataset.hspace[1],
+                    show_polygon_text = show_polygon_text)
+            
             plt.savefig('output/figures/' + manager.dataset.__class__.__name__ + 'PredictSampleUncertaintyLandsatColorbar.png', dpi=150, bbox_inches='tight')
 
 
@@ -308,7 +367,7 @@ class Logger():
                     uncertainty_vlims = uncertainty_vlims,
                     polygons = manager.dataset.polygons[0],
                     hspace = manager.dataset.hspace[0],
-                    show_polygon_text = False) # 0.
+                    show_polygon_text = show_polygon_text) # 0.
             save_name = 'output/figures/{}PredictSampleUncertaintyLandsat0_exp{}.png'.format(
                 manager.dataset.__class__.__name__, str(manager.exp))
             plt.savefig(save_name, dpi=150, bbox_inches='tight')
@@ -364,6 +423,19 @@ class Logger():
             save_name = 'output/figures/{}PredictSampleUncertaintyLandsat4_exp{}.png'.format(
                 manager.dataset.__class__.__name__, str(manager.exp))
             plt.savefig(save_name, dpi=150, bbox_inches='tight')
+
+            _plt.plotCropSample6(ims[:], 
+                    lims = manager.dataset.previewLims5, 
+                    titles = titles,
+                    cmaps = cmaps,
+                    uncertainty_vlims = uncertainty_vlims,
+                    polygons = manager.dataset.polygons[1],
+                    hspace = manager.dataset.hspace[1],
+                    show_polygon_text = False) # 0.
+            save_name = 'output/figures/{}PredictSampleUncertaintyLandsat5_exp{}.png'.format(
+                manager.dataset.__class__.__name__, str(manager.exp))
+            plt.savefig(save_name, dpi=150, bbox_inches='tight')
+
 
 
             _plt.plotCropSample6(ims[:], 
