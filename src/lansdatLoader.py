@@ -43,7 +43,7 @@ class LandsatLoader():
 			## im = (im*256).astype(np.uint8)
 
 			# im = ((im*2.75e-05-0.2)*256).astype(np.uint8)
-			mode = 1
+			mode = 0
 			if mode == 0:
 				for chan in range(im.shape[0]):
 					# im[chan] = exposure.equalize_hist(im[chan])
