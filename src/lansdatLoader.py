@@ -43,17 +43,18 @@ class LandsatLoader():
 			## im = (im*256).astype(np.uint8)
 
 			# im = ((im*2.75e-05-0.2)*256).astype(np.uint8)
-			mode = 0
-			if mode == 0:
-				for chan in range(im.shape[0]):
-					# im[chan] = exposure.equalize_hist(im[chan])
-					print("im[chan].shape", im[chan].shape)
-					im[chan] = cv2.equalizeHist(im[chan])
-			elif mode == 1:
-				# Contrast stretching
-				p2, p98 = np.percentile(im, (2, 98))
-				im = exposure.rescale_intensity(im, in_range=(p2, p98))
-			
+			preprocessing_mode = None
+			if preprocessing_mode != None:
+				if preprocessing_mode == 0:
+					for chan in range(im.shape[0]):
+						# im[chan] = exposure.equalize_hist(im[chan])
+						print("im[chan].shape", im[chan].shape)
+						im[chan] = cv2.equalizeHist(im[chan])
+				elif preprocessing_mode == 1:
+					# Contrast stretching
+					p2, p98 = np.percentile(im, (2, 98))
+					im = exposure.rescale_intensity(im, in_range=(p2, p98))
+				
 
 			im = np.transpose(im, (1, 2, 0))[...,0:3]
 			

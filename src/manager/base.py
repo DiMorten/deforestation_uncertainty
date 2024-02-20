@@ -760,22 +760,22 @@ class Manager():
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
         fig.set_figheight(5)
         fig.set_figwidth(15)
-        ax1.plot(self.m['AA']*100, self.m['precision_L']*100, 'C3-', label="Precision Low Uncertainty")
-        ax1.plot(self.m['AA']*100, self.m['recall_L']*100, 'C3--', label="Recall Low Uncertainty")
-        ax1.plot(self.m['AA']*100, self.m['precision_H']*100, 'C0-', label="Precision High Uncertainty")
-        ax1.plot(self.m['AA']*100, self.m['recall_H']*100, 'C0--', label="Recall High Uncertainty")
-        ax1.plot(self.m['AA']*100, self.m_audited['precision']*100, 'C2-', label="Precision Audited")
-        ax1.plot(self.m['AA']*100, self.m_audited['recall']*100, 'C2--', label="Recall Audited")
+        ax3.plot(self.m['AA']*100, self.m['precision_L']*100, 'C3-', label="Precision Low Uncertainty")
+        ax3.plot(self.m['AA']*100, self.m['recall_L']*100, 'C3--', label="Recall Low Uncertainty")
+        ax3.plot(self.m['AA']*100, self.m['precision_H']*100, 'C0-', label="Precision High Uncertainty")
+        ax3.plot(self.m['AA']*100, self.m['recall_H']*100, 'C0--', label="Recall High Uncertainty")
+        ax3.plot(self.m['AA']*100, self.m_audited['precision']*100, 'C2-', label="Precision Audited")
+        ax3.plot(self.m['AA']*100, self.m_audited['recall']*100, 'C2--', label="Recall Audited")
 
-        ax1.legend(loc="lower right")
-        ax1.set_ylabel('Precision/recall (%)')
-        ax1.set_xlabel('Audit Area (%)')
-        ax1.set_ylim(self.ylim)
-        ax1.set_xlim(self.xlim)
-        ax1.grid()
+        ax3.legend(loc="lower right")
+        ax3.set_ylabel('Precision/recall (%)')
+        ax3.set_xlabel('Audit Area (%)')
+        ax3.set_ylim(self.ylim)
+        ax3.set_xlim(self.xlim)
+        ax3.grid()
 
         xs = [0, 120]
-        ax1.vlines(x = 3, ymin = 0, ymax = max(xs),
+        ax3.vlines(x = 3, ymin = 0, ymax = max(xs),
                 colors = (0.2, 0.2, 0.2),
                 label = 'vline_multiple - full height')
 
@@ -800,14 +800,14 @@ class Manager():
                 colors = (0.2, 0.2, 0.2),
                 label = '3% AA')
 
-        ax3.plot(np.asarray(self.threshold_list), self.m['AA']*100, label="AA")
-        ax3.set_ylabel('Audit Area (%)')
-        ax3.set_xlabel('Uncertainty Threshold')
-        ax3.grid()
-        ax3.set_ylim(self.xlim)
+        ax1.plot(np.asarray(self.threshold_list), self.m['AA']*100, label="AA")
+        ax1.set_ylabel('Audit Area (%)')
+        ax1.set_xlabel('Uncertainty Threshold')
+        ax1.grid()
+        ax1.set_ylim(self.xlim)
 
-        self.xlim_adjusted = ax3.get_xlim()
-        ax3.hlines(y = 3, xmin = self.xlim_adjusted[0], xmax = self.xlim_adjusted[1],
+        self.xlim_adjusted = ax1.get_xlim()
+        ax1.hlines(y = 3, xmin = self.xlim_adjusted[0], xmax = self.xlim_adjusted[1],
                 colors = (0.2, 0.2, 0.2),
                 label = '3% AA')
 
@@ -815,7 +815,7 @@ class Manager():
             self.xlim_adjusted = (0,1)
 
 
-        ax3.set_xlim(self.xlim_adjusted)
+        ax1.set_xlim(self.xlim_adjusted)
 
         # if save_figures == True:
         if True:

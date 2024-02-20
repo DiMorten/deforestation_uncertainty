@@ -204,16 +204,20 @@ class Logger():
 
 
     def plotCropSampleLandsat(self, manager, landsat_ims, show_polygon_text = True):
-
+        show_polygon_text = manager.dataset.use_text
         uncertainty_vlims = [np.min(manager.uncertainty_to_show), np.max(manager.uncertainty_to_show)]
 
         self.plotCropSampleFlag = True
         if self.plotCropSampleFlag == True:
-            ic(manager.dataset.previewLims1, manager.dataset.previewLims2)
-            lims = manager.dataset.previewLims1
-            ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]]))
-            lims = manager.dataset.previewLims2
-            ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
+            for idx, lims in enumerate(manager.dataset.previewLims):
+                ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]]))
+                print("manager.dataset.previewLims {}: {}".format(idx, lims))
+
+            # ic(manager.dataset.previewLims1, manager.dataset.previewLims2)
+            # lims = manager.dataset.previewLims1
+            # ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]]))
+            # lims = manager.dataset.previewLims2
+            # ic(np.unique(manager.mask_test[lims[0]:lims[1], lims[2]:lims[3]], return_counts=True))
 
             ims = [landsat_ims[0], landsat_ims[1], landsat_ims[2],
                     manager.mean_prob, 
@@ -233,12 +237,23 @@ class Logger():
                              'jet', plt.cm.gray, 'jet']
 
             # manager.dataset.hspace = [-0.1, 0.03]
-            print("manager.dataset.previewLims0", manager.dataset.previewLims0)
-            print("manager.dataset.previewLims1", manager.dataset.previewLims1)
-            print("manager.dataset.previewLims2", manager.dataset.previewLims2)
-            print("manager.dataset.previewLims3", manager.dataset.previewLims3)
-            print("manager.dataset.previewLims4", manager.dataset.previewLims4)
-            # print("manager.dataset.previewLims5", manager.dataset.previewLims5)
+
+            for idx, lims in enumerate(manager.dataset.previewLims):
+                print("Saving point of interest number {}. Lims: {}".format(idx, lims))
+                polygons = manager.dataset.polygons[idx] if manager.dataset.use_text else manager.dataset.polygons[0]
+                hspace = manager.dataset.hspace[idx] if manager.dataset.site == 'MT' else manager.dataset.hspace[0]
+                _plt.plotCropSample6(ims[:], 
+                        lims = lims, 
+                        titles = titles,
+                        cmaps = cmaps,
+                        uncertainty_vlims = uncertainty_vlims,
+                        polygons = polygons,
+                        hspace = hspace,
+                        show_polygon_text = show_polygon_text)
+                save_name = 'output/figures/{}PredictSampleUncertaintyLandsat{}_exp{}.png'.format(
+                    manager.dataset.__class__.__name__, idx, str(manager.exp))
+                plt.savefig(save_name, dpi=150, bbox_inches='tight') 
+            '''
             _plt.plotCropSample6(ims[:], 
                     lims = manager.dataset.previewLims0, 
                     titles = titles,
@@ -300,7 +315,7 @@ class Logger():
             save_name = 'output/figures/{}PredictSampleUncertaintyLandsat4_exp{}.png'.format(
                 manager.dataset.__class__.__name__, str(manager.exp))
             plt.savefig(save_name, dpi=150, bbox_inches='tight')
-            '''
+            
             _plt.plotCropSample6(ims[:], 
                     lims = manager.dataset.previewLims5, 
                     titles = titles,

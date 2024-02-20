@@ -94,6 +94,8 @@ class PA(Dataset):
 
 		self.previewLims1 = np.array([2200, 3200, 6900, 7900])
 		self.previewLims2 = np.array([500, 1500, 3500, 4500])
+
+		self.previewLims = [self.previewLims1, self.previewLims2]
 		self.previewBands = [2, 1, 0]
 		self.grid_x, self.grid_y = 5,4
 
@@ -122,6 +124,7 @@ class PA(Dataset):
 
 						[{"coords": [70, 530], "text": "A"},
                         {"coords": [900, 410], "text": "B"}]]
+		self.use_text = True
 		self.prodes_dates_to_print = ['21/07/2018', '24/07/2019', '26/07/2020']
 		self.prodes_dates = [2018, 2019, 2020]
 		self.hspace = [-0.1, -0.1]
@@ -139,6 +142,7 @@ class MT(Dataset):
 		self.previewLims1 = np.array([11500, 12500, 9000, 10000])
 
 		self.previewLims2 = np.array([5000, 6000, 9500, 10500])
+		self.previewLims = [self.previewLims1, self.previewLims2]
 		# self.previewLims2 = np.array([5080, 6000, 9500, 10500])
 		
 		# self.previewLims2 = np.array([5000, 6000, 9420, 10420])
@@ -178,7 +182,7 @@ class MT(Dataset):
 						{"coords": [500, 850], "text": "I"},
 						{"coords": [200, 650], "text": "J"},
 						{"coords": [670, 550], "text": "K"}]]
-		
+		self.use_text = True
 		self.prodes_dates_to_print = ['02/08/2019', '05/08/2020', '22/07/2021']
 		self.prodes_dates = [2019, 2020, 2021]
 		self.hspace = [-0.1, 0.03]
@@ -205,6 +209,7 @@ class MS(Dataset):
 		self.previewLims2 = np.array([13600, 13900, 4450, 4750])
 		self.previewLims3 = np.array([17770, 18070, 14600, 14900])
 		self.previewLims4 = np.array([ 6000,  7000, 15600, 16600])
+		self.previewLims = [self.previewLims0, self.previewLims1, self.previewLims2, self.previewLims3, self.previewLims4]
 
 		'''
 		self.previewLims0 = np.array([6000, 7000, 15600, 16600])
@@ -260,7 +265,8 @@ class MS(Dataset):
 						{"coords": [500, 850], "text": "I"},
 						{"coords": [200, 650], "text": "J"},
 						{"coords": [670, 550], "text": "K"}]]
-		
+		self.use_text = False
+
 		self.prodes_dates_to_print = ['19/07/2019', '21/07/2020', '24/07/2021']
 		self.prodes_dates = [2019, 2020, 2021]
 		self.hspace = [-0.1, -0.1]				# 0,    1,2,3,4,5,6,7,8,9,10,    11,12,13,14,15,16,17,18,19,20  
@@ -286,7 +292,7 @@ class PI(Dataset):
 		self.previewLims4 = np.array([18355, 19355, 10600, 11600]) 
 		self.previewLims5 = np.array([6000, 6500, 14800, 15300])   
 
-
+		self.previewLims = [self.previewLims0, self.previewLims1, self.previewLims2, self.previewLims3, self.previewLims4, self.previewLims5]
 
 		self.site = 'PI' 
 		 
@@ -331,6 +337,7 @@ class PI(Dataset):
 						{"coords": [500, 850], "text": "I"},
 						{"coords": [200, 650], "text": "J"},
 						{"coords": [670, 550], "text": "K"}]]
+		self.use_text = False
 		
 		self.prodes_dates_to_print = ['08/08/2019', '25/07/2020', '28/07/2021']
 		self.prodes_dates = [2019, 2020, 2021]

@@ -369,7 +369,33 @@ class ManagerEvidential2(ManagerMultiOutput):
         self.model = self.network_architecture(input_shape, self.nb_filters, self.class_n, last_activation='relu')
         # ,
         #                                        last_activation='relu'
-        self.model.compile(optimizer=adam, loss=loss, metrics=['accuracy'])
+        
+
+        def loss_error_term(y_truth, y_pred):
+
+            mask = tf.expand_dims(1 - y_truth[:,:,:,-1], axis=-1)
+            y_truth = y_truth[:,:,:,0:2]
+            
+            S = tf.reduce_sum(y_pred, axis=3,keepdims=True)
+            prob = tf.math.divide_no_nan(y_pred,S)
+
+            
+            A = tf.reduce_sum((y_truth-prob)**2, axis=3, keepdims=True) 
+            return A
+
+        def loss_variance_term(y_truth, y_pred):
+
+            mask = tf.expand_dims(1 - y_truth[:,:,:,-1], axis=-1)
+            y_truth = y_truth[:,:,:,0:2]
+            
+            S = tf.reduce_sum(y_pred, axis=3,keepdims=True)
+
+            B = tf.reduce_sum(y_pred*(S-y_pred)/(S*S*(S+1)), axis=3, keepdims=True) 
+            return B
+
+        self.model.compile(optimizer=adam, loss=loss, metrics=['accuracy', loss_error_term, loss_variance_term])
+        # self.model.compile(optimizer=adam, loss=loss, metrics=['accuracy'])
+        
         self.model.summary()
 
         earlystop = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=1, mode='min')
@@ -381,7 +407,7 @@ class ManagerEvidential2(ManagerMultiOutput):
         start_training = time.time()
 
         epochs = 500
-        history_list = []
+        self.history = []
 
         val_loss = Inf
         es = _EarlyStopping(10)
@@ -397,7 +423,7 @@ class ManagerEvidential2(ManagerMultiOutput):
                 validation_data=self.valid_gen_batch,
                 validation_steps=self.len_X_valid*3//self.valid_gen.batch_size,
                 callbacks=callbacks_list)
-            history_list.append(history.history)
+            self.history.append(history.history)
             new_val_loss = round(history.history['val_loss'][-1], 5)
             if new_val_loss < val_loss:
                 # self.model.save(checkpoint_filename)
@@ -416,7 +442,6 @@ class ManagerEvidential2(ManagerMultiOutput):
 
         end_training = time.time() - start_training
         print('Training time: ', end_training)	
-
 
     def getOptimalUncertaintyThreshold(self, AA = 0.03, bounds = None):
 
